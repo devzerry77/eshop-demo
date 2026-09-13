@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Grabby Tech — Product</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+    (function () {
+        try {
+            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            var C = null;
+            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            if (C) {
+                var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
+                if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
+                else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
+            }
+        } catch (e) {}
+    })();
+    </script>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/components.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/pages.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/responsive.css" media="print" onload="this.media='all'" />
+    <noscript>
+        <link rel="stylesheet" href="css/layout.css" />
+        <link rel="stylesheet" href="css/components.css" />
+        <link rel="stylesheet" href="css/pages.css" />
+        <link rel="stylesheet" href="css/responsive.css" />
+    </noscript>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
+                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            </a>
+            <div class="header-actions">
+                <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+                <button class="icon-btn cart-btn" id="pageCartBtn" aria-label="Cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span class="badge-dot" id="pageCartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- CART SIDEBAR -->
+    <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart">
+        <div class="cart-header"><span>Your Cart</span><button id="cartCloseBtn">✕</button></div>
+        <div class="cart-items" id="cartItems"><div class="empty-cart-msg">Your cart is empty.</div></div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Total</span><span id="cartTotalAmount">৳ 0</span></div>
+            <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+        </div>
+    </aside>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="pageToastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="product-page" id="productPage">
+        <div class="container product-container">
+            <a href="index.html" class="back-btn">← Back to Shop</a>
+            <div id="productContent">
+                <div class="product-page-loading">
+                    <div class="loader-spinner"></div>
+                    <p>Loading product...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ZOOM OVERLAY -->
+    <div class="zoom-overlay" id="zoomOverlay">
+        <button class="close-zoom" id="zoomCloseBtn">✕</button>
+        <img id="zoomImage" alt="Zoomed product image" />
+    </div>
+
+    <!-- STICKY BOTTOM BAR -->
+    <div class="sticky-bottom-bar" id="stickyBar">
+        <div class="bar-inner">
+            <div class="bar-left">
+                <button class="bar-wishlist" id="barWishlistBtn">♡</button>
+                <button class="bar-share" id="barShareBtn">↗</button>
+            </div>
+            <div class="bar-center">
+                <button class="bar-add-cart" id="barAddCartBtn">Add to Cart</button>
+            </div>
+            <div class="bar-right">
+                <button class="bar-buy-now" id="barBuyNowBtn">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+            </div>
+            <p class="footer-tagline">Modern gadgets for modern life.</p>
+            <div class="footer-links"><a href="about.html">About</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+            <div class="footer-copy">© 2026 Grabby Tech</div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/pages/product-detail.js"></script>
+</body>
+</html>

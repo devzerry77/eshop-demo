@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Search — Grabby Tech</title>
+    <meta name="description" content="Search products at Grabby Tech. Modern gadgets for modern life." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+    (function () {
+        try {
+            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            var C = null;
+            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            if (C) {
+                var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
+                if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
+                else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
+            }
+        } catch (e) {}
+    })();
+    </script>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/components.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/pages.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/responsive.css" media="print" onload="this.media='all'" />
+    <noscript>
+        <link rel="stylesheet" href="css/layout.css" />
+        <link rel="stylesheet" href="css/components.css" />
+        <link rel="stylesheet" href="css/pages.css" />
+        <link rel="stylesheet" href="css/responsive.css" />
+    </noscript>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <button class="hamburger" id="menuBtn" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
+                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            </a>
+            <div class="search-container" id="searchBar">
+                <div class="search-box">
+                    <svg class="search-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off" aria-label="Search products" />
+                    <button class="search-clear-btn" id="searchClearBtn" type="button" aria-label="Clear search">×</button>
+                    <button class="search-submit-btn" id="searchSubmitBtn" type="button" aria-label="Search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span>Search</span>
+                    </button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions" role="listbox"></div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn wishlist-btn" id="wishlistToggleBtn" aria-label="Wishlist">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span class="badge-dot" id="wishCount">0</span>
+                </button>
+                <button class="icon-btn cart-btn" id="cartToggleBtn" aria-label="Cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span class="badge-dot" id="cartCount">0</span>
+                </button>
+                <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <div class="overlay" id="overlay"></div>
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="sidebar-brand">
+            <button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button>
+            <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+            <span class="brand-title">GRABBY TECH</span>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <h3>SHOP</h3>
+                <ul>
+                    <li><a href="index.html">Collections</a></li>
+                    <li><a href="index.html" data-category="audio">Audio</a></li>
+                    <li><a href="index.html" data-category="electronics">Electronics</a></li>
+                    <li><a href="index.html" data-category="gaming">Gaming</a></li>
+                    <li><a href="index.html" data-category="wearables">Wearables</a></li>
+                    <li><a href="index.html" data-category="accessories">Accessories</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CART SIDEBAR -->
+    <aside class="cart-sidebar" id="cartSidebar" aria-label="Shopping cart">
+        <div class="cart-header">
+            <span>Your Cart</span>
+            <button id="cartCloseBtn" aria-label="Close cart">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="empty-cart-msg">Your cart is empty.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cartTotalAmount">৳ 0</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+        </div>
+    </aside>
+
+    <!-- TOASTS -->
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="container">
+
+            <!-- RESULTS HEADER -->
+            <div class="products-header">
+                <h2 id="searchHeading">Search results</h2>
+                <div class="page-header-actions">
+                    <span class="product-count" id="productCount">0 products</span>
+                    <button class="filter-sort-btn filter-toggle-btn" id="filterBtn" aria-label="Filter">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                        <span class="filter-btn-label">Filter</span>
+                    </button>
+                    <div class="sort-wrap">
+                        <label class="sort-label" for="sortSelect">Sort by</label>
+                        <select class="sort-select sort-select--top" id="sortSelect" aria-label="Sort products">
+                            <option value="featured">Featured</option>
+                            <option value="popularity">Popularity</option>
+                            <option value="newest">Newest</option>
+                            <option value="rating">Customer Review</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="name">Name: A–Z</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Panel -->
+            <div class="filter-panel" id="filterPanel">
+                <div class="filter-panel-header">
+                    <span>Filter</span>
+                    <button id="filterPanelClose">✕</button>
+                </div>
+                <div class="filter-section">
+                    <h4>Category</h4>
+                    <div class="filter-chips">
+                        <button class="filter-chip active" data-category="all">All</button>
+                        <button class="filter-chip" data-category="audio">Audio</button>
+                        <button class="filter-chip" data-category="electronics">Electronics</button>
+                        <button class="filter-chip" data-category="gaming">Gaming</button>
+                        <button class="filter-chip" data-category="wearables">Wearables</button>
+                        <button class="filter-chip" data-category="accessories">Accessories</button>
+                        <button class="filter-chip" data-category="camera">Camera</button>
+                        <button class="filter-chip" data-category="lifestyle">Lifestyle</button>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <button class="button-secondary" id="clearFiltersBtn" style="width:100%;">Clear All Filters</button>
+                </div>
+            </div>
+
+            <!-- SKELETON LOADER -->
+            <div id="productSkeleton" class="skeleton-container">
+                <div class="skeleton-grid"></div>
+            </div>
+
+            <div class="no-products-msg" id="noProductsMsg">No products found.</div>
+            <div class="product-grid" id="productGrid"></div>
+
+            <!-- Infinite scroll loading indicator -->
+            <div class="load-more-wrap" id="loadMoreWrap">
+                <div class="loader" id="loader" style="display:none;">
+                    <div class="spinner"></div>
+                    <span>Loading more...</span>
+                </div>
+                <div class="load-end-msg" id="loadEndMsg" style="display:none;">— You've seen all products —</div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+            </div>
+            <p class="footer-tagline">Modern gadgets for modern life.</p>
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </div>
+            <div class="footer-copy">© 2026 Grabby Tech</div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/pages/search.js"></script>
+</body>
+</html>

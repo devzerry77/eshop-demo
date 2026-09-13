@@ -1,0 +1,200 @@
+/* ═══════════════════════════════════════════════════════════════
+   GRABBY TECH — SILVER THEME (BDT ৳ ONLY)
+   Clean, minimal, silver-grey aesthetic.
+   Presets available via <html data-chrome="silver|light|dark">:
+     ■ default (no attr)  = Silver
+     ■ data-chrome="silver"= Silver   (explicit)
+     ■ data-chrome="light" = Light
+     ■ data-chrome="dark"  = Dark
+   data-theme="dark" toggles each preset's dark variant.
+   Custom colors are applied at runtime via inline CSS custom props.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg: #f1f3f5;
+    --text: #181b20;
+    --text-secondary: #5f6670;
+    --secondary-bg: #e7eaee;
+    --card-bg: #ffffff;
+    --border: #d2d7dd;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow: 0 2px 12px rgba(32, 36, 43, 0.07);
+    --shadow-lg: 0 8px 32px rgba(32, 36, 43, 0.14);
+    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --accent: #20242b;
+    --accent-text: #20242b;
+    --danger: #c0392b;
+    --success: #1e8449;
+    --input-bg: #ffffff;
+    --input-border: #d2d7dd;
+    --input-text: #181b20;
+    --footer-bg: #20242b;
+    --footer-text: #f5f7fa;
+    --footer-text-secondary: #aab2bd;
+    --header-bg: #20242b;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(255, 255, 255, 0.92);
+    --sticky-shadow: 0 -4px 20px rgba(32, 36, 43, 0.08);
+    --silver-grad: linear-gradient(135deg, #dfe3e8 0%, #c3c9d1 50%, #8f97a3 100%);
+    --skeleton-base: #e3e6ea;
+    --skeleton-shine: #f4f6f8;
+}
+
+[data-theme="dark"] {
+    --bg: #0f1115;
+    --text: #e8eaee;
+    --text-secondary: #8b939e;
+    --secondary-bg: #1a1e24;
+    --card-bg: #161a20;
+    --border: #2b313a;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --accent: #2a2f37;
+    --accent-text: #a8b3bf;
+    --input-bg: #1d222a;
+    --input-border: #2f3540;
+    --input-text: #e8eaee;
+    --footer-bg: #0a0c0f;
+    --footer-text: #e8eaee;
+    --footer-text-secondary: #8b939e;
+    --header-bg: #0a0c0f;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(22, 26, 32, 0.92);
+    --sticky-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);
+    --skeleton-base: #232a33;
+    --skeleton-shine: #2f3742;
+}
+
+/* ─── PRESET: SILVER (explicit) ─── */
+:root[data-chrome="silver"] {
+    --bg: #f1f3f5;
+    --text: #181b20;
+    --text-secondary: #5f6670;
+    --secondary-bg: #e7eaee;
+    --card-bg: #ffffff;
+    --border: #d2d7dd;
+    --accent: #20242b;
+    --input-bg: #ffffff;
+    --input-border: #d2d7dd;
+    --input-text: #181b20;
+    --footer-bg: #20242b;
+    --footer-text: #f5f7fa;
+    --header-bg: #20242b;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(255, 255, 255, 0.92);
+    --silver-grad: linear-gradient(135deg, #dfe3e8 0%, #c3c9d1 50%, #8f97a3 100%);
+    --skeleton-base: #e3e6ea;
+    --skeleton-shine: #f4f6f8;
+}
+:root[data-chrome="silver"][data-theme="dark"] {
+    --bg: #0f1115;
+    --text: #e8eaee;
+    --text-secondary: #8b939e;
+    --secondary-bg: #1a1e24;
+    --card-bg: #161a20;
+    --border: #2b313a;
+    --accent: #2a2f37;
+    --input-bg: #1d222a;
+    --input-border: #2f3540;
+    --input-text: #e8eaee;
+    --footer-bg: #0a0c0f;
+    --footer-text: #e8eaee;
+    --header-bg: #0a0c0f;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(22, 26, 32, 0.92);
+    --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);
+    --skeleton-base: #232a33;
+    --skeleton-shine: #2f3742;
+}
+
+/* ─── PRESET: LIGHT ─── */
+:root[data-chrome="light"] {
+    --bg: #ffffff;
+    --text: #14171c;
+    --text-secondary: #5b6470;
+    --secondary-bg: #e9ebef;
+    --card-bg: #ffffff;
+    --border: #d8dce2;
+    --accent: #23282f;
+    --input-bg: #ffffff;
+    --input-border: #d8dce2;
+    --input-text: #14171c;
+    --footer-bg: #23282f;
+    --footer-text: #f5f7fa;
+    --header-bg: #23282f;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(255, 255, 255, 0.92);
+    --silver-grad: linear-gradient(135deg, #e4e7ea 0%, #c9ced4 50%, #98a0ab 100%);
+    --skeleton-base: #e7e9ec;
+    --skeleton-shine: #f7f8f9;
+}
+:root[data-chrome="light"][data-theme="dark"] {
+    --bg: #101014;
+    --text: #eceef1;
+    --text-secondary: #9098a3;
+    --secondary-bg: #1c1f25;
+    --card-bg: #181b21;
+    --border: #2c313a;
+    --accent: #2b3038;
+    --input-bg: #1e2229;
+    --input-border: #30353f;
+    --input-text: #eceef1;
+    --footer-bg: #0b0c10;
+    --footer-text: #eceef1;
+    --header-bg: #0b0c10;
+    --header-text: #f7f8fa;
+    --sticky-bg: rgba(24, 27, 33, 0.92);
+    --silver-grad: linear-gradient(135deg, #3d444f 0%, #292f38 50%, #1c2128 100%);
+    --skeleton-base: #252a32;
+    --skeleton-shine: #313842;
+}
+
+/* ─── PRESET: DARK ─── */
+:root[data-chrome="dark"] {
+    --bg: #0f1115;
+    --text: #e8eaee;
+    --text-secondary: #8b939e;
+    --secondary-bg: #1a1e24;
+    --card-bg: #161a20;
+    --border: #2b313a;
+    --accent: #2a2f37;
+    --accent-text: #a8b3bf;
+    --input-bg: #1d222a;
+    --input-border: #2f3540;
+    --input-text: #e8eaee;
+    --footer-bg: #0a0c0f;
+    --footer-text: #e8eaee;
+    --footer-text-secondary: #8b939e;
+    --header-bg: #0a0c0f;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(22, 26, 32, 0.92);
+    --sticky-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);
+    --skeleton-base: #232a33;
+    --skeleton-shine: #2f3742;
+}
+:root[data-chrome="dark"][data-theme="dark"] {
+    --bg: #0f1115;
+    --text: #e8eaee;
+    --text-secondary: #8b939e;
+    --secondary-bg: #1a1e24;
+    --card-bg: #161a20;
+    --border: #2b313a;
+    --accent: #2a2f37;
+    --input-bg: #1d222a;
+    --input-border: #2f3540;
+    --input-text: #e8eaee;
+    --footer-bg: #0a0c0f;
+    --footer-text: #e8eaee;
+    --header-bg: #0a0c0f;
+    --header-text: #f5f7fa;
+    --sticky-bg: rgba(22, 26, 32, 0.92);
+    --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);
+    --skeleton-base: #232a33;
+    --skeleton-shine: #2f3742;
+}

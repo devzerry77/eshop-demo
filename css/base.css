@@ -1,0 +1,14 @@
+/* ─── RESET ─── */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); overflow-x:hidden; -webkit-font-smoothing:antialiased; transition:background 0.3s, color 0.3s; }
+a { text-decoration:none; color:inherit; }
+button { cursor:pointer; border:none; background:none; font:inherit; }
+img { display:block; max-width:100%; }
+ul { list-style:none; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:#ddd; border-radius:10px; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background:#333; }
