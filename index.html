@@ -60,6 +60,14 @@
     @keyframes skeletonFadeOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(8px); } }
     @keyframes dotPulse { 0%,80%,100% { transform:scale(0.6); opacity:0.4; } 40% { transform:scale(1); opacity:1; } }
     </style>
+    <style>
+    :root { --bg:#f1f3f5; --text:#181b20; }
+    :root[data-theme="dark"] { --bg:#0f1115; --text:#e8eaee; }
+    :root[data-chrome="light"] { --bg:#ffffff; --text:#14171c; }
+    :root[data-chrome="light"][data-theme="dark"] { --bg:#101014; --text:#eceef1; }
+    :root[data-chrome="dark"] { --bg:#0f1115; --text:#e8eaee; }
+    html, body { background-color:var(--bg,#0f1115); color:var(--text,#e8eaee); }
+    </style>
     <link rel="stylesheet" href="css/variables.css" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'" />
