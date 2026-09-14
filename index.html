@@ -86,6 +86,9 @@
             <a href="index.html" class="logo" aria-label="Grabby Tech Home">
                 <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
             </a>
+            <a href="index.html" class="header-home" data-home-link aria-label="Home">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22v-8h6v8"/></svg>
+            </a>
             <div class="search-container" id="searchBar">
                 <div class="search-box">
                     <svg class="search-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -103,6 +106,9 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     <span class="badge-dot" id="wishCount">0</span>
                 </button>
+                <a class="icon-btn account-btn" data-account-link href="login.html" aria-label="Account">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </a>
                 <button class="icon-btn cart-btn" id="cartToggleBtn" aria-label="Cart">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     <span class="badge-dot" id="cartCount">0</span>
@@ -129,14 +135,20 @@
         </div>
         <div class="sidebar-menu">
             <div class="menu-section">
+                <h3>MAIN</h3>
+                <ul>
+                    <li><a href="index.html" data-home-link>Home</a></li>
+                </ul>
+            </div>
+            <div class="menu-section">
                 <h3>SHOP</h3>
                 <ul>
-                    <li><a href="index.html">Collections</a></li>
-                    <li><a href="#" data-category="audio">Audio</a></li>
-                    <li><a href="#" data-category="electronics">Electronics</a></li>
-                    <li><a href="#" data-category="gaming">Gaming</a></li>
-                    <li><a href="#" data-category="wearables">Wearables</a></li>
-                    <li><a href="#" data-category="accessories">Accessories</a></li>
+                    <li><a href="collection.html?category=all">Collections</a></li>
+                    <li><a href="collection.html?category=audio">Audio</a></li>
+                    <li><a href="collection.html?category=electronics">Electronics</a></li>
+                    <li><a href="collection.html?category=gaming">Gaming</a></li>
+                    <li><a href="collection.html?category=wearables">Wearables</a></li>
+                    <li><a href="collection.html?category=accessories">Accessories</a></li>
                 </ul>
             </div>
             <div class="menu-section">
@@ -344,6 +356,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/components/home-link.js"></script>
+    <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/home.js"></script>
     <script type="module">
     (async function() {

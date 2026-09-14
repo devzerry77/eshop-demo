@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Search — Grabby Tech</title>
-    <meta name="description" content="Search products at Grabby Tech. Modern gadgets for modern life." />
+    <title>Collections — Grabby Tech</title>
+    <meta name="description" content="Shop by collection at Grabby Tech. Audio, electronics, gaming, wearables and more." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -106,6 +106,12 @@
                     <li><a href="collection.html?category=accessories">Accessories</a></li>
                 </ul>
             </div>
+            <div class="menu-section">
+                <h3>ABOUT</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -127,6 +133,17 @@
         </div>
     </aside>
 
+    <!-- WISHLIST SIDEBAR -->
+    <aside class="cart-sidebar wishlist-sidebar" id="wishlistSidebar" aria-label="Your wishlist">
+        <div class="cart-header">
+            <span>Your Wishlist <span class="wishlist-count" id="wishlistPanelCount"></span></span>
+            <button id="wishlistCloseBtn" aria-label="Close wishlist">✕</button>
+        </div>
+        <div class="cart-items" id="wishlistItems">
+            <div class="empty-cart-msg">Your wishlist is empty.</div>
+        </div>
+    </aside>
+
     <!-- TOASTS -->
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
@@ -134,15 +151,11 @@
     <main class="main">
         <div class="container">
 
-            <!-- RESULTS HEADER -->
+            <!-- COLLECTION HEADER -->
             <div class="products-header">
-                <h2 id="searchHeading">Search results</h2>
+                <h2 id="collectionHeading">Collection</h2>
                 <div class="page-header-actions">
                     <span class="product-count" id="productCount">0 products</span>
-                    <button class="filter-sort-btn filter-toggle-btn" id="filterBtn" aria-label="Filter">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-                        <span class="filter-btn-label">Filter</span>
-                    </button>
                     <div class="sort-wrap">
                         <label class="sort-label" for="sortSelect">Sort by</label>
                         <select class="sort-select sort-select--top" id="sortSelect" aria-label="Sort products">
@@ -155,30 +168,6 @@
                             <option value="name">Name: A–Z</option>
                         </select>
                     </div>
-                </div>
-            </div>
-
-            <!-- Filter Panel -->
-            <div class="filter-panel" id="filterPanel">
-                <div class="filter-panel-header">
-                    <span>Filter</span>
-                    <button id="filterPanelClose">✕</button>
-                </div>
-                <div class="filter-section">
-                    <h4>Category</h4>
-                    <div class="filter-chips">
-                        <button class="filter-chip active" data-category="all">All</button>
-                        <button class="filter-chip" data-category="audio">Audio</button>
-                        <button class="filter-chip" data-category="electronics">Electronics</button>
-                        <button class="filter-chip" data-category="gaming">Gaming</button>
-                        <button class="filter-chip" data-category="wearables">Wearables</button>
-                        <button class="filter-chip" data-category="accessories">Accessories</button>
-                        <button class="filter-chip" data-category="camera">Camera</button>
-                        <button class="filter-chip" data-category="lifestyle">Lifestyle</button>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <button class="button-secondary" id="clearFiltersBtn" style="width:100%;">Clear All Filters</button>
                 </div>
             </div>
 
@@ -223,6 +212,6 @@
     <script type="module" src="js/components/mobile-nav.js"></script>
     <script type="module" src="js/components/home-link.js"></script>
     <script type="module" src="js/components/account-link.js"></script>
-    <script type="module" src="js/pages/search.js"></script>
+    <script type="module" src="js/pages/collection.js"></script>
 </body>
 </html>

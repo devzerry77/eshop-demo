@@ -769,24 +769,6 @@ function bindEvents() {
         });
     });
 
-    document.querySelectorAll('.sidebar-menu a[data-category]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const cat = link.dataset.category;
-            currentCategory = cat;
-            displayedCount = 8;
-            allLoaded = false;
-            document.querySelectorAll('.filter-chip').forEach(b => {
-                b.classList.toggle('active', b.dataset.category === cat);
-            });
-            renderProducts(true);
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            setTimeout(() => setupInfiniteScroll(), 200);
-        });
-    });
-
     if (sortSelect) sortSelect.addEventListener('change', (e) => {
         currentSort = e.target.value;
         displayedCount = 8;

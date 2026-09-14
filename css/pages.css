@@ -400,6 +400,23 @@
 .address-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
 .address-card:focus-within { border-color:var(--accent-text); }
 
+/* Account Settings (profile page) */
+.account-settings { margin-top:1.5rem; }
+.account-settings h2 { font-size:1.25rem; font-weight:700; margin-bottom:1rem; }
+.auth-provider-note { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; color:var(--text-secondary); font-size:0.9rem; line-height:1.6; }
+.auth-provider-note strong { color:var(--text); font-weight:600; }
+.auth-form { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem 1.4rem; }
+.auth-form h3 { font-size:1.05rem; font-weight:700; margin-bottom:1rem; }
+.auth-form .field { margin-bottom:0.9rem; }
+.auth-form .field label { display:block; font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem; }
+.auth-form .field input { width:100%; padding:0.7rem 0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--secondary-bg); color:var(--text); font-size:0.88rem; transition:border-color 0.2s; box-sizing:border-box; }
+.auth-form .field input:focus { outline:none; border-color:var(--accent-text); }
+.auth-form .form-error { color:var(--danger); font-size:0.82rem; margin-bottom:0.8rem; }
+.auth-form .form-success { color:var(--success); font-size:0.82rem; margin-bottom:0.8rem; }
+.auth-form .form-btn-row { display:flex; gap:0.7rem; flex-wrap:wrap; }
+.auth-form .form-btn-row .btn-save { flex:1 1 auto; min-width:140px; }
+.auth-form .form-btn-row .btn-cancel { flex:0 0 auto; }
+
 /* ═══════════════════════════════════════════════════════════════
    ABOUT PAGE
    ═══════════════════════════════════════════════════════════════ */

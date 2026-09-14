@@ -239,6 +239,109 @@ async function handleAddressAction(supabase, user, action, id, renderList) {
     }
 }
 
+function renderAccountSettings(supabase, user) {
+    const slot = document.getElementById('accountSettingsSlot');
+    if (!slot) return;
+    const providers = (user.app_metadata && user.app_metadata.provider) || [];
+    const isGoogleUser = providers.includes('google');
+    const email = user.email || '';
+
+    slot.innerHTML = `
+        <div class="account-settings">
+            <h2>Account Settings</h2>
+            ${isGoogleUser
+                ? `<div class="auth-provider-note">
+                       <strong>Google Account:</strong> Your password is managed by Google and cannot be changed here. To update your password, please visit your Google account settings.
+                   </div>`
+                : `<div class="auth-form" id="passwordChangeForm">
+                       <h3>Change Password</h3>
+                       <div class="field"><label for="currentPassword">Current Password *</label><input type="password" id="currentPassword" autocomplete="current-password" /></div>
+                       <div class="field"><label for="newPassword">New Password *</label><input type="password" id="newPassword" autocomplete="new-password" /></div>
+                       <div class="field"><label for="confirmPassword">Confirm New Password *</label><input type="password" id="confirmPassword" autocomplete="new-password" /></div>
+                       <div class="form-error" id="passwordError"></div>
+                       <div class="form-success" id="passwordSuccess"></div>
+                       <div class="form-btn-row"><button type="button" class="button button-primary btn-save" id="savePasswordBtn">Update Password</button></div>
+                   </div>`
+            }
+            <div class="auth-form" id="emailChangeForm" style="margin-top:1rem;">
+                <h3>Change Email</h3>
+                <div class="field"><label>Current Email</label><input type="email" value="${email}" disabled style="opacity:0.7; cursor:default;" /></div>
+                <div class="field"><label for="newEmail">New Email *</label><input type="email" id="newEmail" autocomplete="email" /></div>
+                <div class="form-error" id="emailError"></div>
+                <div class="form-success" id="emailSuccess"></div>
+                <div class="form-btn-row"><button type="button" class="button button-primary btn-save" id="saveEmailBtn">Update Email</button></div>
+            </div>
+        </div>
+    `;
+
+    if (!isGoogleUser) {
+        const savePwdBtn = document.getElementById('savePasswordBtn');
+        if (savePwdBtn) savePwdBtn.addEventListener('click', async () => {
+            const errEl = document.getElementById('passwordError');
+            const okEl = document.getElementById('passwordSuccess');
+            const cur = (document.getElementById('currentPassword') || {}).value || '';
+            const pwd = (document.getElementById('newPassword') || {}).value || '';
+            const cfm = (document.getElementById('confirmPassword') || {}).value || '';
+            if (errEl) errEl.textContent = '';
+            if (okEl) okEl.textContent = '';
+            if (!cur) { if (errEl) errEl.textContent = 'Please enter your current password.'; return; }
+            if (pwd.length < 6) { if (errEl) errEl.textContent = 'Password must be at least 6 characters long.'; return; }
+            if (pwd !== cfm) { if (errEl) errEl.textContent = 'New passwords do not match.'; return; }
+            if (pwd === cur) { if (errEl) errEl.textContent = 'New password must be different from your current password.'; return; }
+            savePwdBtn.disabled = true;
+            savePwdBtn.textContent = 'Updating…';
+            try {
+                const { error: authErr } = await supabase.auth.signInWithPassword({ email, password: cur });
+                if (authErr) {
+                    if (errEl) errEl.textContent = 'Current password is incorrect.';
+                    savePwdBtn.disabled = false;
+                    savePwdBtn.textContent = 'Update Password';
+                    return;
+                }
+                const { error } = await supabase.auth.updateUser({ password: pwd });
+                if (error) {
+                    if (errEl) errEl.textContent = error.message || 'Failed to update password.';
+                } else {
+                    if (okEl) okEl.textContent = 'Password updated successfully.';
+                    const f = document.getElementById('currentPassword'); if (f) f.value = '';
+                    const n = document.getElementById('newPassword'); if (n) n.value = '';
+                    const c = document.getElementById('confirmPassword'); if (c) c.value = '';
+                }
+            } catch (e) {
+                if (errEl) errEl.textContent = 'Something went wrong. Please try again.';
+            }
+            savePwdBtn.disabled = false;
+            savePwdBtn.textContent = 'Update Password';
+        });
+    }
+
+    const saveEmailBtn = document.getElementById('saveEmailBtn');
+    if (saveEmailBtn) saveEmailBtn.addEventListener('click', async () => {
+        const errEl = document.getElementById('emailError');
+        const okEl = document.getElementById('emailSuccess');
+        const newEmail = ((document.getElementById('newEmail') || {}).value || '').trim();
+        if (errEl) errEl.textContent = '';
+        if (okEl) okEl.textContent = '';
+        if (!newEmail) { if (errEl) errEl.textContent = 'Please enter a new email address.'; return; }
+        if (newEmail.toLowerCase() === email.toLowerCase()) { if (errEl) errEl.textContent = 'New email must be different from your current email.'; return; }
+        saveEmailBtn.disabled = true;
+        saveEmailBtn.textContent = 'Updating…';
+        try {
+            const { error } = await supabase.auth.updateUser({ email: newEmail });
+            if (error) {
+                if (errEl) errEl.textContent = error.message || 'Failed to update email.';
+            } else {
+                if (okEl) okEl.textContent = 'A verification link has been sent to your new email address. Please check your inbox and confirm the change.';
+                const f = document.getElementById('newEmail'); if (f) f.value = '';
+            }
+        } catch (e) {
+            if (errEl) errEl.textContent = 'Something went wrong. Please try again.';
+        }
+        saveEmailBtn.disabled = false;
+        saveEmailBtn.textContent = 'Update Email';
+    });
+}
+
 function renderSignedIn(supabase, user) {
     const name = firstNameOf(user);
     const email = user.email || '';
@@ -257,6 +360,7 @@ function renderSignedIn(supabase, user) {
             </div>
         </div>
         <div id="addressBookSlot"></div>
+        <div id="accountSettingsSlot"></div>
     `;
     document.getElementById('logoutBtn')?.addEventListener('click', async () => {
         if (!supabase) {
@@ -271,6 +375,7 @@ function renderSignedIn(supabase, user) {
         }
     });
     renderAddressBook(supabase, user);
+    renderAccountSettings(supabase, user);
 }
 
 async function renderProfile() {
