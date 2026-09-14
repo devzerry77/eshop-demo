@@ -25,6 +25,11 @@
     <script>
     (function () {
         try {
+            var params = new URLSearchParams(window.location.search);
+            var hash = window.location.hash || '';
+            var isOAuth = params.has('code') || params.has('state') || params.has('error')
+                           || hash.indexOf('access_token') !== -1;
+            if (isOAuth) return;
             var intent = sessionStorage.getItem('grabby_auth_return');
             if (intent) {
                 sessionStorage.removeItem('grabby_auth_return');
@@ -310,5 +315,38 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
     <script type="module" src="js/pages/home.js"></script>
+    <script type="module">
+    (async function() {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var hash = window.location.hash || '';
+            var isOAuth = params.has('code') || params.has('error') || hash.indexOf('access_token') !== -1;
+            if (!isOAuth) return;
+            if (params.has('error')) {
+                var errUrl = 'login.html?error=' + encodeURIComponent(params.get('error'));
+                if (params.has('error_description')) errUrl += '&error_description=' + encodeURIComponent(params.get('error_description'));
+                sessionStorage.removeItem('grabby_auth_return');
+                window.location.replace(errUrl);
+                return;
+            }
+            var { createClient } = await import('./js/supabase/client.js');
+            var supabase = createClient();
+            if (!supabase) return;
+            await supabase.auth.getSession();
+            var intent = sessionStorage.getItem('grabby_auth_return');
+            if (intent) {
+                sessionStorage.removeItem('grabby_auth_return');
+                var u = new URL(intent, window.location.origin);
+                if (u.origin === window.location.origin) {
+                    window.location.replace(u.href);
+                    return;
+                }
+            }
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.pathname);
+            }
+        } catch (e) {}
+    })();
+    </script>
 </body>
 </html>

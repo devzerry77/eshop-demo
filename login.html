@@ -76,10 +76,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module">
-        import { initAuthModal, openAuthModal } from './js/components/auth-modal.js';
+        import { initAuthModal, openAuthModal, checkOAuthErrorAndShow } from './js/components/auth-modal.js';
         import { loadTheme, toggleTheme, loadSitePalette } from './js/core/theme.js';
         initAuthModal();
-        openAuthModal({ mode: 'signin' });
+        var params = new URLSearchParams(window.location.search);
+        var errorNotice = null;
+        if (params.has('error_description')) errorNotice = decodeURIComponent(params.get('error_description'));
+        else if (params.has('error')) errorNotice = 'Google sign-in failed: ' + decodeURIComponent(params.get('error'));
+        if (errorNotice) {
+            openAuthModal({ mode: 'signin', notice: errorNotice });
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.pathname);
+            }
+        } else {
+            checkOAuthErrorAndShow();
+            openAuthModal({ mode: 'signin' });
+        }
         loadTheme();
         loadSitePalette();
         document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
