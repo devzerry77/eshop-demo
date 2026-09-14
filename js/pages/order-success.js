@@ -47,7 +47,7 @@ async function loadOrder() {
             <div class="detail-row"><span>Order Number</span><span>${order.order_number}</span></div>
             <div class="detail-row"><span>Date</span><span>${new Date(order.created_at).toLocaleString()}</span></div>
             <div class="detail-row"><span>Payment Method</span><span>${order.payment_method}</span></div>
-            <div class="detail-row"><span>Status</span><span>${order.status.toUpperCase()}</span></div>
+            <div class="detail-row"><span>Status</span><span class="order-status ${order.status}">${order.status.toUpperCase()}</span></div>
             <div style="margin:0.5rem 0 0.2rem;"><strong>Items</strong></div>
             ${itemsHtml}
             <div class="detail-row" style="font-weight:700; margin-top:0.5rem;"><span>Total</span><span>${formatPrice(order.total_amount)}</span></div>

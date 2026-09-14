@@ -345,7 +345,7 @@ async function loadProduct() {
                     <button class="detail-wish-btn ${isWish ? 'liked' : ''}" id="detailWishBtn">${isWish ? '♥' : '♡'}</button>
                 </div>
                 <div class="product-detail-meta">
-                    <span>📦 ${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                    <span class="${p.inStock ? 'stock-in' : 'stock-out'}">📦 ${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
                     <span>Verified Product ✅</span>
                     <span>↩️ 7-day return</span>
                 </div>

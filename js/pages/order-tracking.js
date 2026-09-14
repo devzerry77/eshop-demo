@@ -51,7 +51,7 @@ async function trackOrder(orderId, phone) {
         document.getElementById('trackResult').innerHTML = `
             <div style="margin-top:1rem;">
                 <h3 style="margin-bottom:0.5rem;">Order #${order.order_number}</h3>
-                <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+                <p><strong>Status:</strong> <span class="order-status ${order.status}">${order.status.toUpperCase()}</span></p>
                 <p><strong>Total:</strong> ${formatPrice(order.total_amount)}</p>
                 <p><strong>Payment:</strong> ${order.payment_method}</p>
                 <div style="margin:1rem 0;"><strong>Items</strong></div>

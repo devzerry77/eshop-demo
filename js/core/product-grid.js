@@ -5,7 +5,7 @@ import { getCartItem } from './storage.js';
 export function buildProductCardHTML(p, idx, cart = [], wishlist = new Set()) {
     const inCart = getCartItem(cart, p.id);
     const isWish = wishlist.has(p.id);
-    const badgeClass = p.badge === 'Sale' ? 'sale' : 'stock';
+    const badgeClass = p.badge === 'Sale' ? 'sale' : (!p.inStock ? 'stock' : 'in-stock');
     const badgeHtml = p.badge ? `<span class="badge ${badgeClass}">${escapeHtml(p.badge)}</span>` : '';
     const btnText = p.inStock ? (inCart ? '✓ In Cart' : 'Add to Cart') : 'Sold Out';
     const btnDisabled = !p.inStock;
