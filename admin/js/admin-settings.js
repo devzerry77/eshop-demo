@@ -142,6 +142,7 @@
         'flash_accent', 'flash_duration_minutes'
     ];
     let flashSelectedIds = [];
+    let heroSlides = [];
 
     function updateFlashAutoplayLabel() {
         if (!DOM.flashAutoplay || !DOM.flashAutoplayLabel) return;
@@ -235,6 +236,281 @@
         populateFlashProductSelect();
         DOM.flashStatus.textContent = 'Reset to default — click Save to publish';
         setTimeout(() => { DOM.flashStatus.textContent = ''; }, 3000);
+    }
+
+    // ─── HERO / TOP BANNER CAROUSEL ──────────────────────────
+    const HERO_KEYS = ['hero_enabled', 'hero_title', 'hero_autoplay_ms', 'hero_slides'];
+
+    function defaultHeroSlides() {
+        return [];
+    }
+
+    function heroProductOptionsHTML(selected) {
+        const products = STATE.allProducts && STATE.allProducts.length ? STATE.allProducts : STATE.products;
+        if (!products || !products.length) return '<option value="">No products yet</option>';
+        return `<option value="">Choose product…</option>` + products.map(p =>
+            `<option value="${escapeHTML(p.id)}" ${String(p.id) === String(selected) ? 'selected' : ''}>${escapeHTML(p.title)} (৳${Math.round(Number(p.price) || 0)})</option>`
+        ).join('');
+    }
+
+    function heroSlidePreviewHTML(slide) {
+        const url = (slide.url || '').trim();
+        if (!url) return '<span style="font-size:12px;color:var(--text-secondary);">?</span>';
+        if (slide.type === 'youtube' || admin.isYouTubeUrl(url)) {
+            const thumb = admin.getYouTubeThumbnail(url);
+            if (thumb) return `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+        return `<img src="${escapeHTML(url)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='❌';">`;
+    }
+
+    function renderHeroSlides() {
+        const container = DOM.heroSlidesList;
+        if (!container) return;
+        const slides = heroSlides;
+        container.innerHTML = slides.map((slide, idx) => {
+            const isYouTube = slide.type === 'youtube' || admin.isYouTubeUrl(slide.url);
+            const type = slide.type && slide.type !== 'image' ? slide.type : (isYouTube ? 'youtube' : 'image');
+            return `
+                <div class="hero-slide-row" data-idx="${idx}" style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; background:var(--surface); display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:56px; height:56px; border-radius:8px; overflow:hidden; background:var(--secondary-bg); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px;">
+                            ${heroSlidePreviewHTML(slide)}
+                        </span>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:6px; min-width:0;">
+                            <select class="hero-slide-type" style="padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">
+                                <option value="image" ${type === 'image' ? 'selected' : ''}>🖼️ Image</option>
+                                <option value="video" ${type === 'video' ? 'selected' : ''}>🎬 Video (mp4/webm)</option>
+                                <option value="youtube" ${type === 'youtube' ? 'selected' : ''}>▶️ YouTube</option>
+                            </select>
+                            <input class="hero-slide-url" type="text" placeholder="Image / video / YouTube URL" value="${escapeHTML(slide.url || '')}" style="padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text); width:100%;">
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+                            <label style="display:flex; align-items:center; gap:4px; font-size:0.72rem; color:var(--text-secondary);">
+                                <input type="checkbox" class="hero-slide-enabled" ${slide.enabled !== false ? 'checked' : ''}> On
+                            </label>
+                            <button type="button" class="hero-slide-remove" style="padding:4px 10px; font-size:12px; background:var(--danger); color:#fff; border-radius:6px;">✕</button>
+                            <button type="button" class="hero-slide-up" style="padding:4px 10px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);" ${idx === 0 ? 'disabled' : ''}>▲</button>
+                            <button type="button" class="hero-slide-down" style="padding:4px 10px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);" ${idx === slides.length - 1 ? 'disabled' : ''}>▼</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <input class="hero-slide-title" type="text" placeholder="Slide title (optional)" value="${escapeHTML(slide.title || '')}" style="flex:1; min-width:120px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">
+                        <select class="hero-slide-link-type" style="padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">
+                            <option value="none" ${!slide.link_target ? 'selected' : ''}>🔗 No link</option>
+                            <option value="product" ${slide.link_target === 'product' ? 'selected' : ''}>🏷️ Product</option>
+                            <option value="url" ${slide.link_target === 'url' ? 'selected' : ''}>🌐 Custom URL</option>
+                        </select>
+                        ${slide.link_target === 'product'
+                            ? `<select class="hero-slide-product" style="flex:1; min-width:140px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">${heroProductOptionsHTML(slide.link_value)}</select>`
+                            : ''}
+                        ${slide.link_target === 'url'
+                            ? `<input class="hero-slide-url-value" type="text" placeholder="https://…" value="${escapeHTML(slide.link_value || '')}" style="flex:1; min-width:140px; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">`
+                            : ''}
+                        <button type="button" class="hero-slide-upload" style="padding:5px 10px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text);">📤 Upload</button>
+                        <input type="file" accept="image/*" class="hero-slide-file" style="display:none;">
+                    </div>
+                </div>`;
+        }).join('');
+        bindHeroSlideEvents(container);
+        bindHeroFileInputs(container);
+    }
+
+    function bindHeroSlideEvents(container) {
+        container.onclick = function (e) {
+            const row = e.target.closest('.hero-slide-row');
+            if (!row) return;
+            const idx = parseInt(row.dataset.idx);
+            if (e.target.closest('.hero-slide-remove')) {
+                e.preventDefault();
+                heroSlides.splice(idx, 1);
+                renderHeroSlides();
+                return;
+            }
+            if (e.target.closest('.hero-slide-up')) {
+                if (idx > 0) {
+                    const t = heroSlides[idx - 1];
+                    heroSlides[idx - 1] = heroSlides[idx];
+                    heroSlides[idx] = t;
+                    renderHeroSlides();
+                }
+                return;
+            }
+            if (e.target.closest('.hero-slide-down')) {
+                if (idx < heroSlides.length - 1) {
+                    const t = heroSlides[idx + 1];
+                    heroSlides[idx + 1] = heroSlides[idx];
+                    heroSlides[idx] = t;
+                    renderHeroSlides();
+                }
+                return;
+            }
+        };
+        container.onchange = function (e) {
+            const row = e.target.closest('.hero-slide-row');
+            if (!row) return;
+            const idx = parseInt(row.dataset.idx);
+            const slide = heroSlides[idx];
+            if (!slide) return;
+            if (e.target.classList.contains('hero-slide-type')) {
+                slide.type = e.target.value;
+                renderHeroSlides();
+                return;
+            }
+            if (e.target.classList.contains('hero-slide-enabled')) {
+                slide.enabled = e.target.checked;
+                return;
+            }
+            if (e.target.classList.contains('hero-slide-link-type')) {
+                slide.link_target = e.target.value;
+                if (slide.link_target === 'none') delete slide.link_value;
+                renderHeroSlides();
+                return;
+            }
+            if (e.target.classList.contains('hero-slide-product')) {
+                slide.link_value = e.target.value;
+            }
+        };
+        container.oninput = function (e) {
+            const row = e.target.closest('.hero-slide-row');
+            if (!row) return;
+            const idx = parseInt(row.dataset.idx);
+            const slide = heroSlides[idx];
+            if (!slide) return;
+            if (e.target.classList.contains('hero-slide-url')) {
+                slide.url = e.target.value;
+                const th = row.querySelector('.hero-slide-type');
+                if (th && admin.isYouTubeUrl(e.target.value)) {
+                    th.value = 'youtube';
+                    slide.type = 'youtube';
+                }
+            } else if (e.target.classList.contains('hero-slide-title')) {
+                slide.title = e.target.value;
+            } else if (e.target.classList.contains('hero-slide-url-value')) {
+                slide.link_value = e.target.value;
+            }
+        };
+    }
+
+    function bindHeroFileInputs(container) {
+        container.querySelectorAll('.hero-slide-file').forEach(fileInput => {
+            fileInput.addEventListener('change', async function () {
+                const file = this.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select an image file.', 'warning');
+                    this.value = '';
+                    return;
+                }
+                const row = this.closest('.hero-slide-row');
+                const idx = parseInt(row.dataset.idx);
+                const uploadBtn = row.querySelector('.hero-slide-upload');
+                uploadBtn.textContent = '⏳ Uploading...';
+                uploadBtn.disabled = true;
+                try {
+                    const url = await admin.uploadToImgBB(file);
+                    const slide = heroSlides[idx];
+                    slide.url = url;
+                    slide.type = 'image';
+                    renderHeroSlides();
+                    showToast('Image uploaded successfully!', 'success');
+                } catch (err) {
+                    showToast('Upload failed: ' + err.message, 'error');
+                } finally {
+                    renderHeroSlides();
+                }
+            });
+        });
+        container.querySelectorAll('.hero-slide-upload').forEach(btn => {
+            btn.onclick = () => {
+                const row = btn.closest('.hero-slide-row');
+                const fileInput = row.querySelector('.hero-slide-file');
+                if (fileInput) fileInput.click();
+            };
+        });
+    }
+
+    function readHeroSlides() {
+        const rows = DOM.heroSlidesList ? DOM.heroSlidesList.querySelectorAll('.hero-slide-row') : [];
+        return Array.from(rows).map((row, idx) => {
+            const slide = heroSlides[idx] || {};
+            return {
+                type: slide.type || 'image',
+                url: slide.url || '',
+                title: slide.title || '',
+                enabled: slide.enabled !== false,
+                link_target: slide.link_target || 'none',
+                link_value: slide.link_value || ''
+            };
+        });
+    }
+
+    function updateHeroAutoplayLabel() {
+        if (DOM.heroAutoplay && DOM.heroAutoplayLabel) {
+            DOM.heroAutoplayLabel.textContent = (DOM.heroAutoplay.value / 1000).toFixed(1) + 's';
+        }
+    }
+
+    async function loadHeroSettings() {
+        heroSlides = defaultHeroSlides();
+        try {
+            const { data, error } = await STATE.supabase.from('settings').select('*').in('key', HERO_KEYS);
+            if (error) throw error;
+            const map = {};
+            (data || []).forEach(row => { map[row.key] = row.value; });
+            DOM.heroEnabled.checked = map.hero_enabled !== 'false';
+            DOM.heroTitle.value = map.hero_title || '';
+            DOM.heroAutoplay.value = parseInt(map.hero_autoplay_ms) || 4000;
+            updateHeroAutoplayLabel();
+            try { heroSlides = JSON.parse(map.hero_slides || '[]'); } catch (e) { heroSlides = []; }
+            if (!Array.isArray(heroSlides)) heroSlides = [];
+            renderHeroSlides();
+        } catch (err) {
+            showToast('Failed to load hero banner settings: ' + err.message, 'error');
+        }
+    }
+
+    async function saveHeroSettings() {
+        const slides = readHeroSlides();
+        const valid = slides.filter(s => s.url.trim());
+        if (valid.length === 0) {
+            showToast('Add at least one slide with a media URL.', 'warning');
+            return;
+        }
+        const settings = [
+            { key: 'hero_enabled', value: String(DOM.heroEnabled.checked) },
+            { key: 'hero_title', value: DOM.heroTitle.value.trim() },
+            { key: 'hero_autoplay_ms', value: String(parseInt(DOM.heroAutoplay.value) || 4000) },
+            { key: 'hero_slides', value: JSON.stringify(valid) }
+        ];
+        DOM.heroStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            settings.forEach(s => { localStorage.setItem('grabby_' + s.key, s.value); });
+            showToast('Hero banners saved! The homepage will update within seconds.', 'success');
+            DOM.heroStatus.textContent = '✓ Saved';
+            setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2500);
+        } catch (err) {
+            showToast('Failed to save: ' + err.message, 'error');
+            DOM.heroStatus.textContent = '✗ Error';
+        }
+    }
+
+    function resetHeroSettings() {
+        heroSlides = defaultHeroSlides();
+        DOM.heroEnabled.checked = true;
+        DOM.heroTitle.value = '';
+        DOM.heroAutoplay.value = 4000;
+        updateHeroAutoplayLabel();
+        renderHeroSlides();
+        DOM.heroStatus.textContent = 'Reset to default — click Save to publish';
+        setTimeout(() => { DOM.heroStatus.textContent = ''; }, 3000);
+    }
+
+    function addHeroSlide() {
+        if (!heroSlides) heroSlides = [];
+        heroSlides.push({ type: 'image', url: '', title: '', enabled: true, link_target: 'none', link_value: '' });
+        renderHeroSlides();
     }
 
     // ─── SITE THEME / COLORS ───────────────────────────────────
@@ -333,193 +609,53 @@
         setTimeout(() => { DOM.themeStatus.textContent = ''; }, 3500);
     }
 
-    // ─── ADMIN PREFERENCE TOGGLES (Dark / Auto-dark / Animations / Compact / Auto-Save) ───
-    const PREFS_KEY = 'grabby_admin_settings';
-    const DRAFT_KEY = 'grabby_admin_product_draft';
-    const DEFAULT_PREFS = { dark: null, autoDark: false, animations: true, compact: false, autoSave: true };
-    let prefs = Object.assign({}, DEFAULT_PREFS);
+    // ─── SETTINGS PAGE BINDINGS ─────────────────────────────
+    function bindSettingsControls() {
+        // Marquee controls
+        DOM.marqueeGlowIntensity?.addEventListener('input', function() {
+            document.getElementById('glowIntensityLabel').textContent = this.value + 'px';
+            admin.updateMarqueePreview();
+        });
+        DOM.marqueeSpeed?.addEventListener('input', function() {
+            document.getElementById('speedLabel').textContent = this.value + 's';
+            admin.updateMarqueePreview();
+        });
+        DOM.marqueeEnabled?.addEventListener('change', admin.updateMarqueePreview);
+        DOM.marqueeGlow?.addEventListener('change', admin.updateMarqueePreview);
+        DOM.marqueeGlowColor?.addEventListener('input', admin.updateMarqueePreview);
+        DOM.marqueeBorderGlow?.addEventListener('change', admin.updateMarqueePreview);
+        DOM.marqueeBorderColor?.addEventListener('input', admin.updateMarqueePreview);
+        DOM.marqueeBgColor?.addEventListener('input', admin.updateMarqueePreview);
+        DOM.marqueeTextColor?.addEventListener('input', admin.updateMarqueePreview);
+        DOM.marqueeInput?.addEventListener('input', admin.updateMarqueePreview);
 
-    function loadPrefs() {
-        try {
-            const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
-            prefs = Object.assign({}, DEFAULT_PREFS, saved);
-        } catch {
-            prefs = Object.assign({}, DEFAULT_PREFS);
-        }
-    }
-
-    function savePrefs() {
-        try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* noop */ }
-    }
-
-    function updateThemeToggleUI(dark) {
-        const t = DOM.themeToggle;
-        if (!t) return;
-        const icon = t.querySelector('.theme-icon');
-        const label = t.querySelector('.theme-label');
-        if (icon) icon.textContent = dark ? '☀️' : '🌙';
-        if (label) label.textContent = dark ? 'Light' : 'Dark';
-    }
-
-    function setAdminDark(dark) {
-        const root = document.documentElement;
-        if (dark) root.setAttribute('data-theme', 'dark');
-        else root.removeAttribute('data-theme');
-        try { localStorage.setItem('grabby_theme', dark ? 'dark' : 'light'); } catch { /* noop */ }
-        updateThemeToggleUI(dark);
-        if (DOM.settingsDarkMode) DOM.settingsDarkMode.checked = !!dark;
-        if (DOM.settingsAutoDark) DOM.settingsAutoDark.checked = !!prefs.autoDark;
-    }
-
-    function applyDarkFromPrefs() {
-        if (prefs.autoDark) {
-            setAdminDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
-            return;
-        }
-        if (prefs.dark === null || typeof prefs.dark === 'undefined') {
-            setAdminDark(document.documentElement.getAttribute('data-theme') === 'dark');
-            return;
-        }
-        setAdminDark(!!prefs.dark);
-    }
-
-    function applyMotionPref() {
-        document.documentElement.classList.toggle('reduce-motion', !prefs.animations);
-    }
-
-    function applyCompactPref() {
-        document.body.classList.toggle('admin-compact', !!prefs.compact);
-    }
-
-    function applyPrefsAll() {
-        if (DOM.settingsAnimations) DOM.settingsAnimations.checked = prefs.animations;
-        if (DOM.settingsCompact) DOM.settingsCompact.checked = prefs.compact;
-        if (DOM.settingsAutoSave) DOM.settingsAutoSave.checked = prefs.autoSave;
-        applyDarkFromPrefs();
-        applyMotionPref();
-        applyCompactPref();
-    }
-
-    // ─── NEW-PRODUCT AUTOSAVE DRAFT ─────────────────────────
-    function saveDraft() {
-        if (!prefs.autoSave) return;
-        if (DOM.editId && DOM.editId.value) return;
-        const draft = {
-            title: DOM.prodTitle.value,
-            category: DOM.prodCategory.value,
-            brand: DOM.prodBrand.value,
-            price: DOM.prodPrice.value,
-            original: DOM.prodOriginal.value,
-            badge: DOM.prodBadge.value,
-            sold: DOM.prodSold.value,
-            rating: DOM.prodRating.value,
-            reviews: DOM.prodReviews.value,
-            inStock: DOM.prodInStock.checked,
-            shortDesc: DOM.prodShortDesc.value,
-            fullDesc: DOM.prodFullDesc.value
-        };
-        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* noop */ }
-    }
-
-    function clearDraft() {
-        try { localStorage.removeItem(DRAFT_KEY); } catch { /* noop */ }
-    }
-
-    function restoreDraft() {
-        if (!prefs.autoSave) return;
-        if (DOM.editId && DOM.editId.value) return;
-        let draft = null;
-        try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { draft = null; }
-        if (!draft) return;
-        DOM.prodTitle.value = draft.title || '';
-        DOM.prodCategory.value = draft.category || '';
-        DOM.prodBrand.value = draft.brand || '';
-        DOM.prodPrice.value = draft.price || '';
-        DOM.prodOriginal.value = draft.original || '';
-        DOM.prodBadge.value = draft.badge || '';
-        DOM.prodSold.value = draft.sold || '';
-        DOM.prodRating.value = draft.rating || '';
-        DOM.prodReviews.value = draft.reviews || '';
-        DOM.prodInStock.checked = draft.inStock !== false;
-        DOM.prodShortDesc.value = draft.shortDesc || '';
-        DOM.prodFullDesc.value = draft.fullDesc || '';
-        showToast('Draft restored — finish filling it in and save.', 'info');
-    }
-
-    const debouncedDraftSave = admin.debounce(saveDraft, 800);
-
-    function onFormValue() {
-        if (prefs.autoSave && DOM.editId && !DOM.editId.value) debouncedDraftSave();
-    }
-
-    function bindAutoSave() {
-        DOM.productForm?.addEventListener('input', onFormValue);
-        DOM.productForm?.addEventListener('change', onFormValue);
-    }
-
-    let prefsBound = false;
-
-    function bindPrefsEvents() {
-        if (prefsBound) return;
-        prefsBound = true;
-
-        DOM.settingsDarkMode?.addEventListener('change', () => {
-            prefs.dark = DOM.settingsDarkMode.checked;
-            prefs.autoDark = false;
-            savePrefs();
-            setAdminDark(prefs.dark);
-            if (DOM.settingsAutoDark) DOM.settingsAutoDark.checked = false;
+        DOM.saveMarqueeBtn?.addEventListener('click', admin.saveMarqueeSettings);
+        DOM.resetMarqueeBtn?.addEventListener('click', admin.resetMarqueeToDefault);
+        DOM.previewMarqueeBtn?.addEventListener('click', () => {
+            admin.updateMarqueePreview();
+            showToast('Preview updated!', 'info');
         });
 
-        DOM.settingsAutoDark?.addEventListener('change', () => {
-            prefs.autoDark = DOM.settingsAutoDark.checked;
-            prefs.dark = prefs.autoDark ? null : (document.documentElement.getAttribute('data-theme') === 'dark');
-            savePrefs();
-            applyDarkFromPrefs();
+        // Hero banner controls
+        DOM.heroAutoplay?.addEventListener('input', admin.updateHeroAutoplayLabel);
+        DOM.saveHeroBtn?.addEventListener('click', admin.saveHeroSettings);
+        DOM.resetHeroBtn?.addEventListener('click', admin.resetHeroSettings);
+        DOM.heroAddSlide?.addEventListener('click', () => {
+            admin.addHeroSlide();
         });
 
-        DOM.settingsAnimations?.addEventListener('change', () => {
-            prefs.animations = DOM.settingsAnimations.checked;
-            savePrefs();
-            applyMotionPref();
-        });
-
-        DOM.settingsCompact?.addEventListener('change', () => {
-            prefs.compact = DOM.settingsCompact.checked;
-            savePrefs();
-            applyCompactPref();
-        });
-
-        DOM.settingsAutoSave?.addEventListener('change', () => {
-            prefs.autoSave = DOM.settingsAutoSave.checked;
-            savePrefs();
-            if (!prefs.autoSave) clearDraft();
-            showToast('Auto-save ' + (prefs.autoSave ? 'enabled' : 'disabled'), 'info');
-        });
-
-        // Keep prefs in sync when the header dark/light toggle is used.
-        DOM.themeToggle?.addEventListener('click', () => {
-            prefs.autoDark = false;
-            prefs.dark = document.documentElement.getAttribute('data-theme') === 'dark';
-            savePrefs();
-            setAdminDark(prefs.dark);
-        });
-
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        const onSystemChange = () => { if (prefs.autoDark) applyDarkFromPrefs(); };
-        if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
-        else if (mq.addListener) mq.addListener(onSystemChange);
-
-        // Restore the pending new-product draft when opening a fresh Add form.
-        document.querySelectorAll('.admin-nav a[data-section="add"]').forEach(link =>
-            link.addEventListener('click', () => { if (prefs.autoSave) restoreDraft(); })
-        );
-
-        bindAutoSave();
+        // Flash sale controls
+        DOM.flashAutoplay?.addEventListener('input', admin.updateFlashAutoplayLabel);
+        DOM.flashEnabled?.addEventListener('change', admin.populateFlashProductSelect);
+        DOM.saveFlashBtn?.addEventListener('click', admin.saveFlashSettings);
+        DOM.resetFlashBtn?.addEventListener('click', admin.resetFlashSettings);
+        DOM.flashProductSelect?.addEventListener('change', admin.recordFlashSelection);
     }
 
     function bindThemeSettings() {
-        loadPrefs();
+        admin.loadPrefs();
+
+        // Theme preset / custom colors
         DOM.themePresets?.addEventListener('click', e => {
             const btn = e.target.closest('.theme-preset');
             if (!btn) return;
@@ -527,16 +663,34 @@
         });
         DOM.saveThemeBtn?.addEventListener('click', saveThemeSettings);
         DOM.resetThemeBtn?.addEventListener('click', resetThemeSettings);
-        bindPrefsEvents();
-        applyPrefsAll();
+
+        // Admin preference toggles
+        DOM.settingsDarkMode?.addEventListener('change', () => {
+            admin.setPrefs({ dark: DOM.settingsDarkMode.checked, autoDark: false });
+            if (DOM.settingsAutoDark) DOM.settingsAutoDark.checked = false;
+        });
+        DOM.settingsAutoDark?.addEventListener('change', () => {
+            const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            admin.setPrefs({ autoDark: DOM.settingsAutoDark.checked, dark: DOM.settingsAutoDark.checked ? null : dark });
+        });
+        DOM.settingsAnimations?.addEventListener('change', () => admin.setPrefs({ animations: DOM.settingsAnimations.checked }));
+        DOM.settingsCompact?.addEventListener('change', () => admin.setPrefs({ compact: DOM.settingsCompact.checked }));
+        DOM.settingsAutoSave?.addEventListener('change', () => {
+            admin.setPrefs({ autoSave: DOM.settingsAutoSave.checked });
+            if (!DOM.settingsAutoSave.checked) admin.clearDraft();
+            showToast('Auto-save ' + (DOM.settingsAutoSave.checked ? 'enabled' : 'disabled'), 'info');
+        });
+
+        admin.bindAutoSave();
     }
 
     Object.assign(admin, {
-        loadPrefs, applyPrefsAll, applyDarkFromPrefs, saveDraft, clearDraft, restoreDraft,
         loadMarqueeSettings, saveMarqueeSettings, resetMarqueeToDefault, updateMarqueePreview,
-        loadThemeSettings, saveThemeSettings, resetThemeSettings, bindThemeSettings,
+        loadThemeSettings, saveThemeSettings, resetThemeSettings,
         loadFlashSettings, saveFlashSettings, resetFlashSettings,
-        populateFlashProductSelect, updateFlashAutoplayLabel, recordFlashSelection
+        populateFlashProductSelect, updateFlashAutoplayLabel, recordFlashSelection,
+        loadHeroSettings, saveHeroSettings, resetHeroSettings, addHeroSlide, updateHeroAutoplayLabel,
+        bindSettingsControls, bindThemeSettings
     });
 
 })();

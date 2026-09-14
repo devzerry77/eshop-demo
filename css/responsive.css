@@ -107,8 +107,22 @@
 @media (min-width: 768px) { .product-container { padding: 0 24px; } }
 
 @media (min-width: 1024px) {
-    .product-container { padding: 0 32px; max-width: 1400px; margin: 0 auto; }
-    .product-detail-grid { display: grid; grid-template-columns: 45% 55%; gap: 2rem; align-items: start; }
+    .product-container { padding: 0 28px; max-width: 1200px; margin: 0 auto; }
+    .product-detail-grid { grid-template-columns: clamp(300px, 36%, 460px) minmax(0, 1fr); gap: 2rem; align-items: start; }
+    .gallery-main { max-width: 460px; max-height: 460px; margin-inline: auto; border: 1px solid var(--border); box-shadow: var(--shadow); }
+    .gallery-thumb { width: 64px; height: 64px; }
+    .product-detail-info { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem 1.5rem 1.5rem; }
+    .product-detail-info .product-header { order: 1; }
+    .product-detail-info .product-price-section { order: 2; margin-top: 0.5rem; }
+    .product-detail-info .product-detail-actions { order: 3; }
+    .product-detail-info .product-detail-meta { order: 4; }
+    .product-detail-info .short-desc { order: 5; }
+    .product-detail-info .product-sections { order: 6; margin-top: 0.75rem; }
+    .product-detail-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin-top: 0.75rem; }
+    .detail-add-btn { padding: 14px 16px; font-size: 1.05rem; min-height: 50px; }
+    .product-detail-meta span { white-space: nowrap; }
+    .bar-inner { max-width: 1200px; }
+    body:has(.sticky-bottom-bar) { padding-bottom: 76px; }
 }
 
 /* ─── CHECKOUT GRID (from checkout.html) ─── */

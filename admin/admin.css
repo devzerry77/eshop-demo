@@ -473,6 +473,7 @@ textarea { resize:vertical; }
 
 /* ─── PANEL ─── */
 .panel {
+    scroll-margin-top: 90px;
     margin-bottom:24px;
     padding:28px;
     background: var(--glass-bg);

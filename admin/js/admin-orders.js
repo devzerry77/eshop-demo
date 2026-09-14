@@ -63,6 +63,7 @@
     }
 
     function renderOrders() {
+        if (!DOM.ordersTableBody) return;
         const orders = filteredOrders();
         const totalPages = Math.max(1, Math.ceil(orders.length / STATE.orderPageSize));
         STATE.orderPage = Math.min(STATE.orderPage, totalPages);
@@ -342,7 +343,9 @@
                 window.open(url, '_blank');
             }
         });
+    }
 
+    function bindPaymentsEvents() {
         DOM.addPaymentBtn?.addEventListener("click", () => openPaymentForm(null));
         DOM.savePaymentBtn?.addEventListener("click", savePaymentMethod);
         DOM.cancelPaymentBtn?.addEventListener("click", closePaymentForm);
@@ -365,7 +368,7 @@
         computeOrderStats, renderOrderStats, exportOrdersCSV,
         loadPaymentSettings, renderPaymentSettings, openPaymentForm, closePaymentForm,
         savePaymentMethod, deletePaymentMethod, togglePaymentMethod,
-        bindOrdersEvents
+        bindOrdersEvents, bindPaymentsEvents
     });
 
 })();

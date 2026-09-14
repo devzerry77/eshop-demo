@@ -10,12 +10,12 @@
         const visits = Number(localStorage.getItem("grabby_visits")) || 0;
         const live = Number(localStorage.getItem("grabby_live")) || 0;
         const cartAdds = Number(localStorage.getItem("grabby_total_cart_adds")) || 0;
-        DOM.statVisits.textContent = visits;
-        DOM.statLive.textContent = live;
-        DOM.statCartAdds.textContent = cartAdds;
-        DOM.statProducts.textContent = STATE.products.length;
-        DOM.liveTrend.textContent = live ? "Active now" : "No active users";
-        DOM.productTrend.textContent = `${STATE.products.filter(p => p.inStock).length} in stock`;
+        if (DOM.statVisits) DOM.statVisits.textContent = visits;
+        if (DOM.statLive) DOM.statLive.textContent = live;
+        if (DOM.statCartAdds) DOM.statCartAdds.textContent = cartAdds;
+        if (DOM.statProducts) DOM.statProducts.textContent = STATE.products.length;
+        if (DOM.liveTrend) DOM.liveTrend.textContent = live ? "Active now" : "No active users";
+        if (DOM.productTrend) DOM.productTrend.textContent = `${STATE.products.filter(p => p.inStock).length} in stock`;
         admin.renderOrderStats();
     }
 
@@ -101,6 +101,7 @@
     }
 
     async function renderActivity() {
+        if (!DOM.activityTableBody) return;
         let activity;
         try { activity = JSON.parse(localStorage.getItem("grabby_cart_activity") || "[]"); } catch { activity = []; }
         if (!activity.length) {
@@ -125,10 +126,10 @@
 
     function renderAll() {
         admin.renderStats();
-        admin.renderProducts();
-        admin.renderActivity();
-        admin.renderOrders();
-        admin.renderPaymentSettings();
+        if (DOM.adminProductsTable) admin.renderProducts();
+        if (DOM.activityTableBody) admin.renderActivity();
+        if (DOM.ordersTableBody) admin.renderOrders();
+        if (DOM.paymentMethodsAdmin) admin.renderPaymentSettings();
     }
 
     // ─── AI CHAT ────────────────────────────────────────────

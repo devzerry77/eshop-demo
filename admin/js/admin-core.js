@@ -107,6 +107,9 @@
             "themeBg", "themeCard", "themeSecondary", "themeText", "themeTextSecondary",
             "themeBorder", "themeAccent", "themeHeaderBg", "themeHeaderText",
             "saveThemeBtn", "resetThemeBtn", "themeStatus",
+            // Hero banners (new)
+            "heroEnabled", "heroTitle", "heroAutoplay", "heroAutoplayLabel",
+            "heroAddSlide", "heroSlidesList", "saveHeroBtn", "resetHeroBtn", "heroStatus",
             // Flash sale (new)
             "flashEnabled", "flashTitle", "flashSubtitle", "flashBadge",
             "flashProductSelect", "flashAutoplay", "flashAutoplayLabel",
@@ -216,6 +219,147 @@
         }
     }
 
+    // ─── ADMIN PREFS (shared across all pages) ─────────────
+    const PREFS_KEY = 'grabby_admin_settings';
+    const DRAFT_KEY = 'grabby_admin_product_draft';
+    const DEFAULT_PREFS = { dark: null, autoDark: false, animations: true, compact: false, autoSave: true };
+    let prefs = Object.assign({}, DEFAULT_PREFS);
+
+    function loadPrefs() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
+            prefs = Object.assign({}, DEFAULT_PREFS, saved);
+        } catch {
+            prefs = Object.assign({}, DEFAULT_PREFS);
+        }
+    }
+
+    function savePrefs() {
+        try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* noop */ }
+    }
+
+    function updateThemeToggleUI(dark) {
+        const t = DOM.themeToggle;
+        if (!t) return;
+        const icon = t.querySelector('.theme-icon');
+        const label = t.querySelector('.theme-label');
+        if (icon) icon.textContent = dark ? '☀️' : '🌙';
+        if (label) label.textContent = dark ? 'Light' : 'Dark';
+    }
+
+    function setAdminDark(dark) {
+        const root = document.documentElement;
+        if (dark) root.setAttribute('data-theme', 'dark');
+        else root.removeAttribute('data-theme');
+        try { localStorage.setItem('grabby_theme', dark ? 'dark' : 'light'); } catch { /* noop */ }
+        updateThemeToggleUI(dark);
+        if (DOM.settingsDarkMode) DOM.settingsDarkMode.checked = !!dark;
+        if (DOM.settingsAutoDark) DOM.settingsAutoDark.checked = !!prefs.autoDark;
+    }
+
+    function applyDarkFromPrefs() {
+        if (prefs.autoDark) {
+            setAdminDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+            return;
+        }
+        if (prefs.dark === null || typeof prefs.dark === 'undefined') {
+            setAdminDark(document.documentElement.getAttribute('data-theme') === 'dark');
+            return;
+        }
+        setAdminDark(!!prefs.dark);
+    }
+
+    function applyMotionPref() {
+        document.documentElement.classList.toggle('reduce-motion', !prefs.animations);
+    }
+
+    function applyCompactPref() {
+        document.body.classList.toggle('admin-compact', !!prefs.compact);
+    }
+
+    function applyPrefsAll() {
+        if (DOM.settingsAnimations) DOM.settingsAnimations.checked = prefs.animations;
+        if (DOM.settingsCompact) DOM.settingsCompact.checked = prefs.compact;
+        if (DOM.settingsAutoSave) DOM.settingsAutoSave.checked = prefs.autoSave;
+        applyDarkFromPrefs();
+        applyMotionPref();
+        applyCompactPref();
+    }
+
+    function setPrefs(patch) {
+        loadPrefs();
+        Object.assign(prefs, patch);
+        savePrefs();
+        applyPrefsAll();
+    }
+
+    function syncPrefsFromThemeToggle() {
+        prefs.autoDark = false;
+        prefs.dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        savePrefs();
+        setAdminDark(prefs.dark);
+    }
+
+    // ─── NEW-PRODUCT AUTOSAVE DRAFT ─────────────────────────
+    function saveDraft() {
+        if (!prefs.autoSave) return;
+        if (DOM.editId && DOM.editId.value) return;
+        const draft = {
+            title: DOM.prodTitle.value,
+            category: DOM.prodCategory.value,
+            brand: DOM.prodBrand.value,
+            price: DOM.prodPrice.value,
+            original: DOM.prodOriginal.value,
+            badge: DOM.prodBadge.value,
+            sold: DOM.prodSold.value,
+            rating: DOM.prodRating.value,
+            reviews: DOM.prodReviews.value,
+            inStock: DOM.prodInStock.checked,
+            shortDesc: DOM.prodShortDesc.value,
+            fullDesc: DOM.prodFullDesc.value
+        };
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* noop */ }
+    }
+
+    function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch { /* noop */ }
+    }
+
+    function restoreDraft() {
+        if (!prefs.autoSave) return;
+        if (DOM.editId && DOM.editId.value) return;
+        let draft = null;
+        try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { draft = null; }
+        if (!draft) return;
+        DOM.prodTitle.value = draft.title || '';
+        DOM.prodCategory.value = draft.category || '';
+        DOM.prodBrand.value = draft.brand || '';
+        DOM.prodPrice.value = draft.price || '';
+        DOM.prodOriginal.value = draft.original || '';
+        DOM.prodBadge.value = draft.badge || '';
+        DOM.prodSold.value = draft.sold || '';
+        DOM.prodRating.value = draft.rating || '';
+        DOM.prodReviews.value = draft.reviews || '';
+        DOM.prodInStock.checked = draft.inStock !== false;
+        DOM.prodShortDesc.value = draft.shortDesc || '';
+        DOM.prodFullDesc.value = draft.fullDesc || '';
+        showToast('Draft restored — finish filling it in and save.', 'info');
+    }
+
+    const debouncedDraftSave = (() => {
+        let timer;
+        return () => { clearTimeout(timer); timer = setTimeout(saveDraft, 800); };
+    })();
+
+    function onFormValue() {
+        if (prefs.autoSave && DOM.editId && !DOM.editId.value) debouncedDraftSave();
+    }
+
+    function bindAutoSave() {
+        DOM.productForm?.addEventListener('input', onFormValue);
+        DOM.productForm?.addEventListener('change', onFormValue);
+    }
+
     // ─── AUTH ──────────────────────────────────────────────
     function initSupabase() {
         if (!window.supabase || !window.supabase.createClient) return false;
@@ -237,7 +381,7 @@
         showToast("Welcome back!", "success");
         if (!STATE.initialized) {
             STATE.initialized = true;
-            admin.initDashboard && admin.initDashboard();
+            admin.pageInit && admin.pageInit();
         }
         resetSession();
     }
@@ -334,6 +478,9 @@
         isYouTubeUrl, extractYouTubeId, getYouTubeThumbnail, getYouTubeEmbedUrl, isValidUrl,
         uploadToImgBB,
         loadTheme, toggleTheme,
+        loadPrefs, savePrefs, applyPrefsAll, applyDarkFromPrefs, setAdminDark,
+        updateThemeToggleUI, applyMotionPref, applyCompactPref, setPrefs, syncPrefsFromThemeToggle,
+        saveDraft, clearDraft, restoreDraft, onFormValue, bindAutoSave,
         initSupabase, showLogin, showAdmin, checkSession, initLogin, logout, resetSession,
         openLightbox, closeLightbox,
         exportCSV

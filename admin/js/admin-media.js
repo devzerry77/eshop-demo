@@ -311,18 +311,13 @@
         function reorderItem(direction) {
             const wrappers = DOM.imageInputsWrapper.querySelectorAll('.image-input-group');
             const currentIdx = Array.from(wrappers).indexOf(wrapper);
-            let newIdx = currentIdx + direction;
             if (direction === -1 && currentIdx === 0) return;
             if (direction === 1 && currentIdx === wrappers.length - 1) return;
             const parent = wrapper.parentNode;
             if (direction === -1) {
                 parent.insertBefore(wrapper, wrappers[currentIdx - 1]);
             } else {
-                if (currentIdx + 1 < wrappers.length) {
-                    parent.insertBefore(wrapper, wrappers[currentIdx + 1]);
-                } else {
-                    parent.appendChild(wrapper);
-                }
+                parent.insertBefore(wrapper, wrappers[currentIdx + 2] || null);
             }
             updateOrderNumber();
             updateGalleryPreview();

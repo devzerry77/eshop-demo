@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Products — Grabby Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+        <div class="login-card glass-card">
+            <div class="brand brand-login">
+                <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                <span id="loginTitle">Grabby Admin</span>
+            </div>
+            <div class="login-heading">
+                <span class="eyebrow">CONTROL CENTER</span>
+                <h1>Welcome back.</h1>
+                <p>Sign in to manage your store.</p>
+            </div>
+            <form id="loginForm" novalidate>
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="loginEmail" autocomplete="email" placeholder="admin@example.com" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <div class="password-wrap">
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">Show</button>
+                    </div>
+                </label>
+                <p class="form-error" id="loginError" role="alert"></p>
+                <p class="rate-limit" id="loginRateLimit">Too many attempts. Please try again later.</p>
+                <button type="submit" class="button button-primary button-full" id="loginBtn">
+                    <span class="button-label">Sign in</span>
+                    <span class="button-loader" aria-hidden="true"></span>
+                </button>
+            </form>
+            <p class="login-footer">Secure administration panel</p>
+        </div>
+    </section>
+
+    <!-- ADMIN APP -->
+    <div class="admin-layout" id="adminLayout">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-top">
+                <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+                <div class="brand">
+                    <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                    <span>Grabby Tech</span>
+                </div>
+                <span class="admin-label">ADMIN</span>
+            </div>
+            <nav class="admin-nav" aria-label="Admin navigation">
+                <a href="dashboard.html" data-section="dashboard">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="products.html" data-section="products" class="active">
+                    <span class="nav-icon">▦</span>
+                    <span>Products</span>
+                </a>
+                <a href="product-form.html" data-section="add">
+                    <span class="nav-icon">＋</span>
+                    <span>Add Product</span>
+                </a>
+                <a href="orders.html" data-section="orders">
+                    <span class="nav-icon">☰</span>
+                    <span>Orders</span>
+                </a>
+                <a href="activity.html" data-section="activity">
+                    <span class="nav-icon">◷</span>
+                    <span>Cart Activity</span>
+                </a>
+                <a href="payments.html" data-section="payments">
+                    <span class="nav-icon">◉</span>
+                    <span>Payment Settings</span>
+                </a>
+                <a href="settings.html" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="sidebar-action" id="logoutBtn">
+                    <span>↪</span>
+                    <span>Sign out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+                    <div>
+                        <span class="eyebrow">GRABBY TECH ADMIN</span>
+                        <h1 id="pageTitle">Products</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">
+                        <span class="theme-icon">🌙</span>
+                        <span class="theme-label">Dark</span>
+                    </button>
+                    <button class="icon-button" id="refreshStats" title="Refresh">↻</button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <!-- PRODUCTS LIST -->
+                <section class="panel" id="productsSection">
+                    <div class="panel-header panel-header-stack-mobile">
+                        <div><span class="eyebrow">CATALOG</span><h2>Products</h2></div>
+                        <input class="search-input" type="search" id="adminSearch" placeholder="Search products..." autocomplete="off">
+                        <button class="button button-secondary" id="exportProductsBtn" style="margin-left:auto;">Export CSV</button>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                            <tbody id="adminProductsTable"><tr><td colspan="5" class="empty-state">Loading products...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="adminPagination"></div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CONFIRM MODAL -->
+    <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <span class="eyebrow">CONFIRM ACTION</span>
+            <h2 id="confirmTitle">Delete Product?</h2>
+            <p>This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="button button-danger" id="confirmYes">Delete</button>
+                <button class="button button-secondary" id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX -->
+    <div class="lightbox" id="imageLightbox" role="dialog" aria-modal="true">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Close preview">×</button>
+        <img id="lightboxImg" alt="Full image preview">
+    </div>
+
+    <!-- AI CHAT -->
+    <div class="chat-widget">
+        <div class="chat-panel" id="aiChatPanel" role="dialog" aria-label="Admin assistant">
+            <div class="chat-header">
+                <strong>Admin Assistant</strong>
+                <div class="chat-header-actions">
+                    <button id="aiChatClear">Clear</button>
+                    <button id="aiChatClose">×</button>
+                </div>
+            </div>
+            <div class="chat-messages" id="aiChatMessages" aria-live="polite"></div>
+            <div class="chat-input-wrap">
+                <textarea id="aiChatInput" rows="1" placeholder="Ask about your admin panel..."></textarea>
+                <button id="aiChatSend">→</button>
+            </div>
+        </div>
+        <button class="chat-toggle" id="aiChatToggle">AI</button>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="js/admin-core.js"></script>
+    <script src="js/admin-media.js"></script>
+    <script src="js/admin-products.js"></script>
+    <script src="js/admin-orders.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script src="js/admin-settings.js"></script>
+    <script src="js/admin-main.js"></script>
+    <script src="js/page-products.js"></script>
+</body>
+</html>

@@ -233,6 +233,7 @@
             showToast(product.id ? "Product updated successfully!" : "Product added successfully!", "success");
             if (admin.clearDraft) admin.clearDraft();
             resetForm();
+            if (admin.afterSave) admin.afterSave(product);
         } catch (error) {
             showToast(error.message || "Could not save product.", "error");
         } finally {
@@ -240,9 +241,7 @@
         }
     }
 
-    function editProduct(id) {
-        const product = STATE.products.find(item => String(item.id) === String(id));
-        if (!product) return;
+    function fillProductForm(product) {
         DOM.editId.value = product.id;
         DOM.prodTitle.value = product.title;
         DOM.prodCategory.value = product.category;
@@ -265,7 +264,14 @@
             opt.selected = product.related && product.related.includes(parseInt(opt.value));
         });
         DOM.formTitle.textContent = "Edit Product";
-        admin.showSection("add", true);
+    }
+
+    function editProduct(id) {
+        const product = STATE.products.find(item => String(item.id) === String(id));
+        if (!product) return;
+        populateRelatedSelect();
+        fillProductForm(product);
+        if (admin.showSection) admin.showSection("add", true);
     }
 
     function resetForm() {
@@ -283,6 +289,7 @@
     }
 
     function populateRelatedSelect() {
+        if (!DOM.relatedProductsSelect) return;
         const select = DOM.relatedProductsSelect;
         const currentVal = select.value;
         select.innerHTML = '';
@@ -307,7 +314,7 @@
     Object.assign(admin, {
         normalizeProduct, loadProducts, productPayload, saveProduct, deleteProduct,
         filteredProducts, renderProducts, renderPagination,
-        readForm, submitForm, editProduct, resetForm, populateRelatedSelect,
+        readForm, submitForm, editProduct, fillProductForm, resetForm, populateRelatedSelect,
         exportProductsCSV
     });
 

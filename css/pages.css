@@ -146,8 +146,11 @@
 [data-theme="dark"] .sticky-bottom-bar { background:var(--sticky-bg); border-top-color:var(--border); }
 [data-theme="dark"] .bar-left button { background:var(--secondary-bg); color:var(--text); border-color:var(--border); }
 [data-theme="dark"] .bar-left button:hover { background:var(--border); }
-[data-theme="dark"] .bar-center .bar-add-cart { background:var(--accent); color:#fff; }
+[data-theme="dark"] .bar-center .bar-add-cart { background: var(--accent); color:#fff; }
 [data-theme="dark"] .bar-center .bar-add-cart:disabled { background:var(--border); color:var(--text-secondary); }
+[data-theme="dark"] .add-cart-btn, [data-theme="dark"] .modal-add-btn { background:#fff !important; color:#181b20 !important; border:1px solid var(--border) !important; }
+[data-theme="dark"] .add-cart-btn:hover:not(:disabled), [data-theme="dark"] .modal-add-btn:hover:not(:disabled) { opacity:0.85; }
+[data-theme="dark"] .add-cart-btn:disabled, [data-theme="dark"] .modal-add-btn:disabled { background: rgba(255,255,255,0.1) !important; color:#6b7a8a !important; }
 [data-theme="dark"] .bar-right .bar-buy-now { background:var(--danger); color:#fff; }
 [data-theme="dark"] .collapsible-section { border-bottom-color:var(--border); }
 [data-theme="dark"] .section-toggle { color:var(--text); }
@@ -180,12 +183,12 @@
 .gallery-slide iframe { background:#000; }
 
 [data-theme="dark"] .detail-add-btn {
-    background: var(--accent) !important;
-    color: #fff !important; border: none !important;
+    background: #fff !important;
+    color: #181b20 !important; border: 1px solid var(--border) !important;
 }
 [data-theme="dark"] .detail-add-btn:hover:not(:disabled) { opacity: 0.85; }
 [data-theme="dark"] .detail-add-btn:disabled { background: rgba(255,255,255,0.1) !important; color:#6b7a8a !important; }
-[data-theme="dark"] .bar-add-cart { background: var(--accent) !important; color:#fff !important; }
+[data-theme="dark"] .bar-add-cart { background: #fff !important; color:#181b20 !important; border: 1px solid var(--border) !important; }
 [data-theme="dark"] .bar-add-cart:disabled { background: rgba(255,255,255,0.1) !important; color:#6b7a8a !important; }
 
 .section-toggle {

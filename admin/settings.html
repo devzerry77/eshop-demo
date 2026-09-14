@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Settings — Grabby Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+        <div class="login-card glass-card">
+            <div class="brand brand-login">
+                <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                <span id="loginTitle">Grabby Admin</span>
+            </div>
+            <div class="login-heading">
+                <span class="eyebrow">CONTROL CENTER</span>
+                <h1>Welcome back.</h1>
+                <p>Sign in to manage your store.</p>
+            </div>
+            <form id="loginForm" novalidate>
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="loginEmail" autocomplete="email" placeholder="admin@example.com" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <div class="password-wrap">
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">Show</button>
+                    </div>
+                </label>
+                <p class="form-error" id="loginError" role="alert"></p>
+                <p class="rate-limit" id="loginRateLimit">Too many attempts. Please try again later.</p>
+                <button type="submit" class="button button-primary button-full" id="loginBtn">
+                    <span class="button-label">Sign in</span>
+                    <span class="button-loader" aria-hidden="true"></span>
+                </button>
+            </form>
+            <p class="login-footer">Secure administration panel</p>
+        </div>
+    </section>
+
+    <!-- ADMIN APP -->
+    <div class="admin-layout" id="adminLayout">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-top">
+                <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+                <div class="brand">
+                    <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                    <span>Grabby Tech</span>
+                </div>
+                <span class="admin-label">ADMIN</span>
+            </div>
+            <nav class="admin-nav" aria-label="Admin navigation">
+                <a href="dashboard.html" data-section="dashboard">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="products.html" data-section="products">
+                    <span class="nav-icon">▦</span>
+                    <span>Products</span>
+                </a>
+                <a href="product-form.html" data-section="add">
+                    <span class="nav-icon">＋</span>
+                    <span>Add Product</span>
+                </a>
+                <a href="orders.html" data-section="orders">
+                    <span class="nav-icon">☰</span>
+                    <span>Orders</span>
+                </a>
+                <a href="activity.html" data-section="activity">
+                    <span class="nav-icon">◷</span>
+                    <span>Cart Activity</span>
+                </a>
+                <a href="payments.html" data-section="payments">
+                    <span class="nav-icon">◉</span>
+                    <span>Payment Settings</span>
+                </a>
+                <a href="settings.html" data-section="settings" class="active">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="sidebar-action" id="logoutBtn">
+                    <span>↪</span>
+                    <span>Sign out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+                    <div>
+                        <span class="eyebrow">GRABBY TECH ADMIN</span>
+                        <h1 id="pageTitle">Settings</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">
+                        <span class="theme-icon">🌙</span>
+                        <span class="theme-label">Dark</span>
+                    </button>
+                    <button class="icon-button" id="refreshStats" title="Refresh">↻</button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <!-- SETTINGS -->
+                <section class="page-section" id="settingsSection">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-grid">
+                        <!-- Theme Settings -->
+                        <div class="setting-card glass-card">
+                            <h3>Theme</h3>
+                            <div class="setting-item">
+                                <span>Dark Mode</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settingsDarkMode">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Auto-dark (system)</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settingsAutoDark" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Site Theme / Colors -->
+                        <div class="setting-card glass-card">
+                            <h3>🎨 Site Theme / Colors</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Choose the color preset for the whole website (homepage, checkout, orders, headers, footer).
+                            </p>
+                            <div class="theme-presets" id="themePresets" role="group" aria-label="Color preset">
+                                <button type="button" class="theme-preset" data-preset="silver">
+                                    <span class="preset-swatch swatch-silver"></span><span>Silver</span>
+                                </button>
+                                <button type="button" class="theme-preset" data-preset="light">
+                                    <span class="preset-swatch swatch-light"></span><span>Light</span>
+                                </button>
+                                <button type="button" class="theme-preset" data-preset="dark">
+                                    <span class="preset-swatch swatch-dark"></span><span>Dark</span>
+                                </button>
+                                <button type="button" class="theme-preset" data-preset="custom">
+                                    <span class="preset-swatch swatch-custom"></span><span>Custom</span>
+                                </button>
+                            </div>
+                            <div id="themeCustomFields" class="theme-custom-grid" style="display:none;">
+                                <label class="theme-color-field"><span>Background</span><input type="color" id="themeBg" value="#f1f3f5"></label>
+                                <label class="theme-color-field"><span>Card Background</span><input type="color" id="themeCard" value="#ffffff"></label>
+                                <label class="theme-color-field"><span>Surface</span><input type="color" id="themeSecondary" value="#e7eaee"></label>
+                                <label class="theme-color-field"><span>Text</span><input type="color" id="themeText" value="#181b20"></label>
+                                <label class="theme-color-field"><span>Text Secondary</span><input type="color" id="themeTextSecondary" value="#5f6670"></label>
+                                <label class="theme-color-field"><span>Border</span><input type="color" id="themeBorder" value="#d2d7dd"></label>
+                                <label class="theme-color-field"><span>Accent</span><input type="color" id="themeAccent" value="#20242b"></label>
+                                <label class="theme-color-field"><span>Header/Footer BG</span><input type="color" id="themeHeaderBg" value="#20242b"></label>
+                                <label class="theme-color-field"><span>Header Text</span><input type="color" id="themeHeaderText" value="#f5f7fa"></label>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveThemeBtn">💾 Save Theme</button>
+                                <button class="button button-secondary" id="resetThemeBtn">↩️ Reset to Silver</button>
+                                <span id="themeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Marquee Controls -->
+                        <div class="setting-card glass-card marquee-controls">
+                            <h3>🏷️ Homepage Marquee</h3>
+
+                            <div class="setting-item">
+                                <span>Enable Marquee</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="marqueeEnabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="marqueeInput" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">
+                                    Announcement Text (supports HTML)
+                                </label>
+                                <textarea id="marqueeInput" rows="3" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); resize:vertical;"></textarea>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>✨ Glow Effect</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="checkbox" id="marqueeGlow" checked>
+                                    <input type="color" id="marqueeGlowColor" value="#ff6b6b" style="width:32px; height:32px; padding:2px; border-radius:50%; cursor:pointer; border:1px solid var(--border);">
+                                    <input type="range" id="marqueeGlowIntensity" min="5" max="50" value="20" style="width:80px;">
+                                    <span id="glowIntensityLabel" style="font-size:0.75rem; color:var(--text-secondary);">20px</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>🌟 Border Glow</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="checkbox" id="marqueeBorderGlow" checked>
+                                    <input type="color" id="marqueeBorderColor" value="#667eea" style="width:32px; height:32px; padding:2px; border-radius:50%; cursor:pointer; border:1px solid var(--border);">
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>⏱️ Animation Speed</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="range" id="marqueeSpeed" min="10" max="40" value="20" style="width:100px;">
+                                    <span id="speedLabel" style="font-size:0.75rem; color:var(--text-secondary);">20s</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>🎨 Background Color</span>
+                                <input type="color" id="marqueeBgColor" value="#0a0a0a" style="width:40px; height:32px; padding:2px; border-radius:4px; cursor:pointer; border:1px solid var(--border);">
+                            </div>
+
+                            <div class="setting-item" style="border-bottom:none;">
+                                <span>📝 Text Color</span>
+                                <input type="color" id="marqueeTextColor" value="#ffffff" style="width:40px; height:32px; padding:2px; border-radius:4px; cursor:pointer; border:1px solid var(--border);">
+                            </div>
+
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveMarqueeBtn">💾 Save Marquee</button>
+                                <button class="button button-secondary" id="resetMarqueeBtn">↩️ Reset to Default</button>
+                                <button class="button button-secondary" id="previewMarqueeBtn">👁️ Preview</button>
+                                <span id="marqueeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+
+                            <div style="margin-top:12px; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; background:var(--bg);">
+                                <div style="padding:6px 12px; background:var(--secondary-bg); font-size:0.7rem; color:var(--text-secondary); border-bottom:1px solid var(--border);">Live Preview</div>
+                                <div id="marqueePreviewContainer" style="padding:8px; overflow:hidden;">
+                                    <div id="marqueePreview" style="white-space:nowrap; animation: marqueeScroll 20s linear infinite; display:inline-block; padding:4px 0; font-weight:500; font-size:0.85rem;">
+                                        🚚 Free delivery all over Bangladesh &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hero / Top Banner Carousel Controls -->
+                        <div class="setting-card glass-card hero-banner-controls">
+                            <h3>🎠 Hero / Top Banner Carousel</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Full-width auto-swiping banner cards at the very top of the homepage.
+                                Add image or video slides, reorder them, and hide the whole section when needed.
+                            </p>
+
+                            <div class="setting-item">
+                                <span>Enable Hero Banners</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="heroEnabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="heroTitle" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Section Title (optional)</label>
+                                <input type="text" id="heroTitle" value="" placeholder="Leave empty to hide title" style="padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+
+                            <div class="setting-item">
+                                <span>▶️ Autoplay Speed</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="range" id="heroAutoplay" min="1500" max="8000" step="100" value="4000" style="width:120px;">
+                                    <span id="heroAutoplayLabel" style="font-size:0.75rem; color:var(--text-secondary);">4.0s</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:6px;">
+                                <button class="button button-primary" id="heroAddSlide" style="width:100%; margin-bottom:10px;">＋ Add Slide</button>
+                                <div id="heroSlidesList" style="display:flex; flex-direction:column; gap:10px;"></div>
+                                <small style="color:var(--text-secondary); display:block; margin-top:6px;">
+                                    Images: upload or paste URL &nbsp;•&nbsp; Video: paste a direct .mp4/.webm URL &nbsp;•&nbsp; YouTube: paste a watch/short/embed link
+                                </small>
+                            </div>
+
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveHeroBtn">💾 Save Hero Banners</button>
+                                <button class="button button-secondary" id="resetHeroBtn">↩️ Reset to Default</button>
+                                <span id="heroStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Flash Sale / Hot Deals Controls -->
+                        <div class="setting-card glass-card flash-sale-controls">
+                            <h3>⚡ Flash Sale / Hot Deals</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                An auto-swiping carousel of "hot" discounted products at the top of the homepage.
+                                Slides scroll right → left and loop forever. Leave products empty to auto-feature every product that has a discount.
+                            </p>
+
+                            <div class="setting-item">
+                                <span>Enable Flash Sale</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="flashEnabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="flashTitle" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Section Title</label>
+                                <input type="text" id="flashTitle" value="Flash Sale" style="padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="flashSubtitle" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Subtitle</label>
+                                <input type="text" id="flashSubtitle" value="Deals of the day — grab them before they are gone" style="padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+
+                            <div class="setting-item">
+                                <span>Badge Label</span>
+                                <input type="text" id="flashBadge" value="Hot" style="padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); width:90px;">
+                            </div>
+
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="flashProductSelect" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">
+                                    Featured Products (leave empty = auto pick discounted)
+                                </label>
+                                <select id="flashProductSelect" multiple style="height:110px; width:100%; padding:6px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                    <option value="" disabled>Loading products...</option>
+                                </select>
+                                <small style="color:var(--text-secondary);">Hold Ctrl/Cmd to select multiple hot cards.</small>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>▶️ Autoplay Speed</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="range" id="flashAutoplay" min="1000" max="6000" step="200" value="2600" style="width:120px;">
+                                    <span id="flashAutoplayLabel" style="font-size:0.75rem; color:var(--text-secondary);">2.6s</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>Cards on Desktop</span>
+                                <select id="flashPerView" style="padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>⏳ Countdown Duration</span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="flashDuration" min="5" max="1440" step="5" value="120" style="width:80px; padding:6px 8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                    <span style="font-size:0.75rem; color:var(--text-secondary);">min (restarts on page load)</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <span>🎨 Accent Color</span>
+                                <input type="color" id="flashAccent" value="#ff5000" style="width:40px; height:32px; padding:2px; border-radius:4px; cursor:pointer; border:1px solid var(--border);">
+                            </div>
+
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveFlashBtn">💾 Save Flash Sale</button>
+                                <button class="button button-secondary" id="resetFlashBtn">↩️ Reset to Default</button>
+                                <span id="flashStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Animation Settings -->
+                        <div class="setting-card glass-card">
+                            <h3>Animations</h3>
+                            <div class="setting-item">
+                                <span>Enable Animations</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settingsAnimations" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Compact Mode</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settingsCompact">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Auto-Save -->
+                        <div class="setting-card glass-card">
+                            <h3>Auto-Save</h3>
+                            <div class="setting-item">
+                                <span>Enable Auto-Save</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settingsAutoSave" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CONFIRM MODAL -->
+    <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <span class="eyebrow">CONFIRM ACTION</span>
+            <h2 id="confirmTitle">Delete Product?</h2>
+            <p>This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="button button-danger" id="confirmYes">Delete</button>
+                <button class="button button-secondary" id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX -->
+    <div class="lightbox" id="imageLightbox" role="dialog" aria-modal="true">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Close preview">×</button>
+        <img id="lightboxImg" alt="Full image preview">
+    </div>
+
+    <!-- AI CHAT -->
+    <div class="chat-widget">
+        <div class="chat-panel" id="aiChatPanel" role="dialog" aria-label="Admin assistant">
+            <div class="chat-header">
+                <strong>Admin Assistant</strong>
+                <div class="chat-header-actions">
+                    <button id="aiChatClear">Clear</button>
+                    <button id="aiChatClose">×</button>
+                </div>
+            </div>
+            <div class="chat-messages" id="aiChatMessages" aria-live="polite"></div>
+            <div class="chat-input-wrap">
+                <textarea id="aiChatInput" rows="1" placeholder="Ask about your admin panel..."></textarea>
+                <button id="aiChatSend">→</button>
+            </div>
+        </div>
+        <button class="chat-toggle" id="aiChatToggle">AI</button>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="js/admin-core.js"></script>
+    <script src="js/admin-media.js"></script>
+    <script src="js/admin-products.js"></script>
+    <script src="js/admin-orders.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script src="js/admin-settings.js"></script>
+    <script src="js/admin-main.js"></script>
+    <script src="js/page-settings.js"></script>
+</body>
+</html>

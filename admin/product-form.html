@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Add / Edit Product — Grabby Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+        <div class="login-card glass-card">
+            <div class="brand brand-login">
+                <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                <span id="loginTitle">Grabby Admin</span>
+            </div>
+            <div class="login-heading">
+                <span class="eyebrow">CONTROL CENTER</span>
+                <h1>Welcome back.</h1>
+                <p>Sign in to manage your store.</p>
+            </div>
+            <form id="loginForm" novalidate>
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="loginEmail" autocomplete="email" placeholder="admin@example.com" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <div class="password-wrap">
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">Show</button>
+                    </div>
+                </label>
+                <p class="form-error" id="loginError" role="alert"></p>
+                <p class="rate-limit" id="loginRateLimit">Too many attempts. Please try again later.</p>
+                <button type="submit" class="button button-primary button-full" id="loginBtn">
+                    <span class="button-label">Sign in</span>
+                    <span class="button-loader" aria-hidden="true"></span>
+                </button>
+            </form>
+            <p class="login-footer">Secure administration panel</p>
+        </div>
+    </section>
+
+    <!-- ADMIN APP -->
+    <div class="admin-layout" id="adminLayout">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-top">
+                <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+                <div class="brand">
+                    <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
+                    <span>Grabby Tech</span>
+                </div>
+                <span class="admin-label">ADMIN</span>
+            </div>
+            <nav class="admin-nav" aria-label="Admin navigation">
+                <a href="dashboard.html" data-section="dashboard">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="products.html" data-section="products">
+                    <span class="nav-icon">▦</span>
+                    <span>Products</span>
+                </a>
+                <a href="product-form.html" data-section="add" class="active">
+                    <span class="nav-icon">＋</span>
+                    <span>Add Product</span>
+                </a>
+                <a href="orders.html" data-section="orders">
+                    <span class="nav-icon">☰</span>
+                    <span>Orders</span>
+                </a>
+                <a href="activity.html" data-section="activity">
+                    <span class="nav-icon">◷</span>
+                    <span>Cart Activity</span>
+                </a>
+                <a href="payments.html" data-section="payments">
+                    <span class="nav-icon">◉</span>
+                    <span>Payment Settings</span>
+                </a>
+                <a href="settings.html" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="sidebar-action" id="logoutBtn">
+                    <span>↪</span>
+                    <span>Sign out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+                    <div>
+                        <span class="eyebrow">GRABBY TECH ADMIN</span>
+                        <h1 id="pageTitle">Add Product</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">
+                        <span class="theme-icon">🌙</span>
+                        <span class="theme-label">Dark</span>
+                    </button>
+                    <button class="icon-button" id="refreshStats" title="Refresh">↻</button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <!-- ADD / EDIT PRODUCT -->
+                <section class="panel" id="addSection">
+                    <div class="panel-header">
+                        <div>
+                            <span class="eyebrow">CATALOG</span>
+                            <h2 id="formTitle">Add Product</h2>
+                        </div>
+                        <button type="button" class="button button-ghost" id="cancelEdit">Reset</button>
+                    </div>
+                    <form class="product-form" id="productForm" novalidate>
+                        <input type="hidden" id="editId">
+                        <label class="field field-wide"><span>Product Title *</span><input type="text" id="prodTitle" placeholder="Enter product title" required></label>
+                        <div class="field field-wide"><span>Media Gallery (Images & YouTube)</span><div id="imageGalleryContainer"><div class="image-gallery-inputs" id="imageInputsWrapper"></div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button type="button" class="button button-secondary" id="addImageBtn">➕ Add Image</button><button type="button" class="button button-secondary" id="addMediaBtn">➕ Add Media (Image/YouTube)</button></div></div><div id="imageGalleryPreview" class="image-gallery-preview"></div></div>
+                        <label class="field"><span>Category</span><select id="prodCategory"><option value="audio">Audio</option><option value="electronics">Electronics</option><option value="gaming">Gaming</option><option value="wearables">Wearables</option><option value="accessories">Accessories</option><option value="camera">Camera</option><option value="lifestyle">Lifestyle</option></select></label>
+                        <label class="field"><span>Brand</span><input type="text" id="prodBrand" placeholder="e.g. Apple, Samsung"></label>
+                        <label class="field"><span>Price (৳) *</span><input type="number" id="prodPrice" min="0" step="1" placeholder="0" required></label>
+                        <label class="field"><span>Compare Price (Original)</span><input type="number" id="prodOriginal" min="0" step="1" placeholder="Optional"></label>
+                        <label class="field"><span>Badge</span><input type="text" id="prodBadge" placeholder="Sale, New, Hot..."></label>
+                        <label class="field"><span>Sold Count</span><input type="text" id="prodSold" placeholder="e.g. 1.2K, 10K+, Popular"></label>
+                        <label class="field"><span>Rating</span><input type="number" id="prodRating" min="0" max="5" step="0.1" placeholder="0"></label>
+                        <label class="field"><span>Reviews</span><input type="number" id="prodReviews" min="0" step="1" placeholder="0"></label>
+                        <label class="checkbox-field"><input type="checkbox" id="prodInStock" checked><span>Product is in stock</span></label>
+                        <label class="field field-wide"><span>Short Description</span><textarea id="prodShortDesc" rows="2" placeholder="Brief summary"></textarea></label>
+                        <label class="field field-wide"><span>Full Description</span><textarea id="prodFullDesc" rows="6" placeholder="Supports paragraphs, line breaks, bullets (- or *), emojis"></textarea><div class="desc-preview" id="descPreview" style="display:none;"></div><button type="button" class="mini-button" id="toggleDescPreview" style="margin-top:4px;">Preview</button></label>
+                        <div class="field field-wide"><span>Specifications</span><div id="specsContainer"><div class="spec-group"><input type="text" class="spec-key" placeholder="Key"><input type="text" class="spec-value" placeholder="Value"><button type="button" class="mini-button remove-spec" style="background:var(--danger); color:#fff;">✕</button></div></div><button type="button" class="mini-button" id="addSpecBtn">➕ Add Spec</button></div>
+                        <div class="field field-wide"><span>Product Sections</span><div id="sectionsContainer"></div><button type="button" class="button button-secondary" id="addSectionBtn" style="margin-top:10px;">➕ Add Custom Section</button></div>
+                        <div class="field field-wide"><span>Related Products</span><select id="relatedProductsSelect" multiple style="height:100px; width:100%;"></select><small>Hold Ctrl/Cmd to select multiple</small></div>
+                        <div class="form-actions field-wide"><button type="submit" class="button button-primary">Save Product</button><button type="button" class="button button-secondary" id="formResetButton">Clear</button></div>
+                    </form>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CONFIRM MODAL -->
+    <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <span class="eyebrow">CONFIRM ACTION</span>
+            <h2 id="confirmTitle">Delete Product?</h2>
+            <p>This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="button button-danger" id="confirmYes">Delete</button>
+                <button class="button button-secondary" id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX -->
+    <div class="lightbox" id="imageLightbox" role="dialog" aria-modal="true">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Close preview">×</button>
+        <img id="lightboxImg" alt="Full image preview">
+    </div>
+
+    <!-- AI CHAT -->
+    <div class="chat-widget">
+        <div class="chat-panel" id="aiChatPanel" role="dialog" aria-label="Admin assistant">
+            <div class="chat-header">
+                <strong>Admin Assistant</strong>
+                <div class="chat-header-actions">
+                    <button id="aiChatClear">Clear</button>
+                    <button id="aiChatClose">×</button>
+                </div>
+            </div>
+            <div class="chat-messages" id="aiChatMessages" aria-live="polite"></div>
+            <div class="chat-input-wrap">
+                <textarea id="aiChatInput" rows="1" placeholder="Ask about your admin panel..."></textarea>
+                <button id="aiChatSend">→</button>
+            </div>
+        </div>
+        <button class="chat-toggle" id="aiChatToggle">AI</button>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="js/admin-core.js"></script>
+    <script src="js/admin-media.js"></script>
+    <script src="js/admin-products.js"></script>
+    <script src="js/admin-orders.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script src="js/admin-settings.js"></script>
+    <script src="js/admin-main.js"></script>
+    <script src="js/page-product-form.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import { formatPrice, renderStars, escapeHtml } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { loadMarquee } from './marquee.js';
 import { initFlashSale } from './flash-sale.js';
+import { initHeroBanners } from './hero-banners.js';
 import { fetchIPAndLocation, logCartActivity, trackVisitor, trackCartAdd } from './tracking.js';
 import { getSearchResults, highlightMatch } from '../core/search.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
@@ -128,6 +129,7 @@ let suggestionIndex = -1;
 // ─── DOM REFS ──────────────────────────────────────────
 let grid, countEl, noMsg, searchInput, suggestions, cartCountEl, wishCountEl;
 let cartItemsEl, cartTotalEl, cartSidebar, cartToggleBtn, cartCloseBtn;
+let wishlistSidebar, wishlistItemsEl, wishlistCloseBtn, wishlistPanelCount;
 let overlay, sidebar, menuBtn, closeBtn, modalOverlay, modalCloseBtn;
 let modalImage, modalTitle, modalCategory, modalRating, modalPrice;
 let modalDesc, modalSpecs, modalAddBtn, modalWishBtn, sortSelect;
@@ -148,6 +150,10 @@ function getRefs() {
     cartSidebar = document.getElementById('cartSidebar');
     cartToggleBtn = document.getElementById('cartToggleBtn');
     cartCloseBtn = document.getElementById('cartCloseBtn');
+    wishlistSidebar = document.getElementById('wishlistSidebar');
+    wishlistItemsEl = document.getElementById('wishlistItems');
+    wishlistCloseBtn = document.getElementById('wishlistCloseBtn');
+    wishlistPanelCount = document.getElementById('wishlistPanelCount');
     overlay = document.getElementById('overlay');
     sidebar = document.getElementById('sidebar');
     menuBtn = document.getElementById('menuBtn');
@@ -209,6 +215,7 @@ async function init() {
     }
 
     loadMarquee();
+    initHeroBanners();
     fetchIPAndLocation();
     initFlashSale(productsData);
 
@@ -466,11 +473,67 @@ function toggleWishlist(id) {
     }
 
     if (modalProductId === id) updateModalWishBtn();
+    if (wishlistSidebar && wishlistSidebar.classList.contains('active')) renderWishlistItems();
     showToast(wasLiked ? 'Removed from wishlist' : 'Added to wishlist');
 }
 
 function saveWishlist() { localStorage.setItem(STORAGE_KEYS.wishlist, JSON.stringify([...wishlist])); }
-function updateWishlistUI() { if (wishCountEl) wishCountEl.textContent = getWishlistCount(); }
+function updateWishlistUI() {
+    if (wishCountEl) wishCountEl.textContent = getWishlistCount();
+    if (wishlistPanelCount) wishlistPanelCount.textContent = `(${getWishlistCount()})`;
+    renderWishlistItems();
+}
+
+function renderWishlistItems() {
+    if (!wishlistItemsEl) return;
+    if (wishlist.size === 0) {
+        wishlistItemsEl.innerHTML = '<div class="empty-cart-msg">Your wishlist is empty.</div>';
+        return;
+    }
+    const items = [...wishlist].map(id => getProduct(id)).filter(Boolean);
+    if (!items.length) {
+        wishlistItemsEl.innerHTML = '<div class="empty-cart-msg">Your wishlist is empty.</div>';
+        return;
+    }
+    wishlistItemsEl.innerHTML = items.map(p => {
+        const imageSrc = (p.images && p.images.length) ? p.images[0] : p.image;
+        return `
+            <div class="wishlist-item" data-id="${p.id}">
+                <div class="wishlist-item-img"><img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(p.title)}" /></div>
+                <div class="wishlist-item-info">
+                    <div class="wishlist-item-title">${escapeHtml(p.title)}</div>
+                    <div class="wishlist-item-price">${formatPrice(p.price)}</div>
+                    <button class="wishlist-add" data-action="wishlist-add-cart" data-id="${p.id}" ${!p.inStock ? 'disabled' : ''}>${p.inStock ? 'Add to Cart' : 'Sold Out'}</button>
+                </div>
+                <button class="wishlist-remove" data-action="wishlist-remove" data-id="${p.id}" aria-label="Remove">✕</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateProductWishlistButtons() {
+    document.querySelectorAll('.wishlist-heart').forEach(heart => {
+        const id = parseInt(heart.dataset.id);
+        const isNowLiked = wishlist.has(id);
+        heart.textContent = isNowLiked ? '♥' : '♡';
+        heart.classList.toggle('liked', isNowLiked);
+        heart.setAttribute('aria-label', isNowLiked ? 'Remove from wishlist' : 'Add to wishlist');
+    });
+}
+
+function openWishlist() {
+    if (!wishlistSidebar || !overlay) return;
+    renderWishlistItems();
+    wishlistSidebar.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeWishlistFn() {
+    if (!wishlistSidebar || !overlay) return;
+    wishlistSidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
 
 // ─── MODAL ──────────────────────────────────────────────
 function openModal(id) {
@@ -606,6 +669,7 @@ function bindEvents() {
     if (overlay) overlay.addEventListener('click', () => {
         if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
         if (cartSidebar && cartSidebar.classList.contains('active')) closeCartFn();
+        if (wishlistSidebar && wishlistSidebar.classList.contains('active')) closeWishlistFn();
         if (modalOverlay && modalOverlay.classList.contains('active')) closeModal();
     });
 
@@ -727,14 +791,14 @@ function bindEvents() {
         if (e.key === 'Escape') {
             if (modalOverlay && modalOverlay.classList.contains('active')) closeModal();
             if (cartSidebar && cartSidebar.classList.contains('active')) closeCartFn();
+            if (wishlistSidebar && wishlistSidebar.classList.contains('active')) closeWishlistFn();
             if (sidebar && sidebar.classList.contains('active')) toggleSidebar();
         }
     });
 
     const wishToggleBtn = document.getElementById('wishlistToggleBtn');
-    if (wishToggleBtn) wishToggleBtn.addEventListener('click', () => {
-        showToast(`Wishlist has ${getWishlistCount()} items`);
-    });
+    if (wishToggleBtn) wishToggleBtn.addEventListener('click', openWishlist);
+    if (wishlistCloseBtn) wishlistCloseBtn.addEventListener('click', closeWishlistFn);
 
     if (grid) {
         grid.addEventListener('click', function (e) {
@@ -783,6 +847,28 @@ function bindEvents() {
                     if (btn) btn.textContent = 'Add to Cart';
                     if (cartCountEl) cartCountEl.textContent = getCartCount();
                 }
+            }
+        });
+    }
+
+    if (wishlistItemsEl) {
+        wishlistItemsEl.addEventListener('click', (e) => {
+            const addBtn = e.target.closest('[data-action="wishlist-add-cart"]');
+            const removeBtn = e.target.closest('[data-action="wishlist-remove"]');
+            const item = e.target.closest('.wishlist-item');
+            if (addBtn) {
+                e.stopPropagation();
+                addToCart(parseInt(addBtn.dataset.id));
+            } else if (removeBtn) {
+                e.stopPropagation();
+                const id = parseInt(removeBtn.dataset.id);
+                if (wishlist.delete(id)) {
+                    saveWishlist();
+                    updateWishlistUI();
+                    updateProductWishlistButtons();
+                }
+            } else if (item) {
+                navigateToProduct(parseInt(item.dataset.id));
             }
         });
     }

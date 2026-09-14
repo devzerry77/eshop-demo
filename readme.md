@@ -87,7 +87,8 @@ grabbytech website/
 - **Fast loading:** critical CSS (`variables.css`, `base.css`) stays in the `<head>`; the rest loads asynchronously (`media="print"` swap). A FOUC-guard script applies theme + stored site colors before first paint.
 - **`js/` modules** are loaded as `<script type="module">` on public pages and plain `<script>` on admin (with Supabase UMD loaded before them).
 - **`admin.js` was split** into 7 focused modules sharing `window.admin` namespace.
-- **`about.html`** is a real About Us page (the old "second admin panel" markup is gone; Orders/Payment Settings were rebuilt fresh in `admin/index.html` + `admin/js/admin-orders.js`).
+- **`about.html`** is a real About Us page.
+- **Admin panel is multi-page:** `admin/dashboard.html`, `products.html`, `product-form.html`, `orders.html`, `activity.html`, `payments.html`, `settings.html` — each loads its own data instead of one page showing/hiding sections. Shared logic lives in `admin/js/*` (core, media, products, orders, dashboard, settings) plus a per-page `page-*.js` bootstrap.
 - **No standalone `cart.js` or `wishlist.js`.** Home, product detail, and checkout each handle cart/wishlist internally per the original architecture.
 - **`product-detail.js`** dynamically sets the page title to `{product} — Grabby Tech`.
 
