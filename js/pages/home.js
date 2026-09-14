@@ -25,10 +25,11 @@ function getCache() {
 }
 
 function setCache(data) {
+    const existing = getCache();
     const cache = {
         products: data,
         timestamp: Date.now(),
-        scrollY: window.scrollY || 0,
+        scrollY: existing ? existing.scrollY : (window.scrollY || 0),
         filter: currentCategory,
         sort: currentSort,
     };
@@ -41,7 +42,6 @@ function restoreCache() {
         productsData = cache.products;
         currentCategory = cache.filter || 'all';
         currentSort = cache.sort || 'featured';
-        setTimeout(() => { window.scrollTo(0, cache.scrollY || 0); }, 100);
         return true;
     }
     return false;
@@ -251,6 +251,8 @@ async function init() {
             updateCartUI();
             updateWishlistUI();
             hideSkeleton();
+            const cache = getCache();
+            if (cache) setTimeout(() => { window.scrollTo(0, cache.scrollY || 0); }, 0);
         } else {
             window.location.reload();
         }
