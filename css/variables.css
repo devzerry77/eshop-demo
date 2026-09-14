@@ -110,14 +110,14 @@
     --skeleton-shine: #2f3742;
 }
 
-/* ─── PRESET: LIGHT ─── */
+/* ─── PRESET: LIGHT (BRIGHT MODE — pure white) ─── */
 :root[data-chrome="light"] {
     --bg: #ffffff;
     --text: #14171c;
     --text-secondary: #5b6470;
-    --secondary-bg: #e9ebef;
+    --secondary-bg: #ffffff;
     --card-bg: #ffffff;
-    --border: #d8dce2;
+    --border: #e3e6ea;
     --accent: #23282f;
     --input-bg: #ffffff;
     --input-border: #d8dce2;
@@ -127,10 +127,32 @@
     --header-bg: #23282f;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(255, 255, 255, 0.92);
-    --silver-grad: linear-gradient(135deg, #e4e7ea 0%, #c9ced4 50%, #98a0ab 100%);
-    --skeleton-base: #e7e9ec;
-    --skeleton-shine: #f7f8f9;
+    --silver-grad: linear-gradient(135deg, #f6f7f8 0%, #eef0f2 50%, #e4e7ea 100%);
+    --skeleton-base: #eceef0;
+    --skeleton-shine: #fafbfc;
 }
+/* Keep light-mode interactive controls visible on pure white */
+:root[data-chrome="light"]:not([data-theme="dark"]) .filter-chip,
+:root[data-chrome="light"]:not([data-theme="dark"]) .filter-sort-btn,
+:root[data-chrome="light"]:not([data-theme="dark"]) .back-btn,
+:root[data-chrome="light"]:not([data-theme="dark"]) .product-detail-meta span {
+    border: 1px solid var(--border);
+}
+:root[data-chrome="light"]:not([data-theme="dark"]) .filter-chip:hover { background:#f2f3f5; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .filter-sort-btn:hover { background:#f2f3f5; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .back-btn:hover { background:#f2f3f5; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .button-secondary:hover { background:#f2f3f5; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .filter-panel { background:#ffffff; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .sort-select { background:#ffffff; }
+/* Keep product cards flat on the pure-white Light preset (no gray shadows/borders) */
+:root[data-chrome="light"]:not([data-theme="dark"]) .product-card,
+:root[data-chrome="light"]:not([data-theme="dark"]) .flash-card,
+:root[data-chrome="light"]:not([data-theme="dark"]) .skeleton-card {
+    box-shadow: none;
+    border-color: transparent;
+}
+:root[data-chrome="light"]:not([data-theme="dark"]) .product-card:hover,
+:root[data-chrome="light"]:not([data-theme="dark"]) .flash-card:hover { box-shadow: none; }
 :root[data-chrome="light"][data-theme="dark"] {
     --bg: #101014;
     --text: #eceef1;

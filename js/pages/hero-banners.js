@@ -195,20 +195,10 @@ export async function initHeroBanners() {
     section.classList.remove('active');
 
     const local = readLocalSettings();
-    const settings = resolveSettings(local);
-    render(settings);
-
     const remote = await fetchSupabaseSettings();
-    if (remote) {
-        persistLocalSettings(remote);
-        const fresh = resolveSettings(Object.assign({}, local, remote));
-        if (fresh.enabled !== settings.enabled ||
-            fresh.title !== settings.title ||
-            fresh.autoplayMs !== settings.autoplayMs ||
-            JSON.stringify(fresh.slides) !== JSON.stringify(settings.slides)) {
-            render(fresh);
-        }
-    }
+    if (remote) persistLocalSettings(remote);
+    const settings = resolveSettings(remote || local);
+    render(settings);
 }
 
 // Reload when the admin saves hero settings in another tab.

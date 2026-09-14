@@ -56,18 +56,19 @@
 .marquee-bar { background:var(--header-bg); color:var(--header-text); font-weight:500; font-size:0.85rem; padding:6px 0; text-align:center; border-top:1px solid rgba(255,255,255,0.08); overflow:hidden; white-space:nowrap; }
 .marquee-bar span { display:inline-block; animation:marqueeScroll 20s linear infinite; padding-left:100%; }
 @keyframes marqueeScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-100%); } }
+.header:has(.marquee-bar) { padding-bottom:0; }
 
 /* ─── SIDEBAR ─── */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:199; display:none; opacity:0; transition:opacity 0.35s; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
 .overlay.active { display:block; opacity:1; }
 .sidebar { position:fixed; top:0; left:-100%; width:85%; max-width:320px; height:100vh; background:var(--card-bg); color:var(--text); z-index:200; transition:left 0.4s cubic-bezier(0.32,0.72,0,1); padding:0; display:flex; flex-direction:column; box-shadow:4px 0 24px rgba(0,0,0,0.15); }
 .sidebar.active { left:0; }
-.sidebar-close { position:absolute; top:14px; right:14px; font-size:1.4rem; color:var(--text); cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; z-index:10; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
+.sidebar-close { position:absolute; top:14px; right:14px; font-size:1.4rem; color:var(--header-text); cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; z-index:10; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
 .sidebar-close:hover { background:var(--secondary-bg); }
-.sidebar-brand { display:flex; flex-direction:column; align-items:center; padding:3rem 1.5rem 1.5rem; background:var(--secondary-bg); }
+.sidebar-brand { display:flex; flex-direction:column; align-items:center; padding:3rem 1.5rem 1.5rem; background:var(--header-bg); }
 .sidebar-brand .logo-mark { width:64px; height:64px; font-size:2.2rem; margin-bottom:0.6rem; }
 .sidebar-brand .logo-img { height:64px; width:auto; margin-bottom:0.6rem; }
-.sidebar-brand .brand-title { font-size:0.9rem; font-weight:600; letter-spacing:2px; color:var(--text-secondary); text-transform:uppercase; }
+.sidebar-brand .brand-title { font-size:0.9rem; font-weight:600; letter-spacing:2px; color:var(--header-text); text-transform:uppercase; }
 .sidebar-menu { flex:1; overflow-y:auto; padding:1.5rem; }
 .menu-section { margin-bottom:2rem; }
 .menu-section h3 { color:var(--text-secondary); font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:1rem; font-weight:600; }
@@ -126,7 +127,7 @@
 .footer-inner { max-width:1400px; margin:0 auto; text-align:center; }
 .footer-brand { display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:1.3rem; }
 .footer-brand .logo-mark { width:38px; height:38px; font-size:1.3rem; }
-.footer-brand .logo-img { height:38px; width:auto; max-width:200px; object-fit:contain; }
+.footer-brand .logo-img { height:190px; width:auto; max-width:200px; object-fit:contain; }
 .footer-tagline { color:var(--footer-text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem; }
 .footer-links { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; font-size:0.85rem; margin-bottom:1.2rem; }
 .footer-links a { color:var(--footer-text-secondary); transition:color 0.2s; }

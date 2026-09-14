@@ -1,6 +1,6 @@
 // ─── SEARCH RESULTS PAGE (Daraz/AliExpress style) ───────
 import { formatPrice, escapeHtml } from '../core/utils.js';
-import { loadTheme, toggleTheme } from '../core/theme.js';
+import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { getCart, saveCart, getCartCount, addCartItem, removeCartItem, loadWishlist, saveWishlist, getCartItem, computeCartTotal } from '../core/storage.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
 import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core/search.js';
@@ -403,7 +403,7 @@ function bindEvents() {
         const cartBtn = e.target.closest('[data-action="add-cart"]');
         if (wishBtn) { e.stopPropagation(); e.preventDefault(); toggleWishlist(Number(wishBtn.dataset.id)); return; }
         if (cartBtn) { e.stopPropagation(); e.preventDefault(); addToCart(Number(cartBtn.dataset.id)); return; }
-        if (card) { e.preventDefault(); window.location.href = 'product.html?id=' + card.dataset.id; }
+        if (card) { e.preventDefault(); document.body.classList.add('page-exit'); setTimeout(() => { window.location.href = 'product.html?id=' + card.dataset.id; }, 220); }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -431,6 +431,7 @@ async function init() {
     if (heading) heading.textContent = q ? `Results for “${q}”` : 'All products';
     if (sortSelect) sortSelect.value = currentSort;
     loadTheme();
+    loadSitePalette();
 
     const cached = getCachedProducts();
     if (cached) {

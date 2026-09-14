@@ -240,6 +240,7 @@
 
     // ─── HERO / TOP BANNER CAROUSEL ──────────────────────────
     const HERO_KEYS = ['hero_enabled', 'hero_title', 'hero_autoplay_ms', 'hero_slides'];
+    const DEFAULT_HERO_ENABLED = true;
 
     function defaultHeroSlides() {
         return [];
@@ -496,15 +497,48 @@
         }
     }
 
-    function resetHeroSettings() {
+    async function toggleHeroSetting() {
+        const isEnabled = DOM.heroEnabled.checked;
+        const settings = [{ key: 'hero_enabled', value: String(isEnabled) }];
+        DOM.heroStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            localStorage.setItem('grabby_hero_enabled', String(isEnabled));
+            showToast(isEnabled ? 'Hero banners enabled' : 'Hero banners disabled', 'success');
+            DOM.heroStatus.textContent = '✓ Saved';
+            setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2000);
+        } catch (err) {
+            showToast('Failed to save: ' + err.message, 'error');
+            DOM.heroStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function resetHeroSettings() {
         heroSlides = defaultHeroSlides();
-        DOM.heroEnabled.checked = true;
+        DOM.heroEnabled.checked = DEFAULT_HERO_ENABLED;
         DOM.heroTitle.value = '';
         DOM.heroAutoplay.value = 4000;
         updateHeroAutoplayLabel();
         renderHeroSlides();
-        DOM.heroStatus.textContent = 'Reset to default — click Save to publish';
-        setTimeout(() => { DOM.heroStatus.textContent = ''; }, 3000);
+        const settings = [
+            { key: 'hero_enabled', value: 'true' },
+            { key: 'hero_title', value: '' },
+            { key: 'hero_autoplay_ms', value: '4000' },
+            { key: 'hero_slides', value: '[]' }
+        ];
+        DOM.heroStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            settings.forEach(s => { localStorage.setItem('grabby_' + s.key, s.value); });
+            showToast('Hero banners reset to default', 'success');
+            DOM.heroStatus.textContent = '✓ Saved';
+            setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2000);
+        } catch (err) {
+            showToast('Failed to save: ' + err.message, 'error');
+            DOM.heroStatus.textContent = '✗ Error';
+        }
     }
 
     function addHeroSlide() {
@@ -580,14 +614,17 @@
         const activeBtn = DOM.themePresets.querySelector('.theme-preset.active') ||
             DOM.themePresets.querySelector('.theme-preset[data-preset="silver"]');
         const preset = activeBtn ? activeBtn.dataset.preset : 'silver';
-        const customColors = preset === 'custom' ? readCustomTheme() : {};
+        let customColors = readCustomTheme();
+
+        // Always persist the concrete color values, not just the preset name.
+        // If a named preset is active, fall back to its colors for any empty fields.
+        const base = PRESET_COLORS[preset] || PRESET_COLORS.silver;
+        Object.keys(base).forEach(key => { if (!customColors[key]) customColors[key] = base[key]; });
 
         const settings = [{ key: 'theme_preset', value: preset }];
-        if (preset === 'custom') {
-            SITE_COLOR_KEYS.forEach(({ key }) =>
-                settings.push({ key: 'theme_' + key, value: customColors[key] })
-            );
-        }
+        SITE_COLOR_KEYS.forEach(({ key }) =>
+            settings.push({ key: 'theme_' + key, value: customColors[key] })
+        );
 
         DOM.themeStatus.textContent = 'Saving...';
         try {
@@ -638,6 +675,7 @@
 
         // Hero banner controls
         DOM.heroAutoplay?.addEventListener('input', admin.updateHeroAutoplayLabel);
+        DOM.heroEnabled?.addEventListener('change', admin.toggleHeroSetting);
         DOM.saveHeroBtn?.addEventListener('click', admin.saveHeroSettings);
         DOM.resetHeroBtn?.addEventListener('click', admin.resetHeroSettings);
         DOM.heroAddSlide?.addEventListener('click', () => {
@@ -689,7 +727,7 @@
         loadThemeSettings, saveThemeSettings, resetThemeSettings,
         loadFlashSettings, saveFlashSettings, resetFlashSettings,
         populateFlashProductSelect, updateFlashAutoplayLabel, recordFlashSelection,
-        loadHeroSettings, saveHeroSettings, resetHeroSettings, addHeroSlide, updateHeroAutoplayLabel,
+        loadHeroSettings, saveHeroSettings, resetHeroSettings, toggleHeroSetting, addHeroSlide, updateHeroAutoplayLabel,
         bindSettingsControls, bindThemeSettings
     });
 

@@ -589,7 +589,8 @@ function closeModal() {
 // ─── NAVIGATE ──────────────────────────────────────────
 function navigateToProduct(id) {
     setCache(productsData);
-    window.location.href = 'product.html?id=' + id;
+    document.body.classList.add('page-exit');
+    setTimeout(() => { window.location.href = 'product.html?id=' + id; }, 220);
 }
 
 // ─── SEARCH ─────────────────────────────────────────────

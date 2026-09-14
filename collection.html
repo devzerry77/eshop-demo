@@ -32,10 +32,10 @@
     </style>
     <link rel="stylesheet" href="css/variables.css" />
     <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/components.css" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/pages.css" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/responsive.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/layout.css" media="all" />
+    <link rel="stylesheet" href="css/components.css" media="all" />
+    <link rel="stylesheet" href="css/pages.css" media="all" />
+    <link rel="stylesheet" href="css/responsive.css" media="all" />
     <noscript>
         <link rel="stylesheet" href="css/layout.css" />
         <link rel="stylesheet" href="css/components.css" />
@@ -190,8 +190,7 @@
             <!-- Infinite scroll loading indicator -->
             <div class="load-more-wrap" id="loadMoreWrap">
                 <div class="loader" id="loader" style="display:none;">
-                    <div class="spinner"></div>
-                    <span>Loading more...</span>
+                    <span class="dot-loader" aria-hidden="true"><span></span><span></span><span></span></span>
                 </div>
                 <div class="load-end-msg" id="loadEndMsg" style="display:none;">— You've seen all products —</div>
             </div>

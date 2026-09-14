@@ -8,6 +8,14 @@
 
     // ─── COMMON UI (sidebar, theme, chat, session) ─────────
     function bindCommonUI() {
+        const adminNav = document.querySelector('.admin-nav');
+        if (adminNav && !document.querySelector('[data-section="back-to-website"]')) {
+            const backLink = document.createElement('a');
+            backLink.href = '../../index.html';
+            backLink.dataset.section = 'back-to-website';
+            backLink.innerHTML = '<span class="nav-icon">⌂</span><span>Go Back to Website</span>';
+            adminNav.prepend(backLink);
+        }
         DOM.adminMobileToggle?.addEventListener("click", () => {
             DOM.adminSidebar.classList.toggle("active");
             DOM.sidebarBackdrop.classList.toggle("active");

@@ -137,9 +137,9 @@
 [data-theme="dark"] .cart-item .item-qty button { background:var(--secondary-bg); color:var(--text); }
 [data-theme="dark"] .checkout-btn { background:var(--accent); color:#fff; }
 [data-theme="dark"] .sidebar { background:var(--card-bg); color:var(--text); }
-[data-theme="dark"] .sidebar-close { color:var(--text); }
+[data-theme="dark"] .sidebar-close { color:var(--header-text); }
 [data-theme="dark"] .sidebar-close:hover { background:var(--secondary-bg); }
-[data-theme="dark"] .sidebar-brand { background:var(--secondary-bg); }
+[data-theme="dark"] .sidebar-brand { background:var(--header-bg); }
 [data-theme="dark"] .sidebar-menu ul li a { color:var(--text); border-bottom-color:var(--border); }
 [data-theme="dark"] .sidebar-menu ul li a:hover { color:var(--accent-text); }
 [data-theme="dark"] .toast { background:var(--accent); color:#fff; }
@@ -179,6 +179,37 @@
 [data-theme="dark"] .loader-spinner { border-color: #333; border-top-color: #f5f5f7; }
 .product-page-loading { text-align:center; padding:4rem 1rem; color:var(--text-secondary); }
 .product-page-loading p { margin-top:0.5rem; }
+
+/* ─── PRODUCT DETAIL: FADE LOADING (no visible spinner/animation) ─── */
+.product-page .loader-spinner { display:none; }
+.product-page .product-page-loading { padding:3rem 1rem; }
+.product-page .product-page-loading p { opacity:0.75; margin-top:0; }
+.product-page #productContent.fade-in { animation:productContentIn 0.45s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+@keyframes productContentIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── PRODUCT DETAIL: ORANGE DISCOUNT BADGE + BUY NOW ─── */
+.product-page .discount-badge {
+    background:#ff5000;
+    color:#fff;
+    padding:2px 10px;
+    border-radius:20px;
+    font-size:0.8rem;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+}
+body:has(.product-page) .bar-right .bar-buy-now {
+    background:#ff5000;
+    color:#fff;
+    border:none;
+}
+body:has(.product-page) .bar-right .bar-buy-now:hover { opacity:0.85; }
+body:has(.product-page) .bar-right .bar-buy-now:active { transform:scale(0.97); }
+
+/* ─── PAGE FADE TRANSITIONS (product navigation) ─── */
+body:has(.product-page) { animation:pageFadeIn 0.35s ease both; }
+@keyframes pageFadeIn { from { opacity:0; } to { opacity:1; } }
+body.page-exit { opacity:0 !important; transform:translateY(4px); transition:opacity 0.22s ease, transform 0.22s ease; pointer-events:none; }
 
 .gallery-carousel { width:100%; height:100%; overflow:hidden; position:relative; }
 .gallery-track { display:flex; height:100%; transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94); will-change:transform; }

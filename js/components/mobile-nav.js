@@ -10,6 +10,41 @@
     if (location.pathname.includes('/admin')) return;
     if (document.getElementById('mobileBottomNav')) return;
 
+    // ─── SHARED SIDEBAR (reuse existing component on pages lacking it) ──
+    if (!document.getElementById('sidebar')) {
+        const sb = document.createElement('nav');
+        sb.className = 'sidebar';
+        sb.id = 'sidebar';
+        sb.setAttribute('aria-label', 'Main navigation');
+        sb.innerHTML = '<div class="sidebar-brand"><button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button><img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" /><span class="brand-title">GRABBY TECH</span></div><div class="sidebar-menu"><div class="menu-section"><h3>MAIN</h3><ul><li><a href="index.html" data-home-link>Home</a></li></ul></div><div class="menu-section"><h3>SHOP</h3><ul><li><a href="collection.html?category=all">Collections</a></li><li><a href="collection.html?category=audio">Audio</a></li><li><a href="collection.html?category=electronics">Electronics</a></li><li><a href="collection.html?category=gaming">Gaming</a></li><li><a href="collection.html?category=wearables">Wearables</a></li><li><a href="collection.html?category=accessories">Accessories</a></li></ul></div><div class="menu-section"><h3>ABOUT</h3><ul><li><a href="about.html">About Us</a></li><li><a href="#">Our Story</a></li><li><a href="#">Sustainability</a></li></ul></div><div class="menu-section"><h3>CONNECT</h3><ul><li><a href="#">Contact Us</a></li><li><a href="#">Shipping</a></li></ul></div></div>';
+        const ov = document.createElement('div');
+        ov.className = 'overlay';
+        ov.id = 'overlay';
+        const header = document.querySelector('.header');
+        if (header) header.after(ov, sb);
+        else { document.body.prepend(ov); document.body.prepend(sb); }
+        const hi = document.querySelector('.header-inner');
+        if (hi && !document.getElementById('menuBtn')) {
+            const mb = document.createElement('button');
+            mb.className = 'hamburger';
+            mb.id = 'menuBtn';
+            mb.setAttribute('aria-label', 'Open menu');
+            mb.innerHTML = '<span></span><span></span><span></span>';
+            hi.prepend(mb);
+        }
+        const closeBtn = document.getElementById('closeBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        function toggleSidebar(open) {
+            if (!sb || !ov) return;
+            sb.classList.toggle('active', open);
+            ov.classList.toggle('active', open);
+            document.body.style.overflow = open ? 'hidden' : 'auto';
+        }
+        menuBtn?.addEventListener('click', () => toggleSidebar(true));
+        closeBtn?.addEventListener('click', () => toggleSidebar(false));
+        ov?.addEventListener('click', () => toggleSidebar(false));
+    }
+
     const CART_KEY = 'grabby_cart';
     let badgeEl = null;
 
@@ -94,6 +129,16 @@
             if (key === 'home') {
                 if (isHomePage()) {
                     e.preventDefault();
+                    // If a category filter is active, reset it so Home shows all products.
+                    const activeChip = document.querySelector('.filter-chip.active');
+                    if (activeChip && activeChip.dataset.category !== 'all') {
+                        const allChip = document.querySelector('.filter-chip[data-category="all"]');
+                        if (allChip) allChip.click();
+                        else {
+                            const resetBtn = document.getElementById('clearFiltersBtn');
+                            if (resetBtn) resetBtn.click();
+                        }
+                    }
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
                 return;

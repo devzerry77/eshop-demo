@@ -195,6 +195,8 @@ async function loadProduct() {
         document.getElementById('productContent').innerHTML =
             '<div style="text-align:center;padding:4rem;color:var(--text-secondary);"><h2>Product not found</h2><a href="index.html" class="back-btn" style="margin-top:1rem;">Back to Shop</a></div>';
         document.getElementById('stickyBar').style.display = 'none';
+        const nf = document.getElementById('productContent');
+        if (nf) { nf.classList.remove('fade-in'); void nf.offsetWidth; nf.classList.add('fade-in'); }
         return;
     }
 
@@ -551,13 +553,6 @@ async function loadProduct() {
         }
     });
 
-    // ─── RELATED PRODUCT CLICKS ─────────────────────────
-    document.querySelectorAll('.related-card').forEach(card => {
-        card.addEventListener('click', function () {
-            window.location.href = 'product.html?id=' + this.dataset.id;
-        });
-    });
-
     // ─── CART SIDEBAR EVENTS ────────────────────────────
     updateCartUI(cart, productsData);
     document.getElementById('pageCartBtn')?.addEventListener('click', openCart);
@@ -605,6 +600,22 @@ async function loadProduct() {
         if (!cartNow.length) { showPageToast('Cart is empty'); return; }
         window.location.href = 'checkout.html';
     });
+
+    // ─── RELATED PRODUCT CLICKS (fade-out transition) ───
+    document.querySelectorAll('.related-card').forEach(card => {
+        card.addEventListener('click', function () {
+            document.body.classList.add('page-exit');
+            setTimeout(() => { window.location.href = 'product.html?id=' + this.dataset.id; }, 220);
+        });
+    });
+
+    // ─── CONTENT FADE-IN ───────────────────────────────
+    const productContent = document.getElementById('productContent');
+    if (productContent) {
+        productContent.classList.remove('fade-in');
+        void productContent.offsetWidth;
+        productContent.classList.add('fade-in');
+    }
 
     document.getElementById('stickyBar').style.display = 'block';
 }
