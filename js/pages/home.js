@@ -6,7 +6,7 @@ import { loadMarquee } from './marquee.js';
 import { initFlashSale } from './flash-sale.js';
 import { initHeroBanners } from './hero-banners.js';
 import { fetchIPAndLocation, logCartActivity, trackVisitor, trackCartAdd } from './tracking.js';
-import { getSearchResults, highlightMatch } from '../core/search.js';
+import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core/search.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
 import { ensureProducts } from '../core/products-loader.js';
 
@@ -607,17 +607,33 @@ function updateSuggestions(query) {
     if (!suggestions) return;
     const q = String(query || '').trim();
     if (!q) { suggestions.classList.remove('active'); suggestionCount = 0; return; }
+    const keywords = getKeywordSuggestions(q, 4).filter(kw => !productsData.some(p => String(p.title || '').toLowerCase() === kw));
     const matches = getSearchResults(productsData, q, 6);
-    suggestions.innerHTML = matches.length ? matches.map(p => {
+    if (!keywords.length && !matches.length) {
+        suggestions.innerHTML = `<div class="suggestion-items-empty">No products found for “${escapeHtml(q)}”</div>`;
+        suggestions.classList.add('active');
+        suggestionCount = 0;
+        return;
+    }
+    const kwHtml = keywords.map(kw => `
+        <a class="suggestion-item suggestion-keyword" href="search.html?q=${encodeURIComponent(kw)}" data-q="${encodeURIComponent(kw)}" role="option">
+            <svg class="suggestion-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <div class="suggestion-meta">
+                <span class="suggestion-title">${highlightMatch(kw, q)}</span>
+                <span class="suggestion-cat">Popular</span>
+            </div>
+        </a>`).join('');
+    const prodHtml = matches.map(p => {
         return `<a class="suggestion-item" href="search.html?q=${encodeURIComponent(p.title)}" data-id="${p.id}" role="option">
             <div class="suggestion-meta">
                 <span class="suggestion-title">${highlightMatch(p.title, q)}</span>
                 <span class="suggestion-cat">${escapeHtml(p.category)}</span>
             </div>
         </a>`;
-    }).join('') : `<div class="suggestion-items-empty">No products found for “${escapeHtml(q)}”</div>`;
+    }).join('');
+    suggestions.innerHTML = kwHtml + prodHtml;
     suggestions.classList.add('active');
-    suggestionCount = matches.length;
+    suggestionCount = keywords.length + matches.length;
 }
 
 function activateSuggestion(index) {
@@ -725,8 +741,9 @@ function bindEvents() {
     if (suggestions) suggestions.addEventListener('click', (e) => {
         const item = e.target.closest('.suggestion-item');
         if (!item) return;
-        const product = getProduct(item.dataset.id);
         closeSuggestions();
+        if (item.dataset.q) { goToSearch(decodeURIComponent(item.dataset.q)); return; }
+        const product = getProduct(item.dataset.id);
         goToSearch(product ? product.title : (searchInput ? searchInput.value : ''));
     });
 

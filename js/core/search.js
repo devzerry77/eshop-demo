@@ -78,3 +78,31 @@ export function highlightMatch(text, q) {
     if (!q) return safe;
     return safe.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
 }
+
+// ─── POPULAR SEARCH KEYWORDS (Daraz-style hot searches) ──
+const TRENDING_SEARCHES = [
+    'bluetooth speaker', 'bluetooth', 'wireless earbuds', 'earbuds', 'earphone',
+    'smart watch', 'smart band', 'power bank', 'fast charger', 'wireless charger',
+    'tempered glass', 'gaming keyboard', 'gaming', 'gamepad', 'action camera',
+    'samsung', 'xiaomi', 'realme', 'redmi', 'baseus',
+    'headset', 'waterproof', 'usb cable', 'lifestyle'
+];
+
+/**
+ * Returns popular search keywords matching rawQ, prefix matches ranked first
+ * (startsWith, then contains) — same behaviour as Daraz's suggestion dropdown.
+ */
+export function getKeywordSuggestions(rawQ, limit = 5) {
+    const q = String(rawQ || '').trim().toLowerCase();
+    if (!q) return [];
+    const out = [];
+    for (const kw of TRENDING_SEARCHES) {
+        if (out.length >= limit) break;
+        if (kw.startsWith(q)) out.push(kw);
+    }
+    for (const kw of TRENDING_SEARCHES) {
+        if (out.length >= limit) break;
+        if (!out.includes(kw) && kw.includes(q)) out.push(kw);
+    }
+    return out;
+}

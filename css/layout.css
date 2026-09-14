@@ -44,6 +44,10 @@
 .suggestion-cat { font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.4px; }
 .suggestion-price { flex-shrink:0; font-weight:700; font-size:0.85rem; color:var(--danger); }
 .suggestion-items-empty { padding:14px 18px; font-size:0.8rem; color:var(--text-secondary); }
+.suggestion-keyword .suggestion-search-icon { width:18px; height:18px; flex-shrink:0; color:var(--text-secondary); }
+.suggestion-keyword .suggestion-cat { color:var(--accent); text-transform:none; letter-spacing:0.2px; }
+.suggestion-keyword + .suggestion-keyword { border-top:1px solid var(--border); }
+.suggestion-keyword + .suggestion-item:not(.suggestion-keyword) { border-top:1px dashed var(--border); }
 
 /* ─── MARQUEE ─── */
 .marquee-bar { background:var(--header-bg); color:var(--header-text); font-weight:500; font-size:0.85rem; padding:6px 0; text-align:center; border-top:1px solid rgba(255,255,255,0.08); overflow:hidden; white-space:nowrap; }
