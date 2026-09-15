@@ -1,13 +1,13 @@
 // ─── MARQUEE LOADER ─────────────────────────────────────
 import { createClient } from '../supabase/client.js';
 
-export function applyMarqueeStyles(bar, span, text, speed, glowColor, glowIntensity, borderGlow, borderColor, bgColor, textColor) {
+export function applyMarqueeStyles(bar, span, text, speed, glow, glowColor, glowIntensity, borderGlow, borderColor, bgColor, textColor) {
     if (!bar || !span) return;
     span.innerHTML = text;
     span.style.color = textColor;
     span.style.animation = `marqueeScroll ${speed}s linear infinite`;
 
-    if (glowIntensity > 0) {
+    if (glow && glowIntensity > 0) {
         span.style.textShadow = `0 0 ${glowIntensity}px ${glowColor}, 0 0 ${glowIntensity * 2}px ${glowColor}40`;
     } else {
         span.style.textShadow = 'none';
@@ -31,6 +31,7 @@ export async function loadMarquee() {
     // Try localStorage first
     const text = localStorage.getItem('grabby_marquee_text');
     const enabled = localStorage.getItem('grabby_marquee_enabled');
+    const glow = localStorage.getItem('grabby_marquee_glow') !== 'false';
     const glowColor = localStorage.getItem('grabby_marquee_glow_color') || '#ff6b6b';
     const glowIntensity = parseInt(localStorage.getItem('grabby_marquee_glow_intensity')) || 20;
     const borderGlow = localStorage.getItem('grabby_marquee_border_glow') !== 'false';
@@ -40,7 +41,7 @@ export async function loadMarquee() {
     const textColor = localStorage.getItem('grabby_marquee_text_color') || '#ffffff';
 
     if (enabled !== 'false' && text) {
-        applyMarqueeStyles(bar, span, text, speed, glowColor, glowIntensity, borderGlow, borderColor, bgColor, textColor);
+        applyMarqueeStyles(bar, span, text, speed, glow, glowColor, glowIntensity, borderGlow, borderColor, bgColor, textColor);
         bar.style.display = 'block';
     } else if (enabled === 'false') {
         bar.style.display = 'none';
@@ -54,7 +55,7 @@ export async function loadMarquee() {
                 .from('settings')
                 .select('*')
                 .in('key', [
-                    'marquee_text', 'marquee_enabled', 'marquee_glow_color',
+                    'marquee_text', 'marquee_enabled', 'marquee_glow', 'marquee_glow_color',
                     'marquee_glow_intensity', 'marquee_border_glow', 'marquee_border_color',
                     'marquee_speed', 'marquee_bg_color', 'marquee_text_color'
                 ]);
@@ -69,6 +70,7 @@ export async function loadMarquee() {
                         bar, span,
                         settings.marquee_text,
                         parseInt(settings.marquee_speed) || 20,
+                        settings.marquee_glow !== 'false',
                         settings.marquee_glow_color || '#ff6b6b',
                         parseInt(settings.marquee_glow_intensity) || 20,
                         settings.marquee_border_glow !== 'false',

@@ -1,7 +1,7 @@
 // ─── SEARCH RESULTS PAGE (Daraz/AliExpress style) ───────
 import { formatPrice, escapeHtml } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
-import { getCart, saveCart, getCartCount, addCartItem, removeCartItem, loadWishlist, saveWishlist, getCartItem, computeCartTotal } from '../core/storage.js';
+import { getCart, saveCart, getCartCount, addCartItem, removeCartItem, getCartItem, computeCartTotal } from '../core/storage.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
 import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core/search.js';
 import { getCachedProducts, ensureProducts } from '../core/products-loader.js';
@@ -10,7 +10,6 @@ import { STORAGE_KEYS } from '../core/config.js';
 // ─── STATE ──────────────────────────────────────────────
 let productsData = [];
 let cart = getCart();
-let wishlist = loadWishlist();
 let q = '';
 let currentCategory = 'all';
 let currentSort = 'featured';
@@ -181,7 +180,7 @@ function render(resetScroll = true) {
     if (noMsg) noMsg.style.display = 'none';
     if (countEl) countEl.textContent = total + (q ? ` results for “${q}”` : ' products');
 
-    grid.innerHTML = toRender.map((p, idx) => buildProductCardHTML(p, idx, cart, wishlist)).join('');
+    grid.innerHTML = toRender.map((p, idx) => buildProductCardHTML(p, idx, cart)).join('');
 
     if (show < total) { if (loader) loader.style.display = 'none'; if (loadEndMsg) loadEndMsg.style.display = 'none'; allLoaded = false; }
     else { if (loader) loader.style.display = 'none'; if (loadEndMsg) loadEndMsg.style.display = 'block'; allLoaded = true; }
@@ -194,7 +193,7 @@ function appendMore() {
     const start = displayedCount;
     const end = Math.min(start + 8, filteredProducts.length);
     if (start >= filteredProducts.length) return;
-    const html = filteredProducts.slice(start, end).map((p, idx) => buildProductCardHTML(p, start + idx, cart, wishlist)).join('');
+    const html = filteredProducts.slice(start, end).map((p, idx) => buildProductCardHTML(p, start + idx, cart)).join('');
     grid.insertAdjacentHTML('beforeend', html);
     displayedCount = end;
     allLoaded = displayedCount >= filteredProducts.length;
@@ -216,18 +215,13 @@ function setupInfiniteScroll() {
     scrollObserver.observe(target);
 }
 
-// ─── CART / WISHLIST ────────────────────────────────────
+// ─── CART ───────────────────────────────────────────────
 function refreshProductCards() {
     if (!grid) return;
     grid.querySelectorAll('.add-cart-btn').forEach(btn => {
         if (btn.disabled) return;
         const p = getProduct(btn.dataset.id);
         if (p) btn.textContent = getCartItem(cart, p.id) ? '✓ In Cart' : 'Add to Cart';
-    });
-    grid.querySelectorAll('.wishlist-heart').forEach(btn => {
-        const liked = wishlist.has(Number(btn.dataset.id));
-        btn.classList.toggle('liked', liked);
-        btn.textContent = liked ? '♥' : '♡';
     });
 }
 
@@ -268,18 +262,6 @@ function removeFromCart(id) {
     updateCartUI();
     refreshProductCards();
 }
-
-function toggleWishlist(id) {
-    const p = getProduct(id);
-    if (!p) return;
-    const was = wishlist.has(id);
-    if (was) wishlist.delete(id); else wishlist.add(id);
-    saveWishlist(wishlist);
-    updateWishlistUI();
-    refreshProductCards();
-    showToast(was ? 'Removed from wishlist' : 'Added to wishlist');
-}
-function updateWishlistUI() { /* heart state handled in refreshProductCards */ }
 
 function openCart() {
     if (!cartSidebar || !overlay) return;
@@ -399,11 +381,9 @@ function bindEvents() {
 
     if (grid) grid.addEventListener('click', (e) => {
         const card = e.target.closest('.product-card');
-        const wishBtn = e.target.closest('[data-action="wishlist"]');
         const cartBtn = e.target.closest('[data-action="add-cart"]');
-        if (wishBtn) { e.stopPropagation(); e.preventDefault(); toggleWishlist(Number(wishBtn.dataset.id)); return; }
         if (cartBtn) { e.stopPropagation(); e.preventDefault(); addToCart(Number(cartBtn.dataset.id)); return; }
-        if (card) { e.preventDefault(); document.body.classList.add('page-exit'); setTimeout(() => { window.location.href = 'product.html?id=' + card.dataset.id; }, 220); }
+        if (card) { e.preventDefault(); window.open('product.html?id=' + encodeURIComponent(card.dataset.id), '_blank', 'noopener'); }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -415,11 +395,14 @@ function bindEvents() {
 
     window.addEventListener('storage', (e) => {
         if (e.key === STORAGE_KEYS.cart) { cart = getCart(); updateCartUI(); refreshProductCards(); }
-        if (e.key === STORAGE_KEYS.wishlist) { wishlist = loadWishlist(); refreshProductCards(); }
         if (e.key === STORAGE_KEYS.products) { ensureProducts().then(list => { productsData = list; render(true); }); }
     });
 
     setTimeout(() => setupInfiniteScroll(), 300);
+
+    window.addEventListener('pageshow', () => {
+        document.body.classList.remove('page-exit');
+    });
 }
 
 // ─── INIT ───────────────────────────────────────────────

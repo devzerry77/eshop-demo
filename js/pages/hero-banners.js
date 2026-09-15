@@ -122,7 +122,7 @@ function slideHTML(slide) {
     const inner = slideMediaHTML(slide);
     return `
         <div class="swiper-slide hero-slide">
-            ${link ? `<a class="hero-slide-link" href="${escapeHtml(link)}">${inner}</a>` : `<div class="hero-slide-link">${inner}</div>`}
+            ${link ? `<a class="hero-slide-link" href="${escapeHtml(link)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="hero-slide-link">${inner}</div>`}
         </div>`;
 }
 

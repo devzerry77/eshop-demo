@@ -58,7 +58,7 @@
 
     <main class="checkout-page" style="min-height:60vh;">
         <div class="checkout-container">
-            <div class="back-to-shop"><a href="index.html">← Back to Shop</a></div>
+            <div class="back-to-shop"><a href="index.html"><img class="back-to-shop-arrow" src="assets/logos/back-arrow.svg" alt=""> Back to Shop</a></div>
             <div class="auth-overlay open" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
                 <div class="auth-dialog">
                     <button class="auth-close" id="authModalClose" type="button" aria-label="Close sign in dialog">✕</button>
@@ -105,5 +105,6 @@
         document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
     </script>
     <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/components/chatbot.js"></script>
 </body>
 </html>

@@ -114,7 +114,11 @@
             "flashEnabled", "flashTitle", "flashSubtitle", "flashBadge",
             "flashProductSelect", "flashAutoplay", "flashAutoplayLabel",
             "flashPerView", "flashDuration", "flashAccent",
-            "saveFlashBtn", "resetFlashBtn", "flashStatus"
+            "saveFlashBtn", "resetFlashBtn", "flashStatus",
+            // Messenger / chat support (new)
+            "messengerLink", "messengerStatus", "saveMessengerBtn",
+            "socialFacebook", "socialInstagram", "socialYouTube", "socialTiktok", "socialX",
+            "saveSocialBtn", "socialStatus"
         ].forEach(id => DOM[id] = $(id));
     }
 

@@ -130,6 +130,7 @@
         if (DOM.activityTableBody) admin.renderActivity();
         if (DOM.ordersTableBody) admin.renderOrders();
         if (DOM.paymentMethodsAdmin) admin.renderPaymentSettings();
+        if (DOM.reviewsTableBody && admin.renderReviews) admin.renderReviews();
     }
 
     // ─── AI CHAT ────────────────────────────────────────────
@@ -146,6 +147,7 @@
         if (q.includes("delete")) return "Click **Delete** beside a product and confirm the action.";
         if (q.includes("stock")) return `${STATE.products.filter(p => p.inStock).length} products are currently in stock.`;
         if (q.includes("activity")) return `Cart activity is available under **Cart Activity**.`;
+        if (q.includes("review")) return `Reviews are managed under **Custom Reviews**: add custom reviews, photos, YouTube links, and publish/hide or delete them for any product.`;
         return "I can help you manage products, stock, search, editing, deleting, orders, payments, and cart activity.";
     }
 

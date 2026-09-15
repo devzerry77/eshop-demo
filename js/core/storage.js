@@ -58,16 +58,6 @@ export function clearCart() {
     localStorage.setItem(STORAGE_KEYS.cart, '[]');
 }
 
-// ─── WISHLIST ───────────────────────────────────────────
-export function loadWishlist() {
-    const stored = readJSON(STORAGE_KEYS.wishlist, []);
-    return new Set(stored);
-}
-
-export function saveWishlist(wishlist) {
-    writeJSON(STORAGE_KEYS.wishlist, [...wishlist]);
-}
-
 // ─── COUPON (session) ───────────────────────────────────
 export function getCoupon() {
     try {

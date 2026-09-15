@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0a0a0a">
-    <title>Dashboard — Grabby Admin</title>
+    <title>Public Reviews — Grabby Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
                 <span class="admin-label">ADMIN</span>
             </div>
             <nav class="admin-nav" aria-label="Admin navigation">
-                <a href="dashboard.html" data-section="dashboard" class="active">
+                <a href="dashboard.html" data-section="dashboard">
                     <span class="nav-icon">⌂</span>
                     <span>Dashboard</span>
                 </a>
@@ -83,7 +83,7 @@
                     <span class="nav-icon">★</span>
                     <span>Custom Reviews</span>
                 </a>
-                <a href="public-reviews.html" data-section="public-reviews">
+                <a href="public-reviews.html" data-section="public-reviews" class="active">
                     <span class="nav-icon">◈</span>
                     <span>Public Reviews</span>
                 </a>
@@ -115,7 +115,7 @@
                     <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
                     <div>
                         <span class="eyebrow">GRABBY TECH ADMIN</span>
-                        <h1 id="pageTitle">Dashboard</h1>
+                        <h1 id="pageTitle">Public Reviews</h1>
                     </div>
                 </div>
                 <div class="header-right">
@@ -129,84 +129,46 @@
 
             <div class="admin-content">
 
-                <!-- DASHBOARD STATS -->
-                <section class="stats-grid" id="statsGrid">
-                    <article class="stat-card">
-                        <span class="stat-label">Total Orders</span>
-                        <strong class="stat-number" id="statTotalOrders">0</strong>
-                        <span class="stat-meta">All orders</span>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-label">Today's Orders</span>
-                        <strong class="stat-number" id="statTodayOrders">0</strong>
-                        <span class="stat-meta" id="todayOrdersTrend">Since midnight</span>
-                    </article>
-                    <article class="stat-card revenue">
-                        <span class="stat-label">Revenue</span>
-                        <strong class="stat-number" id="statRevenue">৳ 0</strong>
-                        <span class="stat-meta">Non-cancelled orders</span>
-                    </article>
-                    <article class="stat-card pending">
-                        <span class="stat-label">Pending</span>
-                        <strong class="stat-number" id="statPendingOrders">0</strong>
-                        <span class="stat-meta">Awaiting confirmation</span>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-label">Delivered</span>
-                        <strong class="stat-number" id="statDeliveredOrders">0</strong>
-                        <span class="stat-meta">Completed orders</span>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-label">Visits</span>
-                        <strong class="stat-number" id="statVisits">0</strong>
-                        <span class="stat-meta">Total visitors</span>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-label">Live now</span>
-                        <strong class="stat-number" id="statLive">0</strong>
-                        <span class="stat-meta" id="liveTrend">No active users</span>
-                    </article>
-                    <article class="stat-card clickable" id="statCartCard" data-section="activity" tabindex="0">
-                        <span class="stat-label">Cart adds</span>
-                        <strong class="stat-number" id="statCartAdds">0</strong>
-                        <span class="stat-meta">View activity →</span>
-                    </article>
-                    <article class="stat-card">
-                        <span class="stat-label">Products</span>
-                        <strong class="stat-number" id="statProducts">0</strong>
-                        <span class="stat-meta" id="productTrend">In catalog</span>
-                    </article>
-                </section>
+                <!-- PUBLIC REVIEWS -->
+                <section class="panel" id="reviewsSection">
+                    <div class="panel-header panel-header-stack-mobile">
+                        <div><span class="eyebrow">CUSTOMER REVIEWS</span><h2>Public Reviews</h2></div>
+                        <button class="button button-secondary" id="exportPublicReviewsBtn" style="margin-left:auto;">Export CSV</button>
+                    </div>
 
-                <!-- QUICK ACTIONS -->
-                <section class="page-section quick-actions" aria-label="Quick actions">
-                    <div class="section-header">
-                        <div>
-                            <span class="eyebrow">SHORTCUTS</span>
-                            <h2>Quick Actions</h2>
+                    <p class="form-hint" style="margin:-6px 0 14px;">Real customer reviews, collected after a delivered purchase. Reviews submitted by verified customers are published automatically.</p>
+
+                    <div class="review-form-panel" id="publicReviewFormArea" style="display:none;">
+                        <div class="field-wide">
+                            <span class="eyebrow">REVIEW</span>
+                            <h3 id="publicReviewFormTitle" style="margin:4px 0 0;">Edit Review</h3>
+                        </div>
+                        <input type="hidden" id="publicReviewId">
+                        <div class="field-wide review-current-product" id="publicReviewCurrentProduct">Loading product…</div>
+                        <label class="field"><span>Reviewer Name *</span><input type="text" id="publicReviewName" placeholder="e.g. Mahmudul Hasan" required></label>
+                        <label class="field"><span>Rating *</span><select id="publicReviewRating"></select></label>
+                        <label class="field"><span>Review Text *</span><textarea id="publicReviewText" rows="4" placeholder="Write the review…" required></textarea></label>
+                        <label class="field"><span>YouTube Video Link (optional)</span><input type="url" id="publicReviewVideo" placeholder="https://www.youtube.com/watch?v=..."></label>
+                        <div class="field">
+                            <span>Images (up to 6)</span>
+                            <div class="review-upload-row">
+                                <button type="button" class="button button-secondary" id="publicReviewUploadBtn">📷 Upload Image</button>
+                                <input type="file" id="publicReviewUploadInput" accept="image/*" multiple style="display:none;">
+                            </div>
+                            <div class="review-images-preview" id="publicReviewImagesPreview"><span class="form-hint">No images uploaded yet.</span></div>
+                        </div>
+                        <label class="checkbox-field"><input type="checkbox" id="publicReviewPublished" checked><span>Published (visible on the store)</span></label>
+                        <div class="form-actions field-wide">
+                            <button type="button" class="button button-primary" id="savePublicReviewBtn">Save Review</button>
+                            <button type="button" class="button button-secondary" id="cancelPublicReviewBtn">Cancel</button>
                         </div>
                     </div>
-                    <div class="quick-actions-grid">
-                        <a class="quick-action-card" href="products.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-cubes"></i></span>
-                            <span class="qa-label">Products</span>
-                        </a>
-                        <a class="quick-action-card" href="product-form.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
-                            <span class="qa-label">Add Product</span>
-                        </a>
-                        <a class="quick-action-card" href="orders.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-receipt"></i></span>
-                            <span class="qa-label">Orders</span>
-                        </a>
-                        <a class="quick-action-card" href="reviews.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-star"></i></span>
-                            <span class="qa-label">Custom Reviews</span>
-                        </a>
-                        <a class="quick-action-card" href="public-reviews.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-comments"></i></span>
-                            <span class="qa-label">Public Reviews</span>
-                        </a>
+
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead><tr><th>Product</th><th>Reviewer</th><th>Rating</th><th>Review</th><th>Media</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                            <tbody id="publicReviewsTableBody"><tr><td colspan="8" class="empty-state">Loading reviews...</td></tr></tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -218,7 +180,7 @@
     <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true">
         <div class="modal-card">
             <span class="eyebrow">CONFIRM ACTION</span>
-            <h2 id="confirmTitle">Delete Product?</h2>
+            <h2 id="confirmTitle">Delete Review?</h2>
             <p>This action cannot be undone.</p>
             <div class="modal-actions">
                 <button class="button button-danger" id="confirmYes">Delete</button>
@@ -264,6 +226,7 @@
     <script src="js/admin-dashboard.js"></script>
     <script src="js/admin-settings.js"></script>
     <script src="js/admin-main.js"></script>
-    <script src="js/page-dashboard.js"></script>
+    <script src="js/admin-public-reviews.js"></script>
+    <script src="js/page-public-reviews.js"></script>
 </body>
 </html>

@@ -8,8 +8,13 @@ An e-commerce site built with vanilla HTML, CSS, and JavaScript, backed by Supab
    - Tables: `products`, `orders`, `order_items`, `payment_settings`, `settings`, `coupons`, `addresses`
    - RPC functions: `decrement_stock(product_id, quantity)`, `increment_coupon_used(code)`
    - Indexes, grants, Row-Level-Security policies (wide-open for the client-side admin), and seed data.
-2. If you keep `all.sql` from GitHub, add the two secrets by following step 3, then re-run.
-3. Credentials live in two files (already set for project ref `arzzuvnuyrhfbqaiwily`):
+2. Run **`reviews.sql`** next. It creates:
+   - The `reviews` table (`id`, `product_id`, `user_id`, `reviewer_name`, `rating`, `review_text`, `images`, `video_url`, `source`, `is_published`, timestamps).
+   - `submit_customer_review(...)` RPC — the ONLY way customers can submit a review. It verifies the caller owns a **delivered** order containing the product and blocks duplicates.
+   - A `review_prevent_bypass` trigger that re-checks the purchase rule on every row change, so the rule can't be bypassed by direct table writes.
+   - RLS: everyone reads published reviews; the admin email (`grabby@tech.com` — change in `grabby_admin_email()`) can insert/update/delete admin-made reviews.
+3. If you keep `all.sql` from GitHub, add the two secrets by following step 3, then re-run.
+4. Credentials live in two files (already set for project ref `arzzuvnuyrhfbqaiwily`):
    - `js/supabase/client.js` (public site)
    - `admin/js/admin-core.js` (admin panel, anon key)
 
@@ -36,6 +41,14 @@ grabbytech website/
 │
 ├── admin/
 │   ├── index.html             # Admin panel (login + full dashboard)
+│   ├── dashboard.html         # Dashboard page
+│   ├── products.html          # Products list
+│   ├── product-form.html      # Add / edit product
+│   ├── orders.html            # Orders list
+│   ├── reviews.html           # Custom Reviews
+│   ├── activity.html          # Cart activity
+│   ├── payments.html          # Payment settings
+│   ├── settings.html          # Theme / marquee / hero / flash settings
 │   ├── admin.css              # Admin-only styles (includes marquee, orders, payments)
 │   └── js/
 │       ├── admin-core.js      # Constants, state, DOM, utils, theme, auth, lightbox
@@ -43,6 +56,7 @@ grabbytech website/
 │       ├── admin-products.js  # Product CRUD, render, pagination, form
 │       ├── admin-orders.js    # Orders list, status updates, payment settings
 │       ├── admin-dashboard.js # Stats, activity, AI assistant, renderAll
+│       ├── admin-reviews.js   # Custom Reviews: list, form, image upload, publish, delete
 │       ├── admin-settings.js  # Site theme/colors + homepage marquee controls
 │       └── admin-main.js      # Navigation (showSection), events, bootstrap
 │
@@ -58,18 +72,20 @@ grabbytech website/
 │   ├── core/
 │   │   ├── config.js          # Currency config, caching, product loaders
 │   │   ├── utils.js           # formatPrice, animateCounter, stock helpers
-│   │   ├── storage.js         # Cart/Wishlist local storage, pending actions
+│   │   ├── storage.js         # Cart local storage, pending actions
 │   │   └── theme.js           # Dark/light toggle + site colors (silver/light/dark/custom)
 │   │
 │   ├── components/
-│   │   └── toast.js           # Toast notifications
+│   │   ├── toast.js           # Toast notifications
+│   │   └── auth-modal.js      # Sign in / sign up dialog (Google OAuth + email)
 │   │
 │   ├── supabase/
 │   │   └── client.js          # Supabase client (static HTML only)
 │   │
 │   └── pages/
 │       ├── home.js            # Home page: hero, search, cart, modal, marquee
-│       ├── product-detail.js  # Product detail: gallery, related, sections
+│       ├── product-detail.js  # Product detail: gallery, related, reviews section
+│       ├── reviews.js         # Product reviews: summary, list, verified write form
 │       ├── checkout.js        # Checkout: payment, login, coupon, orders
 │       ├── orders.js          # My Orders page
 │       ├── order-success.js   # Order confirmation
@@ -81,6 +97,14 @@ grabbytech website/
 └── assets/logos/              # logo.png, etc.
 ```
 
+## Reviews
+
+- **Product pages** show a Daraz-style **Product Reviews** section: average rating, per-star bars, reviewer list with photos and optional YouTube embeds.
+- **Verified purchasing:** only a logged-in customer who owns a **delivered** order (`orders.status = 'delivered'` via `order_items.product_id`) can write a review. Enforced server-side by the `submit_customer_review` RPC and the `review_prevent_bypass` trigger (no UI trick can bypass it).
+- **Write a review:** star rating, text, up to 6 photos (ImgBB upload, same system the admin uses) and an optional YouTube link.
+- **Admin → Custom Reviews:** add a review for any product (reviewer name, rating, text, photo upload, YouTube link), publish/hide or delete reviews, and export a CSV. Admin-made reviews use `source = 'admin'` (no purchase check).
+- Customers can only review a given product once (enforced by a unique partial index on `(product_id, user_id)`).
+
 ## Key Decisions
 
 - **No frameworks or build step.** Pure vanilla JS.
@@ -89,7 +113,7 @@ grabbytech website/
 - **`admin.js` was split** into 7 focused modules sharing `window.admin` namespace.
 - **`about.html`** is a real About Us page.
 - **Admin panel is multi-page:** `admin/dashboard.html`, `products.html`, `product-form.html`, `orders.html`, `activity.html`, `payments.html`, `settings.html` — each loads its own data instead of one page showing/hiding sections. Shared logic lives in `admin/js/*` (core, media, products, orders, dashboard, settings) plus a per-page `page-*.js` bootstrap.
-- **No standalone `cart.js` or `wishlist.js`.** Home, product detail, and checkout each handle cart/wishlist internally per the original architecture.
+- **No standalone `cart.js`.** Home, product detail, and checkout each handle cart internally per the original architecture.
 - **`product-detail.js`** dynamically sets the page title to `{product} — Grabby Tech`.
 
 ## Testing

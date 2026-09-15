@@ -103,20 +103,6 @@
 .checkout-btn:active { transform:scale(0.98); }
 .empty-cart-msg { text-align:center; color:var(--text-secondary); padding:4rem 0; font-size:0.9rem; }
 
-/* ─── WISHLIST SIDEBAR (reuses cart-sidebar shell) ─── */
-.wishlist-sidebar .cart-header .wishlist-count { color:var(--text-secondary); font-size:0.85rem; font-weight:600; }
-.wishlist-item { display:flex; gap:14px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); animation:slideInRight 0.35s cubic-bezier(0.32,0.72,0,1); cursor:pointer; }
-.wishlist-item .wishlist-item-img { width:56px; height:56px; background:var(--secondary-bg); border-radius:12px; overflow:hidden; flex-shrink:0; }
-.wishlist-item .wishlist-item-img img { width:100%; height:100%; object-fit:cover; }
-.wishlist-item .wishlist-item-info { flex:1; min-width:0; }
-.wishlist-item .wishlist-item-title { font-size:0.85rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.wishlist-item .wishlist-item-price { font-size:0.8rem; color:var(--text-secondary); margin-top:2px; }
-.wishlist-item .wishlist-remove { color:var(--text-secondary); font-size:1.1rem; padding:6px; border-radius:8px; transition:all 0.2s; }
-.wishlist-item .wishlist-remove:hover { color:var(--danger); }
-.wishlist-sidebar .wishlist-add { margin-top:6px; display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:10px; background:var(--accent); color:#fff; font-size:0.78rem; font-weight:600; transition:all 0.25s; }
-.wishlist-sidebar .wishlist-add:hover:not(:disabled) { opacity:0.85; }
-.wishlist-sidebar .wishlist-add:disabled { background:var(--border); color:var(--text-secondary); cursor:not-allowed; }
-
 /* ─── MAIN ─── */
 .main { background:var(--bg); animation:fadeIn 0.4s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -132,6 +118,11 @@
 .footer-links { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; font-size:0.85rem; margin-bottom:1.2rem; }
 .footer-links a { color:var(--footer-text-secondary); transition:color 0.2s; }
 .footer-links a:hover { color:var(--footer-text); }
+.footer-social { display:flex; flex-wrap:wrap; justify-content:center; gap:0.85rem; margin:0 0 1.2rem; }
+.footer-social:empty { display:none; }
+.footer-social a { width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:1.05rem; color:var(--footer-text-secondary); background:rgba(255,255,255,0.07); border:1px solid var(--border); text-decoration:none; transition:color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s; }
+.footer-social a:hover { color:var(--footer-text); border-color:var(--footer-text); background:rgba(255,255,255,0.14); transform:translateY(-2px); }
+.footer-social a.is-empty { opacity:0.35; pointer-events:none; }
 .footer-copy { font-size:0.75rem; color:var(--footer-text-secondary); }
 
 /* ─── SHARED ANIMATIONS ─── */

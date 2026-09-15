@@ -15,7 +15,12 @@
     .header-actions { order:2; margin-left:auto; }
     .header-home { display:none; }
     .account-btn { display:none; }
-    .search-container { order:3; flex:1 1 100%; max-width:none; margin:0.55rem 0 0; }
+    .search-header-toggle { display:inline-flex; }
+    .header .search-container { order:3; flex:1 1 100%; max-width:none; margin:0; display:none; }
+    .header.search-open .search-container { display:block; margin-top:0.55rem; animation:searchReveal 0.28s ease; }
+    .header.search-closing .search-container { display:block; margin-top:0.55rem; animation:searchHide 0.22s ease forwards; }
+    @keyframes searchReveal { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes searchHide { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-6px); } }
     .search-submit-btn { padding:9px 14px; }
     .search-submit-btn span { display:none; }
     .products-header { align-items:center; margin-bottom:0.6rem; }
@@ -32,6 +37,7 @@
     .header-inner { flex-wrap:nowrap; }
     .search-container { order:2; flex:1; margin:0 1rem; }
     .header-actions { order:3; }
+    .search-header-toggle { display:none; }
     /* Desktop marquee: thin black border, no glow leak, full-bleed black */
     .marquee-bar {
         margin-left:-1rem;
@@ -321,7 +327,6 @@
     .product-card .product-price { font-size:0.82rem; margin-top:0; padding-top:0.1rem; min-height:auto; line-height:1.2; }
     .product-card .product-price span { font-size:0.62rem; }
     .product-card .add-cart-btn { margin:0.25rem 0.5rem 0.45rem; width:calc(100% - 1rem); min-height:30px; padding:6px 4px; border-radius:10px; font-size:0.68rem; font-weight:600; white-space:nowrap; }
-    .product-card .wishlist-heart { top:6px; right:6px; width:28px; height:28px; font-size:1rem; }
     .product-card .badge { bottom:6px; left:6px; padding:2px 8px; font-size:0.55rem; }
     .skeleton-card { border-radius:12px; gap:8px; padding:10px; }
 }

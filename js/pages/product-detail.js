@@ -4,6 +4,7 @@ import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { createClient } from '../supabase/client.js';
 import { showToast } from '../components/toast.js';
 import { getCart as readCart, saveCart, getCartCount } from '../core/storage.js';
+import { renderReviews } from './reviews.js';
 
 const TOAST_ID = 'pageToastContainer';
 
@@ -201,7 +202,6 @@ async function loadProduct() {
     }
 
     document.title = p.title + ' — Grabby Tech';
-    const isWish = (JSON.parse(localStorage.getItem('grabby_wishlist') || '[]')).includes(p.id);
     const cart = getCart();
 
     let mediaItems = p.images || [p.image];
@@ -257,6 +257,7 @@ async function loadProduct() {
                                 <div class="product-category">${rp.category}</div>
                                 <div class="product-title">${escapeHtml(rp.title)}</div>
                                 <div class="product-price">${formatPrice(rp.price)}</div>
+                                <div class="product-rating"><span class="stars">${renderStars(rp.rating)}</span> (${rp.reviews})${rp.sold ? ' · Sold: ' + rp.sold : ''}</div>
                             </div>
                         </div>`;
                     }).join('')}
@@ -344,7 +345,6 @@ async function loadProduct() {
                 </div>
                 <div class="product-detail-actions">
                     <button class="detail-add-btn" id="detailAddBtn" ${!p.inStock ? 'disabled' : ''}>${btnText}</button>
-                    <button class="detail-wish-btn ${isWish ? 'liked' : ''}" id="detailWishBtn">${isWish ? '♥' : '♡'}</button>
                 </div>
                 <div class="product-detail-meta">
                     <span class="${p.inStock ? 'stock-in' : 'stock-out'}">📦 ${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
@@ -354,6 +354,7 @@ async function loadProduct() {
             </div>
         </div>
         ${relatedHtml}
+        <div id="reviewsContainer"></div>
     `;
 
     // ─── CAROUSEL LOGIC ──────────────────────────────────
@@ -488,33 +489,6 @@ async function loadProduct() {
         });
     });
 
-    // ─── WISHLIST ────────────────────────────────────────
-    function updateWishlistUI() {
-        const wishData = new Set(JSON.parse(localStorage.getItem('grabby_wishlist') || '[]'));
-        const liked = wishData.has(p.id);
-        const btns = [document.getElementById('detailWishBtn'), document.getElementById('barWishlistBtn')];
-        btns.forEach(btn => {
-            if (btn) {
-                btn.textContent = liked ? '♥' : '♡';
-                btn.classList.toggle('liked', liked);
-            }
-        });
-    }
-
-    function toggleWishlist() {
-        let wishData = new Set(JSON.parse(localStorage.getItem('grabby_wishlist') || '[]'));
-        const liked = wishData.has(p.id);
-        if (liked) wishData.delete(p.id);
-        else wishData.add(p.id);
-        localStorage.setItem('grabby_wishlist', JSON.stringify([...wishData]));
-        updateWishlistUI();
-        showPageToast(liked ? 'Removed from wishlist' : 'Added to wishlist');
-    }
-
-    document.getElementById('detailWishBtn')?.addEventListener('click', toggleWishlist);
-    document.getElementById('barWishlistBtn')?.addEventListener('click', toggleWishlist);
-    updateWishlistUI();
-
     // ─── ADD TO CART ──────────────────────────────────────
     function handleAddToCart() {
         if (!p.inStock) return;
@@ -601,13 +575,18 @@ async function loadProduct() {
         window.location.href = 'checkout.html';
     });
 
-    // ─── RELATED PRODUCT CLICKS (fade-out transition) ───
+    // ─── RELATED PRODUCT CLICKS (open in new tab) ───
     document.querySelectorAll('.related-card').forEach(card => {
         card.addEventListener('click', function () {
-            document.body.classList.add('page-exit');
-            setTimeout(() => { window.location.href = 'product.html?id=' + this.dataset.id; }, 220);
+            window.open('product.html?id=' + encodeURIComponent(this.dataset.id), '_blank', 'noopener');
         });
     });
+
+    // ─── PRODUCT REVIEWS ───────────────────────────────
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    if (reviewsContainer && p.id) {
+        renderReviews(reviewsContainer, p.id).catch(err => console.warn('Reviews render failed:', err));
+    }
 
     // ─── CONTENT FADE-IN ───────────────────────────────
     const productContent = document.getElementById('productContent');
@@ -625,5 +604,9 @@ loadTheme();
 loadSitePalette();
 document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+
+window.addEventListener('pageshow', () => {
+    document.body.classList.remove('page-exit');
+});
 
 loadProduct();

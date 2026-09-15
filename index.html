@@ -110,9 +110,8 @@
                 <div class="search-suggestions" id="searchSuggestions" role="listbox"></div>
             </div>
             <div class="header-actions">
-                <button class="icon-btn wishlist-btn" id="wishlistToggleBtn" aria-label="Wishlist">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    <span class="badge-dot" id="wishCount">0</span>
+                <button class="icon-btn search-header-toggle" id="searchToggleBtn" aria-label="Search" aria-expanded="false">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 </button>
                 <a class="icon-btn account-btn" data-account-link href="login.html" aria-label="Account">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -195,17 +194,6 @@
         </div>
     </aside>
 
-    <!-- WISHLIST SIDEBAR -->
-    <aside class="cart-sidebar wishlist-sidebar" id="wishlistSidebar" aria-label="Your wishlist">
-        <div class="cart-header">
-            <span>Your Wishlist <span class="wishlist-count" id="wishlistPanelCount"></span></span>
-            <button id="wishlistCloseBtn" aria-label="Close wishlist">✕</button>
-        </div>
-        <div class="cart-items" id="wishlistItems">
-            <div class="empty-cart-msg">Your wishlist is empty.</div>
-        </div>
-    </aside>
-
     <!-- PRODUCT MODAL (QUICK VIEW) -->
     <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-label="Product details">
         <div class="modal-content">
@@ -220,7 +208,6 @@
                 <div class="modal-specs" id="modalSpecs"></div>
                 <div class="modal-actions">
                     <button class="modal-add-btn" id="modalAddBtn">Add to Cart</button>
-                    <button class="modal-wish-btn" id="modalWishBtn" aria-label="Wishlist">♡</button>
                 </div>
             </div>
         </div>
@@ -363,6 +350,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/components/search-toggle.js"></script>
+    <script type="module" src="js/components/chatbot.js"></script>
+    <script type="module" src="js/components/footer-social.js"></script>
     <script type="module" src="js/components/home-link.js"></script>
     <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/home.js"></script>

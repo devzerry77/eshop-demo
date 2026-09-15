@@ -3,7 +3,6 @@ export const STORAGE_KEYS = {
     cache: 'grabby_cache',
     products: 'grabby_products',
     cart: 'grabby_cart',
-    wishlist: 'grabby_wishlist',
     theme: 'grabby_theme',
     currency: 'grabby_currency',
     visits: 'grabby_visits',

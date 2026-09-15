@@ -75,13 +75,118 @@
         </div>
     </aside>
 
+    <!-- AUTH MODAL -->
+    <div class="auth-overlay" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-describedby="authSubtitle">
+        <div class="auth-dialog">
+            <button class="auth-close" id="authModalClose" type="button" aria-label="Close sign in dialog">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+
+            <div class="auth-head">
+                <h2 class="auth-title" id="authTitle">Welcome back</h2>
+                <p class="auth-subtitle" id="authSubtitle">Sign in to continue to checkout.</p>
+            </div>
+
+            <button class="auth-google-btn" id="authGoogleBtn" type="button" aria-label="Continue with Google">
+                <span class="auth-google-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" width="20" height="20">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    </svg>
+                </span>
+                <span class="auth-google-label">Continue with Google</span>
+                <span class="auth-spinner" aria-hidden="true"></span>
+            </button>
+
+            <div class="auth-divider" aria-hidden="true"><span id="authDividerText">or continue with email</span></div>
+
+            <form class="auth-form" id="authForm" novalidate>
+                <div class="auth-field" id="authNameField" hidden>
+                    <label for="authName">Full name</label>
+                    <div class="auth-input-wrap">
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <input type="text" id="authName" name="name" autocomplete="name" placeholder="Your full name" />
+                    </div>
+                    <p class="auth-field-error" id="authNameError" role="alert" hidden></p>
+                </div>
+
+                <div class="auth-field">
+                    <label for="authEmail">Email</label>
+                    <div class="auth-input-wrap">
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <line x1="22" y1="6" x2="12" y2="13" />
+                            <line x1="2" y1="6" x2="12" y2="13" />
+                        </svg>
+                        <input type="email" id="authEmail" name="email" autocomplete="email" inputmode="email" placeholder="Enter your email" required />
+                    </div>
+                    <p class="auth-field-error" id="authEmailError" role="alert" hidden></p>
+                </div>
+
+                <div class="auth-field">
+                    <div class="auth-label-row">
+                        <label for="authPassword">Password</label>
+                        <button class="auth-forgot" id="authForgotBtn" type="button">Forgot password?</button>
+                    </div>
+                    <div class="auth-input-wrap has-action">
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <input type="password" id="authPassword" name="password" autocomplete="current-password" placeholder="Enter your password" required />
+                        <button class="auth-eye" id="authEyeBtn" type="button" aria-label="Show password" aria-pressed="false">
+                            <svg class="auth-eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg class="auth-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="auth-field-error" id="authPasswordError" role="alert" hidden></p>
+                </div>
+
+                <div class="auth-form-error" id="authFormError" role="alert" hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span id="authFormErrorText"></span>
+                </div>
+
+                <button class="auth-submit" id="authSubmitBtn" type="submit">
+                    <span class="auth-spinner" aria-hidden="true"></span>
+                    <span class="auth-submit-label" id="authSubmitLabel">Sign In</span>
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                <span id="authSwitchText">Don't have an account?</span>
+                <button class="auth-link" id="authSwitchBtn" type="button">Sign up</button>
+            </p>
+
+            <p class="auth-terms">By continuing, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+    </div>
+
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="pageToastContainer" aria-live="polite" aria-atomic="true"></div>
 
     <!-- MAIN CONTENT -->
     <main class="product-page" id="productPage">
         <div class="container product-container">
-            <a href="index.html" class="back-btn">← Back to Shop</a>
+            <a href="index.html" class="back-btn"><img class="back-btn-arrow" src="assets/logos/back-arrow.svg" alt=""> Back to Shop</a>
             <div id="productContent">
                 <div class="product-page-loading">
                     <div class="loader-spinner"></div>
@@ -101,8 +206,7 @@
     <div class="sticky-bottom-bar" id="stickyBar">
         <div class="bar-inner">
             <div class="bar-left">
-                <button class="bar-wishlist" id="barWishlistBtn">♡</button>
-                <button class="bar-share" id="barShareBtn">↗</button>
+                <button class="bar-share" id="barShareBtn" aria-label="Share"><img class="bar-share-img" src="assets/logos/share logo.svg" alt="Share"></button>
             </div>
             <div class="bar-center">
                 <button class="bar-add-cart" id="barAddCartBtn">Add to Cart</button>
@@ -128,6 +232,8 @@
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
+    <script type="module" src="js/components/chatbot.js"></script>
+    <script type="module" src="js/components/footer-social.js"></script>
     <script type="module" src="js/pages/product-detail.js"></script>
 </body>
 </html>

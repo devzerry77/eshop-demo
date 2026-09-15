@@ -14,6 +14,8 @@
         await admin.loadThemeSettings();
         await admin.loadFlashSettings();
         await admin.loadHeroSettings();
+        admin.loadMessengerSettings();
+        admin.loadSocialSettings();
         admin.populateFlashProductSelect();
 
         DOM.refreshStats?.addEventListener("click", () => {
@@ -21,6 +23,8 @@
             admin.loadThemeSettings();
             admin.loadFlashSettings();
             admin.loadHeroSettings();
+            admin.loadMessengerSettings();
+            admin.loadSocialSettings();
             admin.populateFlashProductSelect();
         });
     });

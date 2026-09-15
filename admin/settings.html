@@ -79,6 +79,14 @@
                     <span class="nav-icon">☰</span>
                     <span>Orders</span>
                 </a>
+                <a href="reviews.html" data-section="reviews">
+                    <span class="nav-icon">★</span>
+                    <span>Custom Reviews</span>
+                </a>
+                <a href="public-reviews.html" data-section="public-reviews">
+                    <span class="nav-icon">◈</span>
+                    <span>Public Reviews</span>
+                </a>
                 <a href="activity.html" data-section="activity">
                     <span class="nav-icon">◷</span>
                     <span>Cart Activity</span>
@@ -407,6 +415,60 @@
                                     <input type="checkbox" id="settingsAutoSave" checked>
                                     <span class="toggle-slider"></span>
                                 </label>
+                            </div>
+                        </div>
+
+                        <!-- Messenger / Chat Support -->
+                        <div class="setting-card glass-card">
+                            <h3>💬 Messenger / Chat</h3>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="messengerLink" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">
+                                    Messenger / Facebook Contact Link
+                                </label>
+                                <input type="url" id="messengerLink" placeholder="https://m.me/GrabbyTech or https://fb.com/..." style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="flex-wrap:wrap;">
+                                <span>The website chatbot's "Contact us on Messenger" button uses this link.</span>
+                                <button class="button button-primary" id="saveMessengerBtn" style="margin-left:auto;">💾 Save</button>
+                                <span id="messengerStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Social Media Links -->
+                        <div class="setting-card glass-card">
+                            <h3>🌐 Social Media</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Links shown in the website footer. Leave a field empty to hide that icon on the site.
+                            </p>
+                            <div class="setting-item">
+                                <i class="fa-brands fa-facebook-f" style="width:18px; text-align:center;" aria-hidden="true"></i>
+                                <span style="flex:1;">Facebook</span>
+                                <input type="url" id="socialFacebook" placeholder="https://facebook.com/..." style="flex:1; min-width:180px; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item">
+                                <i class="fa-brands fa-instagram" style="width:18px; text-align:center;" aria-hidden="true"></i>
+                                <span style="flex:1;">Instagram</span>
+                                <input type="url" id="socialInstagram" placeholder="https://instagram.com/..." style="flex:1; min-width:180px; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item">
+                                <i class="fa-brands fa-youtube" style="width:18px; text-align:center;" aria-hidden="true"></i>
+                                <span style="flex:1;">YouTube</span>
+                                <input type="url" id="socialYouTube" placeholder="https://youtube.com/..." style="flex:1; min-width:180px; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item">
+                                <i class="fa-brands fa-tiktok" style="width:18px; text-align:center;" aria-hidden="true"></i>
+                                <span style="flex:1;">TikTok</span>
+                                <input type="url" id="socialTiktok" placeholder="https://tiktok.com/..." style="flex:1; min-width:180px; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="border-bottom:none;">
+                                <i class="fa-brands fa-x-twitter" style="width:18px; text-align:center;" aria-hidden="true"></i>
+                                <span style="flex:1;">X (Twitter)</span>
+                                <input type="url" id="socialX" placeholder="https://x.com/..." style="flex:1; min-width:180px; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="flex-wrap:wrap;">
+                                <span>Links open in a new tab from the footer.</span>
+                                <button class="button button-primary" id="saveSocialBtn" style="margin-left:auto;">💾 Save</button>
+                                <span id="socialStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
                             </div>
                         </div>
                     </div>

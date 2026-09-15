@@ -123,7 +123,7 @@ function cardHTML(p, badge) {
 }
 
 function openProduct(id) {
-    window.location.href = 'product.html?id=' + encodeURIComponent(id);
+    window.open('product.html?id=' + encodeURIComponent(id), '_blank', 'noopener');
 }
 
 // ─── COUNTDOWN ────────────────────────────────────────────

@@ -14,7 +14,7 @@
                 .from('settings')
                 .select('*')
                 .in('key', [
-                    'marquee_text', 'marquee_enabled', 'marquee_glow_color',
+                    'marquee_text', 'marquee_enabled', 'marquee_glow', 'marquee_glow_color',
                     'marquee_glow_intensity', 'marquee_border_glow', 'marquee_border_color',
                     'marquee_speed', 'marquee_bg_color', 'marquee_text_color'
                 ]);
@@ -25,7 +25,7 @@
 
             DOM.marqueeInput.value = settings.marquee_text || DEFAULT_MARQUEE_TEXT;
             DOM.marqueeEnabled.checked = settings.marquee_enabled !== 'false';
-            DOM.marqueeGlow.checked = true;
+            DOM.marqueeGlow.checked = settings.marquee_glow !== 'false';
             DOM.marqueeGlowColor.value = settings.marquee_glow_color || '#ff6b6b';
             DOM.marqueeGlowIntensity.value = parseInt(settings.marquee_glow_intensity) || 20;
             document.getElementById('glowIntensityLabel').textContent = DOM.marqueeGlowIntensity.value + 'px';
@@ -52,6 +52,7 @@
         const settings = [
             { key: 'marquee_text', value: text },
             { key: 'marquee_enabled', value: String(DOM.marqueeEnabled.checked) },
+            { key: 'marquee_glow', value: String(DOM.marqueeGlow.checked) },
             { key: 'marquee_glow_color', value: DOM.marqueeGlowColor.value },
             { key: 'marquee_glow_intensity', value: String(DOM.marqueeGlowIntensity.value) },
             { key: 'marquee_border_glow', value: String(DOM.marqueeBorderGlow.checked) },
@@ -646,7 +647,113 @@
         setTimeout(() => { DOM.themeStatus.textContent = ''; }, 3500);
     }
 
-    // ─── SETTINGS PAGE BINDINGS ─────────────────────────────
+    // ─── MESSENGER / CHAT SUPPORT ─────────────────────────────
+    const MESSENGER_KEY = 'messenger_link';
+    const DEFAULT_MESSENGER_LINK = 'https://m.me/GrabbyTech';
+
+    function loadMessengerSettings() {
+        if (!DOM.messengerLink) return;
+        const cached = localStorage.getItem('grabby_messenger_link');
+        DOM.messengerLink.value = cached || '';
+        try {
+            STATE.supabase
+                .from('settings')
+                .select('*')
+                .eq('key', MESSENGER_KEY)
+                .then(({ data, error }) => {
+                    if (error) throw error;
+                    const row = data && data[0];
+                    if (row && row.value) {
+                        DOM.messengerLink.value = row.value;
+                        localStorage.setItem('grabby_messenger_link', row.value);
+                    }
+                })
+                .catch(err => {
+                    showToast('Failed to load messenger settings: ' + (err.message || err), 'error');
+                });
+        } catch (err) {
+            showToast('Failed to load messenger settings: ' + (err.message || err), 'error');
+        }
+    }
+
+    async function saveMessengerSettings() {
+        if (!DOM.messengerLink) return;
+        const link = DOM.messengerLink.value.trim();
+        if (link && !admin.isValidUrl(link)) {
+            showToast('Please enter a valid Messenger/Facebook URL (https://...).', 'warning');
+            return;
+        }
+        const setting = [{ key: MESSENGER_KEY, value: link }];
+        DOM.messengerStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(setting, { onConflict: 'key' });
+            if (error) throw error;
+            localStorage.setItem('grabby_messenger_link', link);
+            showToast('Messenger link saved!', 'success');
+            DOM.messengerStatus.textContent = '✓ Saved';
+            setTimeout(() => { DOM.messengerStatus.textContent = ''; }, 2500);
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            DOM.messengerStatus.textContent = '✗ Error';
+        }
+    }
+
+    // ─── SOCIAL MEDIA LINKS ─────────────────────────────
+const SOCIAL_KEYS = ['social_facebook', 'social_instagram', 'social_youtube', 'social_tiktok', 'social_x'];
+const SOCIAL_LABELS = ['facebook', 'instagram', 'youtube', 'tiktok', 'x'];
+const SOCIAL_INPUT_IDS = {
+    facebook: 'socialFacebook',
+    instagram: 'socialInstagram',
+    youtube: 'socialYouTube',
+    tiktok: 'socialTiktok',
+    x: 'socialX'
+};
+
+async function loadSocialSettings() {
+    try {
+        const { data, error } = await STATE.supabase.from('settings').select('*').in('key', SOCIAL_KEYS);
+        if (error) throw error;
+        (data || []).forEach(row => {
+            const id = SOCIAL_LABELS[SOCIAL_KEYS.indexOf(row.key)];
+            const inputId = SOCIAL_INPUT_IDS[id];
+            if (id && inputId && DOM[inputId]) {
+                DOM[inputId].value = row.value || '';
+                localStorage.setItem('grabby_social_' + id, row.value || '');
+            }
+        });
+    } catch (err) {
+        showToast('Failed to load social settings: ' + (err.message || err), 'error');
+    }
+}
+
+async function saveSocialSettings() {
+    const settings = [];
+    for (const id of SOCIAL_LABELS) {
+        const input = DOM[SOCIAL_INPUT_IDS[id]];
+        const link = input ? input.value.trim() : '';
+        if (link && !admin.isValidUrl(link)) {
+            showToast('Please enter a valid URL for ' + id + '.', 'warning');
+            input.focus();
+            return;
+        }
+        settings.push({ key: 'social_' + id, value: link });
+    }
+
+    DOM.socialStatus.textContent = 'Saving...';
+    try {
+        const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+        if (error) throw error;
+        settings.forEach(s => localStorage.setItem('grabby_' + s.key, s.value));
+        showToast('Social links saved! The public footer updates automatically.', 'success');
+        DOM.socialStatus.textContent = '✓ Saved';
+        setTimeout(() => { DOM.socialStatus.textContent = ''; }, 2500);
+    } catch (err) {
+        showToast('Failed to save: ' + (err.message || err), 'error');
+        DOM.socialStatus.textContent = '✗ Error';
+    }
+}
+
+// ─── SETTINGS PAGE BINDINGS ─────────────────────────────
     function bindSettingsControls() {
         // Marquee controls
         DOM.marqueeGlowIntensity?.addEventListener('input', function() {
@@ -688,6 +795,11 @@
         DOM.saveFlashBtn?.addEventListener('click', admin.saveFlashSettings);
         DOM.resetFlashBtn?.addEventListener('click', admin.resetFlashSettings);
         DOM.flashProductSelect?.addEventListener('change', admin.recordFlashSelection);
+
+        // Messenger / chat support
+        DOM.saveMessengerBtn?.addEventListener('click', admin.saveMessengerSettings);
+        // Social media links
+        DOM.saveSocialBtn?.addEventListener('click', admin.saveSocialSettings);
     }
 
     function bindThemeSettings() {
@@ -728,6 +840,8 @@
         loadFlashSettings, saveFlashSettings, resetFlashSettings,
         populateFlashProductSelect, updateFlashAutoplayLabel, recordFlashSelection,
         loadHeroSettings, saveHeroSettings, resetHeroSettings, toggleHeroSetting, addHeroSlide, updateHeroAutoplayLabel,
+        loadMessengerSettings, saveMessengerSettings,
+        loadSocialSettings, saveSocialSettings,
         bindSettingsControls, bindThemeSettings
     });
 
