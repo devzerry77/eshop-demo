@@ -10,15 +10,22 @@
 
 /* ─── GLOBAL RESPONSIVE ─── */
 @media (max-width:767px) {
+    .header { padding-right:0.5rem; }
     .header-inner { flex-wrap:wrap; }
-    .logo { margin-left:1.99rem; }
-    .header-actions { order:2; margin-left:auto; }
+    .logo { position: absolute; left: 50%; transform: translateX(-50%); }
+    .header-actions { order:2; margin-left:auto; gap:0; }
+    .header-actions .icon-btn { padding:6px; }
     .header-home { display:none; }
     .account-btn { display:none; }
     .search-header-toggle { display:inline-flex; }
     .header .search-container { order:3; flex:1 1 100%; max-width:none; margin:0; display:none; }
     .header.search-open .search-container { display:block; margin-top:0.55rem; animation:searchReveal 0.28s ease; }
     .header.search-closing .search-container { display:block; margin-top:0.55rem; animation:searchHide 0.22s ease forwards; }
+    /* Expanded search floats below the header (out of flow) so the
+       absolutely-positioned logo keeps its exact static position and
+       the header layout never shifts when search opens/closes. */
+    .header.search-open .search-container,
+    .header.search-closing .search-container { position:absolute; top:100%; left:1rem; right:0.5rem; z-index:60; }
     @keyframes searchReveal { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
     @keyframes searchHide { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-6px); } }
     .search-submit-btn { padding:9px 14px; }
@@ -30,8 +37,8 @@
     .sort-select--top { min-width:0; max-width:132px; }
     .filter-sort-btn { padding:7px 10px; font-size:0.78rem; }
     .product-count { font-size:0.75rem; }
-    /* Full-bleed marquee — negate the header's 1rem horizontal padding on mobile */
-    .marquee-bar { margin-left:-1rem; margin-right:-1rem; }
+    /* Full-bleed marquee — negate the header's horizontal padding on mobile (right is 0.5rem) */
+    .marquee-bar { margin-left:-1rem; margin-right:-0.5rem; }
 }
 @media (min-width:768px) {
     .header-inner { flex-wrap:nowrap; }
@@ -50,6 +57,7 @@
     .current-price { font-size:1.4rem; }
     .header-inner { gap:4px; }
     .icon-btn { padding:6px; }
+    .header-actions .icon-btn { padding:5px; }
     .logo { font-size:1rem; }
     .logo-mark { width:28px; height:28px; font-size:1rem; }
     .logo-img { height:28px; }
@@ -333,5 +341,13 @@
 @media (max-width:380px) {
     .product-grid { gap:0.5rem; }
     .product-card .product-info { padding:0.35rem 0.45rem 0.3rem; }
-    .product-card .add-cart-btn { margin:0.2rem 0.45rem 0.4rem; width:calc(100% - 0.9rem); }
+    .product-card .add-cart-btn { margin:0.2rem 0.45rem 0.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHATBOT — middle-right on mobile only (desktop unchanged)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width:900px) {
+    body:has(.mobile-bottom-nav) .chatbot-widget,
+    .chatbot-widget { top:50%; bottom:auto; right:10px; transform:translateY(-50%); }
 }

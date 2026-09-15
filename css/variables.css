@@ -30,10 +30,10 @@
     --input-bg: #ffffff;
     --input-border: #d2d7dd;
     --input-text: #181b20;
-    --footer-bg: #20242b;
+    --footer-bg: #000000;
     --footer-text: #f5f7fa;
     --footer-text-secondary: #aab2bd;
-    --header-bg: #20242b;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(255, 255, 255, 0.92);
     --sticky-shadow: 0 -4px 20px rgba(32, 36, 43, 0.08);
@@ -80,9 +80,9 @@
     --input-bg: #ffffff;
     --input-border: #d2d7dd;
     --input-text: #181b20;
-    --footer-bg: #20242b;
+    --footer-bg: #000000;
     --footer-text: #f5f7fa;
-    --header-bg: #20242b;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(255, 255, 255, 0.92);
     --silver-grad: linear-gradient(135deg, #dfe3e8 0%, #c3c9d1 50%, #8f97a3 100%);
@@ -122,9 +122,9 @@
     --input-bg: #ffffff;
     --input-border: #d8dce2;
     --input-text: #14171c;
-    --footer-bg: #23282f;
+    --footer-bg: #000000;
     --footer-text: #f5f7fa;
-    --header-bg: #23282f;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(255, 255, 255, 0.92);
     --silver-grad: linear-gradient(135deg, #f6f7f8 0%, #eef0f2 50%, #e4e7ea 100%);
@@ -143,7 +143,7 @@
 :root[data-chrome="light"]:not([data-theme="dark"]) .back-btn:hover { background:#f2f3f5; }
 :root[data-chrome="light"]:not([data-theme="dark"]) .button-secondary:hover { background:#f2f3f5; }
 :root[data-chrome="light"]:not([data-theme="dark"]) .filter-panel { background:#ffffff; }
-:root[data-chrome="light"]:not([data-theme="dark"]) .sort-select { background:#ffffff; }
+:root[data-chrome="light"]:not([data-theme="dark"]) .sort-select { background-color:#ffffff; }
 /* Keep product cards flat on the pure-white Light preset (no gray shadows/borders) */
 :root[data-chrome="light"]:not([data-theme="dark"]) .product-card,
 :root[data-chrome="light"]:not([data-theme="dark"]) .flash-card,
