@@ -19,6 +19,12 @@
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
+            var H = null;
+            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            if (H) {
+                if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
+                if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
+            }
         } catch (e) {}
     })();
     </script>
@@ -51,6 +57,9 @@
             </a>
             <div class="header-actions">
                 <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></button>
+                <a class="icon-btn account-btn" data-account-link href="login.html" aria-label="Account">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </a>
                 <a href="index.html" style="color:var(--header-text); font-weight:500;">Shop</a>
             </div>
         </div>
@@ -87,6 +96,24 @@
         import { initAuthModal, openAuthModal, checkOAuthErrorAndShow } from './js/components/auth-modal.js';
         import { loadTheme, toggleTheme, loadSitePalette } from './js/core/theme.js';
         initAuthModal();
+        // Close (X) must only dismiss the login view and return to the page
+        // the user came from — never Home, never a blank page, no reload.
+        // (initAuthModal already hides the modal in place; this only adds
+        // the history return so the user lands back on the exact page they
+        // were viewing before tapping Account.)
+        document.getElementById('authModalClose')?.addEventListener('click', () => {
+            let canGoBack = false;
+            try {
+                canGoBack = window.history.length > 1;
+                if (document.referrer) {
+                    try { canGoBack = new URL(document.referrer).origin === window.location.origin; }
+                    catch (e) { /* keep history-based value */ }
+                }
+            } catch (e) { canGoBack = false; }
+            if (canGoBack) window.history.back();
+            // Otherwise (direct visit, no previous page): fall through to the
+            // default in-place close — same URL, no navigation, no reload.
+        });
         var params = new URLSearchParams(window.location.search);
         var errorNotice = null;
         if (params.has('error_description')) errorNotice = decodeURIComponent(params.get('error_description'));

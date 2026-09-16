@@ -192,6 +192,38 @@
                             </div>
                         </div>
 
+                        <!-- Header & Footer Color -->
+                        <div class="setting-card glass-card">
+                            <h3>⬛ Header &amp; Footer Color</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                One shared solid color for the website header and footer.
+                                Saved separately for Bright/Light Mode and Dark Mode. Default is matte black (#000000).
+                            </p>
+                            <div class="hf-color-row" data-mode="light">
+                                <span class="hf-swatch" id="hfSwatchLight" aria-hidden="true"></span>
+                                <div class="hf-color-meta">
+                                    <strong>☀️ Bright / Light Mode</strong>
+                                    <span class="hf-current">Current: <code id="hfCurrentLight">#000000</code></span>
+                                </div>
+                                <input type="color" id="hfPickerLight" value="#000000" aria-label="Pick Bright Mode header and footer color">
+                                <input type="text" id="hfHexLight" class="hf-hex" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Enter Bright Mode header and footer HEX color" placeholder="#000000">
+                            </div>
+                            <div class="hf-color-row" data-mode="dark">
+                                <span class="hf-swatch" id="hfSwatchDark" aria-hidden="true"></span>
+                                <div class="hf-color-meta">
+                                    <strong>🌙 Dark Mode</strong>
+                                    <span class="hf-current">Current: <code id="hfCurrentDark">#000000</code></span>
+                                </div>
+                                <input type="color" id="hfPickerDark" value="#000000" aria-label="Pick Dark Mode header and footer color">
+                                <input type="text" id="hfHexDark" class="hf-hex" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Enter Dark Mode header and footer HEX color" placeholder="#000000">
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveHfBtn">💾 Save Header &amp; Footer Color</button>
+                                <button class="button button-secondary" id="resetHfBtn">↩️ Reset to Black</button>
+                                <span id="hfStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
                         <!-- Marquee Controls -->
                         <div class="setting-card glass-card marquee-controls">
                             <h3>🏷️ Homepage Marquee</h3>

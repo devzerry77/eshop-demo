@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── HEADER ─── */
-.header { background:var(--header-bg); color:var(--header-text); padding:0.7rem 1rem; position:sticky; top:0; z-index:100; transition:background 0.3s, color 0.3s; }
+.header { background:var(--hf-bg-light, #000000); background-color:var(--hf-bg-light, #000000); color:var(--header-text); padding:0.7rem 1rem; position:sticky; top:0; z-index:100; transition:background 0.3s, color 0.3s; }
 .header-inner { display:flex; align-items:center; justify-content:space-between; gap:8px; max-width:1400px; margin:0 auto; }
 .hamburger { display:flex; flex-direction:column; gap:5px; padding:6px; flex-shrink:0; border-radius:8px; transition:background 0.2s; }
 .hamburger:hover { background:rgba(255,255,255,0.08); }
@@ -53,7 +53,7 @@
 .suggestion-keyword + .suggestion-item:not(.suggestion-keyword) { border-top:1px dashed var(--border); }
 
 /* ─── MARQUEE ─── */
-.marquee-bar { background:var(--header-bg); color:var(--header-text); font-weight:500; font-size:0.85rem; padding:6px 0; text-align:center; border-top:1px solid rgba(255,255,255,0.08); overflow:hidden; white-space:nowrap; }
+.marquee-bar { background:var(--hf-bg-light, #000000); background-color:var(--hf-bg-light, #000000); color:var(--header-text); font-weight:500; font-size:0.85rem; padding:6px 0; text-align:center; border-top:1px solid rgba(255,255,255,0.08); overflow:hidden; white-space:nowrap; }
 .marquee-bar span { display:inline-block; animation:marqueeScroll 20s linear infinite; padding-left:100%; }
 @keyframes marqueeScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-100%); } }
 .header:has(.marquee-bar) { padding-bottom:0; }
@@ -109,21 +109,57 @@
 .container { max-width:1400px; margin:0 auto; padding:1rem 1rem 2rem; }
 
 /* ─── FOOTER ─── */
-.footer { background:var(--footer-bg); color:var(--footer-text); padding:3rem 1.5rem; margin-top:2rem; }
+.footer { background:var(--hf-bg-light, #000000); background-color:var(--hf-bg-light, #000000); color:var(--footer-text); padding:3rem 1.5rem 1.5rem; margin-top:2rem; }
 .footer-inner { max-width:1400px; margin:0 auto; text-align:center; }
+/* Mobile-first: vertical, centered stack (brand → link sections → social → copyright) */
+.footer-top { display:flex; flex-direction:column; align-items:center; text-align:center; gap:2rem; margin-bottom:1.5rem; }
+.footer-brand-col { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
 .footer-brand { display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:1.3rem; }
 .footer-brand .logo-mark { width:38px; height:38px; font-size:1.3rem; }
-.footer-brand .logo-img { height:190px; width:auto; max-width:200px; object-fit:contain; }
-.footer-tagline { color:var(--footer-text-secondary); font-size:0.85rem; margin:0.5rem 0 1rem; }
+.footer-brand .logo-img { height:auto; width:auto; max-width:180px; max-height:64px; object-fit:contain; }
+.footer-tagline { color:var(--footer-text-secondary); font-size:0.85rem; margin:0.5rem 0 0; max-width:280px; line-height:1.6; }
+.footer-nav { display:flex; flex-direction:column; align-items:center; gap:1.75rem; width:100%; }
+.footer-col { display:flex; flex-direction:column; align-items:center; }
+.footer-heading { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--footer-text); margin:0 0 0.8rem; padding-bottom:0.6rem; border-bottom:1px solid var(--border); }
+.footer-col ul { display:flex; flex-direction:column; gap:0.55rem; }
+.footer-col a { color:var(--footer-text-secondary); font-size:0.88rem; line-height:1.5; transition:color 0.2s; }
+.footer-col a:hover { color:var(--footer-text); }
 .footer-links { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; font-size:0.85rem; margin-bottom:1.2rem; }
 .footer-links a { color:var(--footer-text-secondary); transition:color 0.2s; }
 .footer-links a:hover { color:var(--footer-text); }
-.footer-social { display:flex; flex-wrap:wrap; justify-content:center; gap:0.85rem; margin:0 0 1.2rem; }
+.footer-social { display:flex; flex-wrap:wrap; justify-content:center; gap:0.85rem; margin:0 0 1.5rem; }
 .footer-social:empty { display:none; }
 .footer-social a { width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:1.05rem; color:var(--footer-text-secondary); background:rgba(255,255,255,0.07); border:1px solid var(--border); text-decoration:none; transition:color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s; }
 .footer-social a:hover { color:var(--footer-text); border-color:var(--footer-text); background:rgba(255,255,255,0.14); transform:translateY(-2px); }
 .footer-social a.is-empty { opacity:0.35; pointer-events:none; }
-.footer-copy { font-size:0.75rem; color:var(--footer-text-secondary); }
+.footer-copy { font-size:0.75rem; color:var(--footer-text-secondary); border-top:1px solid var(--border); padding-top:1.2rem; text-align:center; }
 
 /* ─── SHARED ANIMATIONS ─── */
 @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER & FOOTER SOLID COLOR — one shared color for header +
+   footer, applied per color mode via --hf-bg-light / --hf-bg-dark
+   (admin-controllable, default matte black #000000).
+   Beats theme vars, dark-mode rules, and runtime custom palettes
+   so the admin's chosen color always wins. Logo / icons / text /
+   spacing / layout are untouched.
+   ═══════════════════════════════════════════════════════════════ */
+.header,
+:root[data-chrome="silver"] .header,
+:root[data-chrome="light"] .header,
+:root[data-chrome="dark"] .header,
+.marquee-bar,
+.footer,
+:root[data-chrome="silver"] .footer,
+:root[data-chrome="light"] .footer,
+:root[data-chrome="dark"] .footer {
+    background:var(--hf-bg-light, #000000) !important;
+    background-color:var(--hf-bg-light, #000000) !important;
+}
+[data-theme="dark"] .header,
+[data-theme="dark"] .marquee-bar,
+[data-theme="dark"] .footer {
+    background:var(--hf-bg-dark, #000000) !important;
+    background-color:var(--hf-bg-dark, #000000) !important;
+}

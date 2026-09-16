@@ -19,6 +19,12 @@
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
+            var H = null;
+            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            if (H) {
+                if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
+                if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
+            }
         } catch (e) {}
     })();
     </script>
@@ -52,6 +58,9 @@
             </a>
             <div class="header-actions">
                 <button class="icon-btn theme-toggle" id="themeToggle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+                <a class="icon-btn account-btn" data-account-link href="login.html" aria-label="Account">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </a>
                 <a href="index.html" style="color:var(--header-text); font-weight:500;">Shop</a>
             </div>
         </div>
@@ -290,11 +299,42 @@
 
     <footer class="footer">
         <div class="footer-inner">
-            <div class="footer-brand">
-                <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+            <div class="footer-top">
+                <div class="footer-brand-col">
+                    <div class="footer-brand">
+                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                    </div>
+                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                </div>
+                <nav class="footer-nav" aria-label="Footer">
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Policies</h4>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Refund Policy</a></li>
+                            <li><a href="#">Shipping Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4 class="footer-heading">About Us</h4>
+                        <ul>
+                            <li><a href="about.html">Our Story</a></li>
+                            <li><a href="about.html">Our Sustainability Approach</a></li>
+                            <li><a href="about.html">About</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Connect</h4>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Contact Information</a></li>
+                            <li><a href="#">Email</a></li>
+                            <li><a href="#">Regulatory Information</a></li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
-            <p class="footer-tagline">Modern gadgets for modern life.</p>
-            <div class="footer-links"><a href="about.html">About</a><a href="#">Privacy</a><a href="#">Terms</a></div>
             <div class="footer-copy">© 2026 Grabby Tech</div>
         </div>
     </footer>

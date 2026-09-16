@@ -79,6 +79,17 @@
     .product-page .product-title { font-size:1.8rem; }
     .product-page .current-price { font-size:2rem; }
 }
+
+/* ─── FOOTER: desktop multi-column (mobile-first stack stays below 900px) ─── */
+@media (min-width:900px) {
+    .footer-top { flex-direction:row; align-items:flex-start; text-align:left; gap:3rem; margin-bottom:2rem; }
+    .footer-brand-col { align-items:flex-start; text-align:left; flex:0 0 auto; max-width:300px; }
+    .footer-brand { justify-content:flex-start; }
+    .footer-brand .logo-img { max-height:76px; }
+    .footer-nav { flex:1; flex-direction:row; align-items:flex-start; justify-content:flex-end; gap:3rem; }
+    .footer-col { align-items:flex-start; text-align:left; }
+    .footer-social { justify-content:center; }
+}
 @media (min-width:1200px) {
     .product-grid { grid-template-columns:repeat(5,1fr); gap:1rem; }
 }
@@ -342,6 +353,26 @@
     .product-grid { gap:0.5rem; }
     .product-card .product-info { padding:0.35rem 0.45rem 0.3rem; }
     .product-card .add-cart-btn { margin:0.2rem 0.45rem 0.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER & FOOTER SOLID COLOR — final guard (loaded last).
+   Light mode uses --hf-bg-light, dark mode uses --hf-bg-dark
+   (both default matte black #000000, admin-controllable).
+   Only background is forced; logo / icons / text / spacing /
+   layout / functionality kept.
+   ═══════════════════════════════════════════════════════════════ */
+.header,
+.marquee-bar,
+.footer {
+    background:var(--hf-bg-light, #000000) !important;
+    background-color:var(--hf-bg-light, #000000) !important;
+}
+[data-theme="dark"] .header,
+[data-theme="dark"] .marquee-bar,
+[data-theme="dark"] .footer {
+    background:var(--hf-bg-dark, #000000) !important;
+    background-color:var(--hf-bg-dark, #000000) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════

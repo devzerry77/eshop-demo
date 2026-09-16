@@ -1248,6 +1248,78 @@ textarea { resize:vertical; }
     cursor: pointer;
 }
 
+/* ─── HEADER & FOOTER COLOR ─── */
+.hf-color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: var(--surface);
+}
+.hf-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #000000;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.hf-color-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.hf-color-meta strong {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+.hf-current {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.hf-current code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+.hf-color-row input[type="color"] {
+    width: 44px;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.hf-hex {
+    width: 92px;
+    flex-shrink: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    text-transform: lowercase;
+}
+.hf-hex:focus {
+    outline: none;
+    border-color: var(--accent, #20242b);
+}
+.hf-hex.invalid {
+    border-color: var(--danger);
+}
+
 /* ─── SETTINGS PREFERENCES: reduced motion & compact mode ─── */
 html.reduce-motion *,
 html.reduce-motion *::before,

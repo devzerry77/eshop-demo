@@ -19,6 +19,12 @@
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
+            var H = null;
+            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            if (H) {
+                if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
+                if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
+            }
         } catch (e) {}
     })();
     try { history.scrollRestoration = 'manual'; } catch (e) {}
@@ -333,14 +339,41 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="footer-brand">
-                <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
-            </div>
-            <p class="footer-tagline">Modern gadgets for modern life.</p>
-            <div class="footer-links">
-                <a href="about.html">About</a>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
+            <div class="footer-top">
+                <div class="footer-brand-col">
+                    <div class="footer-brand">
+                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                    </div>
+                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                </div>
+                <nav class="footer-nav" aria-label="Footer">
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Policies</h4>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Refund Policy</a></li>
+                            <li><a href="#">Shipping Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4 class="footer-heading">About Us</h4>
+                        <ul>
+                            <li><a href="about.html">Our Story</a></li>
+                            <li><a href="about.html">Our Sustainability Approach</a></li>
+                            <li><a href="about.html">About</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Connect</h4>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Contact Information</a></li>
+                            <li><a href="#">Email</a></li>
+                            <li><a href="#">Regulatory Information</a></li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
             <div class="footer-copy">© 2026 Grabby Tech</div>
         </div>

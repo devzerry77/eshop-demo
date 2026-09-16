@@ -35,6 +35,9 @@
     --footer-text-secondary: #aab2bd;
     --header-bg: #000000;
     --header-text: #f5f7fa;
+    /* Header & Footer solid color — admin-controllable per mode (default matte black) */
+    --hf-bg-light: #000000;
+    --hf-bg-dark: #000000;
     --sticky-bg: rgba(255, 255, 255, 0.92);
     --sticky-shadow: 0 -4px 20px rgba(32, 36, 43, 0.08);
     --silver-grad: linear-gradient(135deg, #dfe3e8 0%, #c3c9d1 50%, #8f97a3 100%);
@@ -56,10 +59,10 @@
     --input-bg: #1d222a;
     --input-border: #2f3540;
     --input-text: #e8eaee;
-    --footer-bg: #0a0c0f;
+    --footer-bg: #000000;
     --footer-text: #e8eaee;
     --footer-text-secondary: #8b939e;
-    --header-bg: #0a0c0f;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(22, 26, 32, 0.92);
     --sticky-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
@@ -100,9 +103,9 @@
     --input-bg: #1d222a;
     --input-border: #2f3540;
     --input-text: #e8eaee;
-    --footer-bg: #0a0c0f;
+    --footer-bg: #000000;
     --footer-text: #e8eaee;
-    --header-bg: #0a0c0f;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(22, 26, 32, 0.92);
     --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);
@@ -164,9 +167,9 @@
     --input-bg: #1e2229;
     --input-border: #30353f;
     --input-text: #eceef1;
-    --footer-bg: #0b0c10;
+    --footer-bg: #000000;
     --footer-text: #eceef1;
-    --header-bg: #0b0c10;
+    --header-bg: #000000;
     --header-text: #f7f8fa;
     --sticky-bg: rgba(24, 27, 33, 0.92);
     --silver-grad: linear-gradient(135deg, #3d444f 0%, #292f38 50%, #1c2128 100%);
@@ -187,10 +190,10 @@
     --input-bg: #1d222a;
     --input-border: #2f3540;
     --input-text: #e8eaee;
-    --footer-bg: #0a0c0f;
+    --footer-bg: #000000;
     --footer-text: #e8eaee;
     --footer-text-secondary: #8b939e;
-    --header-bg: #0a0c0f;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(22, 26, 32, 0.92);
     --sticky-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
@@ -211,9 +214,9 @@
     --input-bg: #1d222a;
     --input-border: #2f3540;
     --input-text: #e8eaee;
-    --footer-bg: #0a0c0f;
+    --footer-bg: #000000;
     --footer-text: #e8eaee;
-    --header-bg: #0a0c0f;
+    --header-bg: #000000;
     --header-text: #f5f7fa;
     --sticky-bg: rgba(22, 26, 32, 0.92);
     --silver-grad: linear-gradient(135deg, #3a414c 0%, #272d36 50%, #1b2026 100%);

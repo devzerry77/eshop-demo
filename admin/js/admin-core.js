@@ -107,6 +107,10 @@
             "themeBg", "themeCard", "themeSecondary", "themeText", "themeTextSecondary",
             "themeBorder", "themeAccent", "themeHeaderBg", "themeHeaderText",
             "saveThemeBtn", "resetThemeBtn", "themeStatus",
+            // Header & footer color (new)
+            "hfPickerLight", "hfHexLight", "hfSwatchLight", "hfCurrentLight",
+            "hfPickerDark", "hfHexDark", "hfSwatchDark", "hfCurrentDark",
+            "saveHfBtn", "resetHfBtn", "hfStatus",
             // Hero banners (new)
             "heroEnabled", "heroTitle", "heroAutoplay", "heroAutoplayLabel",
             "heroAddSlide", "heroSlidesList", "saveHeroBtn", "resetHeroBtn", "heroStatus",

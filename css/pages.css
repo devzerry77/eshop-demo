@@ -140,7 +140,7 @@
 [data-theme="dark"] .sidebar-menu ul li a { color:var(--text); border-bottom-color:var(--border); }
 [data-theme="dark"] .sidebar-menu ul li a:hover { color:var(--accent-text); }
 [data-theme="dark"] .toast { background:var(--accent); color:#fff; }
-[data-theme="dark"] .footer { background:var(--footer-bg); color:var(--footer-text); }
+[data-theme="dark"] .footer { background:var(--hf-bg-dark, #000000); background-color:var(--hf-bg-dark, #000000); color:var(--footer-text); }
 [data-theme="dark"] .footer-links a { color:var(--footer-text-secondary); }
 [data-theme="dark"] .footer-links a:hover { color:var(--footer-text); }
 [data-theme="dark"] .footer-copy { color:var(--footer-text-secondary); }
@@ -178,10 +178,12 @@
 .product-page-loading { text-align:center; padding:4rem 1rem; color:var(--text-secondary); }
 .product-page-loading p { margin-top:0.5rem; }
 
-/* ─── PRODUCT DETAIL: FADE LOADING (no visible spinner/animation) ─── */
-.product-page .loader-spinner { display:none; }
-.product-page .product-page-loading { padding:3rem 1rem; }
+/* ─── PRODUCT DETAIL: reuse homepage 3-dot loader (same .skeleton-dots / dotPulse from components.css) ─── */
+.product-page .product-page-loading { padding:3rem 1rem; min-height:320px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; }
 .product-page .product-page-loading p { opacity:0.75; margin-top:0; }
+.product-page .product-page-loading .skeleton-dots { margin-top:0; padding:0; }
+.product-page .product-page-loading .skeleton-dots span { will-change:transform, opacity; backface-visibility:hidden; }
+.product-page #productContent { min-height:320px; }
 .product-page #productContent.fade-in { animation:productContentIn 0.45s cubic-bezier(0.25,0.46,0.45,0.94) both; }
 @keyframes productContentIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
@@ -1334,3 +1336,40 @@ body.page-exit { opacity:0 !important; transform:translateY(4px); transition:opa
     margin-top: 0.35rem;
     font-size: 0.72rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   BRIGHT/LIGHT MODE — Write a Review readability fix.
+   Root cause: .review-login-btn / .review-submit-btn pair a
+   theme-variable background with theme-variable text, which can
+   resolve to light-on-light (invisible) in Bright Mode — e.g. when
+   the admin saves a custom theme with a light Accent color.
+   Fix uses fixed high-contrast colors (dark button + white text)
+   so the button is readable in EVERY Bright Mode configuration.
+   Scoped to :not([data-theme="dark"]) so Dark Mode is untouched.
+   ═══════════════════════════════════════════════════════════════ */
+:root:not([data-theme="dark"]) .reviews-heading { color:var(--text); }
+:root:not([data-theme="dark"]) .review-write-heading { color:var(--text); }
+:root:not([data-theme="dark"]) .review-gate-note { color:var(--text-secondary); }
+:root:not([data-theme="dark"]) .review-login-btn,
+:root:not([data-theme="dark"]) .review-submit-btn {
+    background:#20242b;
+    background-color:#20242b;
+    color:#ffffff;
+    border:none;
+}
+:root:not([data-theme="dark"]) .review-login-btn:hover,
+:root:not([data-theme="dark"]) .review-login-btn:focus-visible,
+:root:not([data-theme="dark"]) .review-login-btn:active,
+:root:not([data-theme="dark"]) .review-submit-btn:hover:enabled,
+:root:not([data-theme="dark"]) .review-submit-btn:focus-visible {
+    background:#20242b;
+    background-color:#20242b;
+    opacity:0.85;
+    color:#ffffff;
+}
+:root:not([data-theme="dark"]) .review-avatar {
+    background:#20242b;
+    color:#ffffff;
+}
+:root:not([data-theme="dark"]) .review-form-field label { color:var(--text); }
+:root:not([data-theme="dark"]) .review-star-label { color:var(--text-secondary); }

@@ -647,6 +647,141 @@
         setTimeout(() => { DOM.themeStatus.textContent = ''; }, 3500);
     }
 
+    // ─── HEADER & FOOTER COLOR (per color mode, default matte black) ──
+    // Same Header & Footer color setting, editable two ways:
+    //   1. visual color picker,  2. manual HEX code entry.
+    // Stored in the existing `settings` table as:
+    //   header_footer_bg_light + header_footer_bg_dark
+    const HF_KEYS = ['header_footer_bg_light', 'header_footer_bg_dark'];
+    const HF_DEFAULT = '#000000';
+    const HF_CACHE_KEY = 'grabby_header_footer_colors';
+
+    function normalizeHfHex(value) {
+        if (typeof value !== 'string') return null;
+        let v = value.trim().toLowerCase();
+        if (!v) return null;
+        if (v.charAt(0) !== '#') v = '#' + v;
+        if (/^#[0-9a-f]{3}$/.test(v)) {
+            v = '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+        }
+        return /^#[0-9a-f]{6}$/.test(v) ? v : null;
+    }
+
+    function setHfModeUI(mode, color) {
+        const c = normalizeHfHex(color) || HF_DEFAULT;
+        const picker = mode === 'dark' ? DOM.hfPickerDark : DOM.hfPickerLight;
+        const hex = mode === 'dark' ? DOM.hfHexDark : DOM.hfHexLight;
+        const swatch = mode === 'dark' ? DOM.hfSwatchDark : DOM.hfSwatchLight;
+        const current = mode === 'dark' ? DOM.hfCurrentDark : DOM.hfCurrentLight;
+        if (picker) picker.value = c;
+        if (hex) { hex.value = c; hex.classList.remove('invalid'); }
+        if (swatch) swatch.style.background = c;
+        if (current) current.textContent = c;
+    }
+
+    function readHfModeUI(mode) {
+        const hex = mode === 'dark' ? DOM.hfHexDark : DOM.hfHexLight;
+        return normalizeHfHex(hex ? hex.value : '');
+    }
+
+    function cacheHfColors(light, dark) {
+        try { localStorage.setItem(HF_CACHE_KEY, JSON.stringify({ light, dark })); } catch { /* noop */ }
+    }
+
+    async function loadHfColors() {
+        // Show cached values instantly, then refresh from the database.
+        try {
+            const cached = JSON.parse(localStorage.getItem(HF_CACHE_KEY) || 'null');
+            if (cached) {
+                setHfModeUI('light', cached.light);
+                setHfModeUI('dark', cached.dark);
+            }
+        } catch { /* noop */ }
+        try {
+            const { data, error } = await STATE.supabase.from('settings').select('*').in('key', HF_KEYS);
+            if (error) throw error;
+            const map = {};
+            (data || []).forEach(row => { map[row.key] = row.value; });
+            const light = normalizeHfHex(map.header_footer_bg_light) || HF_DEFAULT;
+            const dark = normalizeHfHex(map.header_footer_bg_dark) || HF_DEFAULT;
+            setHfModeUI('light', light);
+            setHfModeUI('dark', dark);
+            cacheHfColors(light, dark);
+        } catch (err) {
+            showToast('Failed to load header & footer color: ' + (err.message || err), 'error');
+        }
+    }
+
+    async function saveHfColors() {
+        const light = readHfModeUI('light');
+        const dark = readHfModeUI('dark');
+        if (!light) {
+            showToast('Bright Mode color is not a valid HEX code (e.g. #000000).', 'warning');
+            if (DOM.hfHexLight) { DOM.hfHexLight.classList.add('invalid'); DOM.hfHexLight.focus(); }
+            return;
+        }
+        if (!dark) {
+            showToast('Dark Mode color is not a valid HEX code (e.g. #000000).', 'warning');
+            if (DOM.hfHexDark) { DOM.hfHexDark.classList.add('invalid'); DOM.hfHexDark.focus(); }
+            return;
+        }
+        const settings = [
+            { key: 'header_footer_bg_light', value: light },
+            { key: 'header_footer_bg_dark', value: dark }
+        ];
+        if (DOM.hfStatus) DOM.hfStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            setHfModeUI('light', light);
+            setHfModeUI('dark', dark);
+            cacheHfColors(light, dark);
+            showToast('Header & footer color saved! The website updates automatically.', 'success');
+            if (DOM.hfStatus) {
+                DOM.hfStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.hfStatus) DOM.hfStatus.textContent = ''; }, 2500);
+            }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.hfStatus) DOM.hfStatus.textContent = '✗ Error';
+        }
+    }
+
+    function resetHfColors() {
+        setHfModeUI('light', HF_DEFAULT);
+        setHfModeUI('dark', HF_DEFAULT);
+        if (DOM.hfStatus) {
+            DOM.hfStatus.textContent = 'Reset to matte black — click Save to publish';
+            setTimeout(() => { if (DOM.hfStatus) DOM.hfStatus.textContent = ''; }, 3500);
+        }
+    }
+
+    function bindHfModePair(mode) {
+        const picker = mode === 'dark' ? DOM.hfPickerDark : DOM.hfPickerLight;
+        const hex = mode === 'dark' ? DOM.hfHexDark : DOM.hfHexLight;
+        // 1. Visual picker -> HEX field + live swatch
+        picker?.addEventListener('input', () => setHfModeUI(mode, picker.value));
+        // 2. Manual HEX entry -> picker + live swatch (when valid)
+        hex?.addEventListener('input', () => {
+            const c = normalizeHfHex(hex.value);
+            const swatch = mode === 'dark' ? DOM.hfSwatchDark : DOM.hfSwatchLight;
+            const current = mode === 'dark' ? DOM.hfCurrentDark : DOM.hfCurrentLight;
+            if (c) {
+                hex.classList.remove('invalid');
+                if (picker) picker.value = c;
+                if (swatch) swatch.style.background = c;
+                if (current) current.textContent = c;
+            } else {
+                hex.classList.add('invalid');
+            }
+        });
+        // Normalize the HEX text on blur (e.g. "abc" -> "#aabbcc")
+        hex?.addEventListener('change', () => {
+            const c = normalizeHfHex(hex.value);
+            if (c) setHfModeUI(mode, c);
+        });
+    }
+
     // ─── MESSENGER / CHAT SUPPORT ─────────────────────────────
     const MESSENGER_KEY = 'messenger_link';
     const DEFAULT_MESSENGER_LINK = 'https://m.me/GrabbyTech';
@@ -800,6 +935,12 @@ async function saveSocialSettings() {
         DOM.saveMessengerBtn?.addEventListener('click', admin.saveMessengerSettings);
         // Social media links
         DOM.saveSocialBtn?.addEventListener('click', admin.saveSocialSettings);
+
+        // Header & footer color (picker + HEX, per color mode)
+        admin.bindHfModePair('light');
+        admin.bindHfModePair('dark');
+        DOM.saveHfBtn?.addEventListener('click', admin.saveHfColors);
+        DOM.resetHfBtn?.addEventListener('click', admin.resetHfColors);
     }
 
     function bindThemeSettings() {
@@ -837,6 +978,7 @@ async function saveSocialSettings() {
     Object.assign(admin, {
         loadMarqueeSettings, saveMarqueeSettings, resetMarqueeToDefault, updateMarqueePreview,
         loadThemeSettings, saveThemeSettings, resetThemeSettings,
+        loadHfColors, saveHfColors, resetHfColors, bindHfModePair,
         loadFlashSettings, saveFlashSettings, resetFlashSettings,
         populateFlashProductSelect, updateFlashAutoplayLabel, recordFlashSelection,
         loadHeroSettings, saveHeroSettings, resetHeroSettings, toggleHeroSetting, addHeroSlide, updateHeroAutoplayLabel,
