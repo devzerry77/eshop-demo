@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════════════════════════════
+   E-SHOP DEMO — DEMO CONTACT DOCK
+   Floating "Like this demo? Contact me" widget: WhatsApp + Facebook.
+   CSS keyframes only (no libraries), respects reduced-motion.
+   ═══════════════════════════════════════════════════════════════ */
+
+.demo-contact-dock {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: inherit;
+}
+
+/* ─── Main floating button ─── */
+.demo-contact-fab {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    box-shadow: 0 8px 28px rgba(59, 130, 246, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+    animation: demoFabEnter 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) 1s backwards,
+        demoFabGradient 5s ease infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.demo-contact-fab:hover {
+    transform: scale(1.1) rotate(6deg);
+    box-shadow: 0 10px 34px rgba(139, 92, 246, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}
+
+.demo-contact-fab:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 3px;
+}
+
+/* pulsing rings */
+.demo-contact-fab::before,
+.demo-contact-fab::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(34, 211, 238, 0.7);
+    animation: demoFabPulse 2.4s ease-out infinite;
+    pointer-events: none;
+}
+
+.demo-contact-fab::after {
+    animation-delay: 1.2s;
+}
+
+.demo-contact-fab svg {
+    width: 28px;
+    height: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+    transition: transform 0.3s ease;
+}
+
+.demo-contact-dock.open .demo-contact-fab svg {
+    transform: rotate(45deg);
+}
+
+@keyframes demoFabEnter {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes demoFabGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes demoFabPulse {
+    0% {
+        opacity: 0.9;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.7);
+    }
+}
+
+/* ─── Expandable glass panel ─── */
+.demo-contact-panel {
+    width: min(320px, calc(100vw - 36px));
+    border-radius: 18px;
+    padding: 18px;
+    color: #eef2ff;
+    background: rgba(13, 17, 28, 0.82);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(103, 232, 249, 0.35);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5),
+        0 0 24px rgba(34, 211, 238, 0.25),
+        0 0 60px rgba(139, 92, 246, 0.18);
+    transform-origin: bottom left;
+    transform: scale(0.7) translateY(14px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.32s cubic-bezier(0.2, 1.3, 0.4, 1),
+        opacity 0.25s ease, visibility 0s linear 0.32s;
+    overflow: hidden;
+}
+
+.demo-contact-dock.open .demo-contact-panel {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.32s cubic-bezier(0.2, 1.3, 0.4, 1),
+        opacity 0.25s ease;
+}
+
+/* animated shine sweep across the panel */
+.demo-contact-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -70%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(103, 232, 249, 0.16), transparent);
+    transform: skewX(-18deg);
+    pointer-events: none;
+}
+
+.demo-contact-dock.open .demo-contact-panel::before {
+    animation: demoPanelShine 1.1s ease 0.15s;
+}
+
+@keyframes demoPanelShine {
+    from { left: -70%; }
+    to { left: 130%; }
+}
+
+.demo-contact-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.demo-contact-eyebrow {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #22d3ee, #a78bfa, #22d3ee);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: demoTextShine 3s linear infinite;
+}
+
+@keyframes demoTextShine {
+    to { background-position: 200% center; }
+}
+
+.demo-contact-title {
+    margin: 4px 0 2px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.demo-contact-sub {
+    margin: 0 0 12px;
+    font-size: 0.8rem;
+    color: #a5b4cf;
+}
+
+.demo-contact-close {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.demo-contact-close:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: rotate(90deg);
+}
+
+/* ─── Contact rows ─── */
+.demo-contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.demo-contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: transform 0.22s ease, box-shadow 0.22s ease,
+        border-color 0.22s ease, background 0.22s ease;
+    animation: demoLinkIn 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) backwards;
+}
+
+.demo-contact-dock.open .demo-contact-link:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+@keyframes demoLinkIn {
+    from {
+        opacity: 0;
+        transform: translateX(-18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.demo-contact-link:hover {
+    transform: translateX(5px) scale(1.02);
+}
+
+.demo-contact-link.whatsapp:hover {
+    border-color: rgba(37, 211, 102, 0.7);
+    box-shadow: 0 0 18px rgba(37, 211, 102, 0.45);
+    background: rgba(37, 211, 102, 0.1);
+}
+
+.demo-contact-link.facebook:hover {
+    border-color: rgba(24, 119, 242, 0.8);
+    box-shadow: 0 0 18px rgba(24, 119, 242, 0.55);
+    background: rgba(24, 119, 242, 0.12);
+}
+
+.demo-contact-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.demo-contact-icon.whatsapp {
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.5);
+    animation: demoIconFloat 3s ease-in-out infinite;
+}
+
+.demo-contact-icon.facebook {
+    background: linear-gradient(135deg, #1877f2, #0d47a1);
+    box-shadow: 0 4px 14px rgba(24, 119, 242, 0.5);
+    animation: demoIconFloat 3s ease-in-out 0.6s infinite;
+}
+
+@keyframes demoIconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.demo-contact-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.demo-contact-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.demo-contact-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.demo-contact-detail {
+    font-size: 0.76rem;
+    color: #a5b4cf;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.demo-contact-arrow {
+    margin-left: auto;
+    font-size: 1.1rem;
+    color: #67e8f9;
+    transition: transform 0.22s ease;
+}
+
+.demo-contact-link:hover .demo-contact-arrow {
+    transform: translateX(4px);
+}
+
+.demo-contact-note {
+    margin: 12px 0 0;
+    font-size: 0.7rem;
+    text-align: center;
+    color: #7c8aa5;
+}
+
+/* ─── Mobile: sit above the bottom nav bar ─── */
+@media (max-width: 768px) {
+    .demo-contact-dock {
+        left: 12px;
+        bottom: 78px;
+    }
+
+    .demo-contact-fab {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+    .demo-contact-fab,
+    .demo-contact-fab::before,
+    .demo-contact-fab::after,
+    .demo-contact-eyebrow,
+    .demo-contact-icon.whatsapp,
+    .demo-contact-icon.facebook {
+        animation: none;
+    }
+
+    .demo-contact-dock.open .demo-contact-panel::before {
+        animation: none;
+    }
+
+    .demo-contact-fab {
+        opacity: 1;
+    }
+}
