@@ -7,7 +7,13 @@
     const { STATE, DOM, showToast, escapeHTML, formatPrice, debounce } = admin;
 
     const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled', 'returned', 'refunded'];
+    const PAYMENT_STATUSES = ['pending', 'verified'];
     const EXCLUDED_FROM_REVENUE = ['cancelled', 'returned', 'refunded'];
+
+    function normalizePaymentStatus(value) {
+        const v = String(value || 'pending').toLowerCase().trim();
+        return v === 'verified' ? 'verified' : 'pending';
+    }
 
     // ─── ORDERS DATA ────────────────────────────────────────
     async function loadOrders() {
@@ -22,6 +28,8 @@
             STATE.orders = (data || []).map(row => ({
                 id: row.id,
                 order_number: row.order_number || ('#' + row.id),
+                user_id: row.user_id || null,
+                is_guest: row.is_guest === true || !row.user_id,
                 customer_name: row.customer_name || 'Unknown',
                 customer_email: row.customer_email || '',
                 customer_phone: row.customer_phone || '',
@@ -33,7 +41,7 @@
                 discount: Number(row.discount) || 0,
                 shipping_cost: Number(row.shipping_cost) || 0,
                 payment_method: row.payment_method || '—',
-                payment_status: row.payment_status || 'pending',
+                payment_status: normalizePaymentStatus(row.payment_status),
                 status: row.status || 'pending',
                 created_at: row.created_at,
                 estimated_delivery: row.estimated_delivery || ''
@@ -75,20 +83,25 @@
             return;
         }
         DOM.ordersTableBody.innerHTML = items.map(o => {
+            const paymentStatus = normalizePaymentStatus(o.payment_status);
             const statusOptions = ORDER_STATUSES.map(s =>
                 `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s.replace(/_/g, ' ').toUpperCase()}</option>`
             ).join('');
+            const paymentOptions = PAYMENT_STATUSES.map(s =>
+                `<option value="${s}" ${paymentStatus === s ? 'selected' : ''}>${s.toUpperCase()}</option>`
+            ).join('');
             return `<tr data-order-id="${escapeHTML(o.id)}">
-                <td><div class="product-name">${escapeHTML(o.order_number)}</div><div class="product-id">${escapeHTML(o.payment_method)}</div></td>
+                <td><div class="product-name">${escapeHTML(o.order_number)}</div><div class="product-id">${escapeHTML(o.payment_method)}</div>${o.is_guest ? `<div class="product-id"><span class="order-status-pill pending">GUEST</span></div>` : ''}</td>
                 <td><strong>${escapeHTML(o.customer_name)}</strong>${o.customer_phone ? `<div class="product-id">${escapeHTML(o.customer_phone)}</div>` : ''}${[o.area, o.city, o.state].filter(Boolean).length ? `<div class="product-id">${escapeHTML([o.area, o.city, o.state].filter(Boolean).join(', '))}</div>` : ''}</td>
                 <td><strong>${formatPrice(o.total_amount)}</strong>${o.discount ? `<div class="product-id">-${formatPrice(o.discount)}</div>` : ''}</td>
-                <td><span class="order-status-pill ${o.payment_status}">${escapeHTML(o.payment_status)}</span></td>
+                <td><span class="order-status-pill ${paymentStatus}">${escapeHTML(paymentStatus.toUpperCase())}</span></td>
                 <td><span class="order-status-pill ${escapeHTML(o.status)}">${escapeHTML(o.status.replace(/_/g, ' '))}</span></td>
                 <td><div class="product-id">${o.created_at ? escapeHTML(new Date(o.created_at).toLocaleString()) : '—'}</div>${o.estimated_delivery ? `<div class="product-id">ETA ${escapeHTML(o.estimated_delivery)}</div>` : ''}</td>
                 <td>
                     <div class="table-actions">
+                        <select class="order-status-select payment-status-select" data-payment-status="${escapeHTML(o.id)}" aria-label="Update payment status">${paymentOptions}</select>
                         <select class="order-status-select" data-status="${escapeHTML(o.id)}" aria-label="Update status">${statusOptions}</select>
-                        <button class="table-action" data-track="${escapeHTML(o.order_number)}" data-phone="${escapeHTML(o.customer_phone)}">Track</button>
+                        <button class="table-action" data-track="${escapeHTML(o.order_number)}">Track</button>
                     </div>
                 </td>
             </tr>`;
@@ -129,6 +142,31 @@
         }
     }
 
+    async function updatePaymentStatus(orderId, newStatus) {
+        if (!STATE.supabase) return;
+        const normalized = normalizePaymentStatus(newStatus);
+        if (newStatus !== normalized) {
+            showToast("Invalid payment status. Use PENDING or VERIFIED.", "warning");
+            renderOrders();
+            return;
+        }
+        const order = STATE.orders.find(o => String(o.id) === String(orderId));
+        if (!order) return;
+        const prev = normalizePaymentStatus(order.payment_status);
+        if (prev === normalized) return;
+        try {
+            const { error } = await STATE.supabase.from("orders").update({ payment_status: normalized }).eq("id", orderId);
+            if (error) throw error;
+            order.payment_status = normalized;
+            renderOrders();
+            showToast(`Order ${order.order_number} payment ${normalized.toUpperCase()}.`, "success");
+        } catch (err) {
+            order.payment_status = prev;
+            renderOrders();
+            showToast("Could not update payment status: " + (err.message || err), "error");
+        }
+    }
+
     function computeOrderStats() {
         const orders = STATE.orders;
         const today = new Date().toDateString();
@@ -154,9 +192,9 @@
 
     function exportOrdersCSV() {
         const orders = filteredOrders();
-        const headers = ['Order Number', 'Customer', 'Email', 'Phone', 'Area/Thana', 'District', 'Division', 'Country', 'Items Total', 'Discount', 'Shipping', 'Payment Method', 'Payment Status', 'Order Status', 'Order Date', 'Estimated Delivery'];
+        const headers = ['Order Number', 'Guest', 'Customer', 'Email', 'Phone', 'Area/Thana', 'District', 'Division', 'Country', 'Items Total', 'Discount', 'Shipping', 'Payment Method', 'Payment Status', 'Order Status', 'Order Date', 'Estimated Delivery'];
         const rows = orders.map(o => [
-            o.order_number, o.customer_name, o.customer_email, o.customer_phone, o.area, o.city, o.state, o.country,
+            o.order_number, o.is_guest ? 'Yes' : 'No', o.customer_name, o.customer_email, o.customer_phone, o.area, o.city, o.state, o.country,
             o.total_amount, o.discount, o.shipping_cost, o.payment_method, o.payment_status, o.status,
             o.created_at, o.estimated_delivery
         ]);
@@ -332,6 +370,11 @@
         }, 300));
 
         DOM.ordersTableBody?.addEventListener("change", e => {
+            const paymentSelect = e.target.closest("[data-payment-status]");
+            if (paymentSelect) {
+                updatePaymentStatus(paymentSelect.dataset.paymentStatus, paymentSelect.value);
+                return;
+            }
             const select = e.target.closest("[data-status]");
             if (select) updateOrderStatus(select.dataset.status, select.value);
         });
@@ -339,7 +382,7 @@
         DOM.ordersTableBody?.addEventListener("click", e => {
             const track = e.target.closest("[data-track]");
             if (track) {
-                const url = `../order-tracking.html?order_id=${encodeURIComponent(track.dataset.track)}&phone=${encodeURIComponent(track.dataset.phone || '')}`;
+                const url = `../order-tracking.html?order_id=${encodeURIComponent(track.dataset.track)}`;
                 window.open(url, '_blank');
             }
         });
@@ -364,7 +407,7 @@
     }
 
     Object.assign(admin, {
-        loadOrders, filteredOrders, renderOrders, updateOrderStatus,
+        loadOrders, filteredOrders, renderOrders, updateOrderStatus, updatePaymentStatus,
         computeOrderStats, renderOrderStats, exportOrdersCSV,
         loadPaymentSettings, renderPaymentSettings, openPaymentForm, closePaymentForm,
         savePaymentMethod, deletePaymentMethod, togglePaymentMethod,

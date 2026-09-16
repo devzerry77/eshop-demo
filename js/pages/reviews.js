@@ -216,10 +216,6 @@ function buildWriteForm() {
                     </div>
                     <div class="review-upload-previews" id="reviewUploadPreviews"></div>
                 </div>
-                <div class="review-form-field">
-                    <label>YouTube video link (optional)</label>
-                    <input type="url" id="reviewVideoUrl" placeholder="https://www.youtube.com/watch?v=..." />
-                </div>
                 <button type="button" class="review-submit-btn" id="reviewSubmitBtn">Submit Review</button>
             </div>
         </div>`;
@@ -389,8 +385,6 @@ function bindReviewEvents(container, supabase, user, productId, canReview, alrea
             if (rating < 1) { showToastMsg('Please select a star rating.', 'warning'); return; }
             const text = form.querySelector('#reviewText').value.trim();
             if (!text) { showToastMsg('Please write a few words about the product.', 'warning'); return; }
-            const videoUrl = form.querySelector('#reviewVideoUrl').value.trim();
-            if (videoUrl && !isYouTubeUrl(videoUrl)) { showToastMsg('Please enter a valid YouTube link.', 'warning'); return; }
             if (!supabase) { showToastMsg('Could not connect. Please try again later.', 'error'); return; }
 
             submitBtn.textContent = 'Submitting…';
@@ -403,7 +397,7 @@ function bindReviewEvents(container, supabase, user, productId, canReview, alrea
                     p_rating: rating,
                     p_review_text: text,
                     p_images: uploaded,
-                    p_video_url: videoUrl || null
+                    p_video_url: null
                 });
                 if (error) throw error;
                 const result = data && data[0] ? data[0] : data;

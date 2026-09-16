@@ -139,6 +139,30 @@
                         <h2>Settings</h2>
                     </div>
                     <div class="settings-grid">
+                        <!-- Customer Order Mode -->
+                        <div class="setting-card glass-card">
+                            <h3>🛒 Customer Order Mode</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Choose whether customers must log in before placing an order.
+                                Applies instantly on the checkout page after saving.
+                            </p>
+                            <div class="setting-item">
+                                <span>Current mode</span>
+                                <strong id="orderModeCurrent" style="font-size:0.85rem;">Loading…</strong>
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="orderModeSelect" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Customer Order Mode</label>
+                                <select id="orderModeSelect" style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                    <option value="login">Customer Order with Login (require login)</option>
+                                    <option value="guest">Customer Order without Login (allow guest checkout)</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveOrderModeBtn">💾 Save Order Mode</button>
+                                <span id="orderModeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
                         <!-- Theme Settings -->
                         <div class="setting-card glass-card">
                             <h3>Theme</h3>

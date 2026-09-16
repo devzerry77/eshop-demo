@@ -122,7 +122,9 @@
             // Messenger / chat support (new)
             "messengerLink", "messengerStatus", "saveMessengerBtn",
             "socialFacebook", "socialInstagram", "socialYouTube", "socialTiktok", "socialX",
-            "saveSocialBtn", "socialStatus"
+            "saveSocialBtn", "socialStatus",
+            // Customer order mode (new)
+            "orderModeSelect", "orderModeCurrent", "saveOrderModeBtn", "orderModeStatus"
         ].forEach(id => DOM[id] = $(id));
     }
 

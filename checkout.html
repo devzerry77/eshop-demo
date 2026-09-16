@@ -198,6 +198,11 @@
             <div id="checkoutForm" style="display:none;">
                 <h1 style="font-size:1.8rem; font-weight:800; margin-bottom:1.5rem;">Checkout</h1>
 
+                <div id="guestNotice" style="display:none; margin-bottom:1rem; padding:0.8rem 1rem; background:var(--secondary-bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.9rem;">
+                    You&apos;re checking out as a guest — no account needed.
+                    <button type="button" id="guestLoginBtn" style="margin-left:0.5rem; background:none; border:none; color:var(--accent-text); text-decoration:underline; cursor:pointer; font-size:0.9rem;">Sign in instead</button>
+                </div>
+
                 <div class="checkout-grid">
                     <!-- LEFT -->
                     <div>
@@ -228,7 +233,7 @@
                                 <label>Country *</label>
                                 <input type="text" id="billingCountry" value="Bangladesh" required>
                             </div>
-                            <div style="margin-top:0.5rem;">
+                            <div style="margin-top:0.5rem;" id="saveAddressRow">
                                 <label style="display:flex; align-items:center; gap:8px; font-weight:500;">
                                     <input type="checkbox" id="saveAddressCheck"> Save this address
                                 </label>

@@ -28,6 +28,116 @@ function withTimeout(promise, ms = 10000, label = 'Request') {
     });
 }
 
+// ─── CUSTOMER ORDER MODE (Admin → Settings → Customer Order Mode) ───
+// 'login' (secure default): customers must sign in before checkout.
+// 'guest': guest checkout allowed; logged-in flow works unchanged.
+// The saved setting lives in the existing `settings` table
+// (key = customer_order_mode) and is cached for instant paint.
+const ORDER_MODE_KEY = 'customer_order_mode';
+const ORDER_MODE_CACHE = 'grabby_customer_order_mode';
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+let orderMode = 'login';
+let isGuestCheckout = false;
+let placingOrder = false;
+
+function getCachedOrderMode() {
+    try {
+        return localStorage.getItem(ORDER_MODE_CACHE) === 'guest' ? 'guest' : 'login';
+    } catch { return 'login'; }
+}
+
+async function loadOrderMode() {
+    orderMode = getCachedOrderMode();
+    if (!supabase) return orderMode;
+    try {
+        const { data, error } = await withTimeout(
+            supabase.from('settings').select('value').eq('key', ORDER_MODE_KEY).maybeSingle(),
+            8000, 'Loading order mode'
+        );
+        if (!error && data && (data.value === 'guest' || data.value === 'login')) {
+            orderMode = data.value;
+            try { localStorage.setItem(ORDER_MODE_CACHE, orderMode); } catch { /* noop */ }
+        }
+    } catch (e) {
+        console.warn('Order mode load failed, defaulting to login:', e);
+    }
+    return orderMode;
+}
+
+// ─── INPUT SANITIZATION (length-cap + strip control chars) ───
+function cleanStr(value, max) {
+    return String(value || '')
+        .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+        .trim().slice(0, max);
+}
+
+function readBillingForm() {
+    const loc = billingSelects ? billingSelects.getValues() : { division: '', district: '', area: '' };
+    return {
+        name: cleanStr(document.getElementById('billingName').value, 80),
+        email: cleanStr(document.getElementById('billingEmail').value, 320).toLowerCase(),
+        phone: cleanStr(document.getElementById('billingPhone').value, 30),
+        address1: cleanStr(document.getElementById('billingAddress1').value, 200),
+        address2: cleanStr(document.getElementById('billingAddress2').value, 200),
+        state: cleanStr(loc.division, 80),
+        city: cleanStr(loc.district, 80),
+        area: cleanStr(loc.area, 80),
+        country: cleanStr(document.getElementById('billingCountry').value, 80)
+    };
+}
+
+function validateBilling(b) {
+    if (b.name.length < 2) return 'Please enter your full name.';
+    if (!EMAIL_RE.test(b.email)) return 'Please enter a valid email address.';
+    const digits = b.phone.replace(/[^0-9]/g, '');
+    if (digits.length < 6 || digits.length > 15) return 'Please enter a valid phone number.';
+    if (b.address1.length < 5) return 'Please enter your street address.';
+    if (b.city.length < 2) return 'Please select your district.';
+    if (b.country.length < 2) return 'Please enter your country.';
+    return null;
+}
+
+// ─── IDEMPOTENCY + ABUSE GUARDS ──────────────────────────────
+// One key per checkout attempt (kept across refresh/retry so the
+// server returns the existing order instead of a duplicate).
+function getIdempotencyKey() {
+    try {
+        let k = sessionStorage.getItem('grabby_order_key');
+        if (!k) {
+            k = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : 'key-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+            sessionStorage.setItem('grabby_order_key', k);
+        }
+        return k;
+    } catch {
+        return 'key-' + Date.now();
+    }
+}
+
+// Device-side complement to the server rate limit: max 5 orders/hour,
+// min 10s between orders. Only successful orders are recorded.
+function orderRateHit() {
+    try {
+        const now = Date.now();
+        const arr = JSON.parse(localStorage.getItem('grabby_order_times') || '[]')
+            .filter(t => typeof t === 'number' && now - t < 3600000);
+        if (arr.length >= 5) return true;
+        if (arr.length && now - arr[arr.length - 1] < 10000) return true;
+        return false;
+    } catch { return false; }
+}
+
+function recordOrderTime() {
+    try {
+        const now = Date.now();
+        const arr = JSON.parse(localStorage.getItem('grabby_order_times') || '[]')
+            .filter(t => typeof t === 'number' && now - t < 3600000);
+        arr.push(now);
+        localStorage.setItem('grabby_order_times', JSON.stringify(arr));
+    } catch { /* noop */ }
+}
+
 // ─── STATE ──────────────────────────────────────────────────
 let productsData = [];
 let orderItems = [];
@@ -456,18 +566,26 @@ async function initCheckout() {
 
     renderOrderSummary();
 
-    const { data: { user: authUser }, error } = await supabase.auth.getUser();
-    if (error) {
-        showToastMsg('Authentication error: ' + error.message, 'error');
+    // Saved Customer Order Mode decides whether anonymous users may
+    // continue. Secure default: require login when the setting cannot
+    // be loaded. Fetched in parallel with the auth state (one paint).
+    const [modeResult, userResult] = await Promise.allSettled([
+        loadOrderMode(),
+        supabase.auth.getUser()
+    ]);
+    if (modeResult.status === 'fulfilled') orderMode = modeResult.value || orderMode;
+    if (userResult.status === 'fulfilled' && !userResult.value.error) {
+        user = userResult.value.data.user || null;
+    } else if (userResult.status === 'rejected' || userResult.value.error) {
+        showToastMsg('Authentication error. Please try again.', 'error');
     }
-    user = authUser;
 
-    if (!user) {
+    if (!user && orderMode !== 'guest') {
         enterAuthGate();
         return;
     }
 
-    enterCheckout();
+    enterCheckout({ guest: !user });
 }
 
 // ─── AUTH GATE / CHECKOUT CONTINUATION ────────────────────
@@ -500,15 +618,33 @@ async function getCurrentUser() {
     }
 }
 
-async function enterCheckout() {
+async function enterCheckout(opts = {}) {
+    isGuestCheckout = !!opts.guest;
     document.getElementById('loginRequired').style.display = 'none';
     document.getElementById('checkoutForm').style.display = 'block';
     document.getElementById('loadingState').style.display = 'none';
 
     billingSelects = createAddressSelects(document.getElementById('billingSelects'));
+    // Re-entry (e.g. guest signs in mid-checkout) rebuilds the selects:
+    // restore any already-chosen location so nothing is lost.
+    if (opts.keepLocation) {
+        try { billingSelects.setValues(opts.keepLocation); } catch { /* noop */ }
+    }
 
     await loadPaymentSettings();
-    await loadUserData();
+    if (user) {
+        await loadUserData();
+    } else {
+        // Guest checkout: auth modal stays available for optional sign-in.
+        initAuthModal();
+        checkOAuthErrorAndShow();
+        wireGuestLogin();
+    }
+
+    const guestNotice = document.getElementById('guestNotice');
+    if (guestNotice) guestNotice.style.display = isGuestCheckout ? 'block' : 'none';
+    const saveRow = document.getElementById('saveAddressRow');
+    if (saveRow) saveRow.style.display = user ? '' : 'none';
 
     const savedCoupon = getCoupon();
     if (savedCoupon) {
@@ -545,8 +681,21 @@ function wireAuthGate() {
 async function onAuthSuccess() {
     closeAuthModal();
     showToastMsg('Signed in successfully');
+    const keepLocation = billingSelects ? billingSelects.getValues() : null;
     user = await getCurrentUser();
-    enterCheckout();
+    enterCheckout(keepLocation ? { keepLocation } : {});
+}
+
+function wireGuestLogin() {
+    if (authWired) return;
+    authWired = true;
+    document.getElementById('guestLoginBtn')?.addEventListener('click', () => {
+        openAuthModal({
+            mode: 'signin',
+            onSuccess: onAuthSuccess,
+            onNotice: (msg) => showToastMsg(msg)
+        });
+    });
 }
 
 async function loadPaymentSettings() {
@@ -568,33 +717,71 @@ async function loadPaymentSettings() {
     }
 }
 
-// ─── PLACE ORDER ────────────────────────────────────────────
+// ─── PLACE ORDER (secure: server recomputes everything) ───
+// The browser sends ONLY contact/address text, the payment method
+// name, the coupon code and [{product_id, quantity}]. Prices,
+// discounts, shipping, totals, payment status and ownership are all
+// derived server-side by the create_order_secure RPC from trusted
+// tables + auth state — never from client values.
+function setPlacingUI(active) {
+    const btn = document.getElementById('placeOrderBtn');
+    if (!btn) return;
+    btn.disabled = active;
+    btn.textContent = active ? 'Placing order…' : 'Place Order';
+}
+
+function handleOrderErrorCode(code) {
+    switch (code) {
+        case 'LOGIN_REQUIRED':
+            showToastMsg('Please log in to place your order.', 'warning');
+            enterAuthGate();
+            break;
+        case 'RATE_LIMITED':
+            showToastMsg('Too many orders. Please try again later.', 'warning');
+            break;
+        case 'OUT_OF_STOCK':
+        case 'INSUFFICIENT_STOCK':
+            showToastMsg('Some items just went out of stock. Please review your cart.', 'error');
+            break;
+        case 'INVALID_COUPON':
+            showToastMsg('This coupon is no longer valid.', 'warning');
+            break;
+        case 'INVALID_PAYMENT':
+            showToastMsg('Please select a valid payment method.', 'warning');
+            break;
+        default:
+            showToastMsg('Please check your details and try again.', 'warning');
+    }
+}
+
 async function placeOrder() {
     if (!isCheckoutReady) {
         showToastMsg('Checkout not ready. Please wait.', 'warning');
         return;
     }
+    if (placingOrder) return; // double-click / double-tap guard
 
-    const name = document.getElementById('billingName').value.trim();
-    const email = document.getElementById('billingEmail').value.trim();
-    const phone = document.getElementById('billingPhone').value.trim();
-    const address1 = document.getElementById('billingAddress1').value.trim();
-    const address2 = document.getElementById('billingAddress2').value.trim();
-    const loc = billingSelects ? billingSelects.getValues() : { division: '', district: '', area: '' };
-    const state = loc.division;
-    const city = loc.district;
-    const area = loc.area;
-    const country = document.getElementById('billingCountry').value.trim();
-
-    if (!name || !email || !phone || !address1 || !city || !country) {
-        showToastMsg('Please fill all required fields.', 'warning');
+    const b = readBillingForm();
+    const formError = validateBilling(b);
+    if (formError) {
+        showToastMsg(formError, 'warning');
         return;
     }
     if (!selectedPayment) {
         showToastMsg('Please select a payment method.', 'warning');
         return;
     }
+    if (!orderItems.length || orderItems.length > 50) {
+        showToastMsg('Your cart is empty or too large.', 'warning');
+        return;
+    }
+    if (orderRateHit()) {
+        showToastMsg('Too many orders. Please try again later.', 'warning');
+        return;
+    }
 
+    // Fail fast on obviously stale stock; the server re-checks
+    // atomically and is the real source of truth.
     if (supabase) {
         for (let item of orderItems) {
             const p = productsData.find(prod => String(prod.id) === String(item.product_id));
@@ -606,6 +793,57 @@ async function placeOrder() {
         }
     }
 
+    placingOrder = true;
+    setPlacingUI(true);
+    try {
+        if (!supabase) throw new Error('Supabase not available');
+        const rpcItems = orderItems.map(item => ({
+            product_id: item.product_id,
+            quantity: Math.min(Math.max(parseInt(item.quantity, 10) || 1, 1), 10)
+        }));
+        const { data, error } = await withTimeout(
+            supabase.rpc('create_order_secure', {
+                p_name: b.name,
+                p_email: b.email,
+                p_phone: b.phone,
+                p_address1: b.address1,
+                p_address2: b.address2 || '',
+                p_city: b.city,
+                p_state: b.state || '',
+                p_area: b.area || '',
+                p_country: b.country,
+                p_payment_method: selectedPayment,
+                p_coupon_code: couponCode || '',
+                p_items: rpcItems,
+                p_idempotency_key: getIdempotencyKey()
+            }),
+            20000, 'Placing order'
+        );
+        if (error) {
+            // Migration not run yet → fall back to the legacy path so
+            // checkout keeps working; otherwise surface the failure.
+            if (/create_order_secure|PGRST202/i.test(error.message || '') || error.code === '42883') {
+                return placeOrderLegacy(b);
+            }
+            throw error;
+        }
+        if (data && data.ok === false) {
+            handleOrderErrorCode(data.error);
+            return;
+        }
+        await afterOrderPlaced(data.order_id, data.order_number, b);
+    } catch (err) {
+        // Log without PII; customers only see a generic message.
+        console.error('Order placement failed:', err && (err.code || err.message));
+        showToastMsg('Failed to place order. Please try again.', 'error');
+    } finally {
+        placingOrder = false;
+        setPlacingUI(false);
+    }
+}
+
+async function afterOrderPlaced(orderId, orderNumber, b) {
+    // Optional address book save for signed-in customers only.
     const saveAddress = document.getElementById('saveAddressCheck').checked;
     if (saveAddress && user && supabase) {
         try {
@@ -618,46 +856,76 @@ async function placeOrder() {
                 .from('addresses')
                 .insert({
                     user_id: user.id,
-                    name: name,
-                    phone: phone,
-                    address_line1: address1,
-                    address_line2: address2,
-                    city: city,
-                    state: state,
-                    area: area,
-                    country: country,
+                    name: b.name,
+                    phone: b.phone,
+                    address_line1: b.address1,
+                    address_line2: b.address2,
+                    city: b.city,
+                    state: b.state,
+                    area: b.area,
+                    country: b.country,
                     is_default: isFirst
                 });
         } catch (e) { console.warn('Failed to save address', e); }
     }
 
-    const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    recordOrderTime();
+    try {
+        sessionStorage.setItem('grabby_last_order',
+            JSON.stringify({ id: orderId, number: orderNumber }));
+        sessionStorage.removeItem('grabby_order_key');
+    } catch (_) { /* noop */ }
 
-    const orderData = {
-        order_number: orderNumber,
-        user_id: user ? user.id : null,
-        customer_name: name,
-        customer_email: email,
-        customer_phone: phone,
-        address_line1: address1,
-        address_line2: address2,
-        city: city,
-        state: state,
-        area: area,
-        country: country,
-        total_amount: total,
-        discount: discount,
-        shipping_cost: shippingCost,
-        coupon_code: couponCode || null,
-        payment_method: selectedPayment,
-        payment_status: 'pending',
-        status: 'pending',
-        estimated_delivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        created_at: new Date().toISOString()
-    };
+    if (!window.location.search.includes('product_id')) {
+        localStorage.setItem('grabby_cart', '[]');
+    }
+    clearCoupon();
 
+    window.location.href = `order-success.html?order_id=${orderId}`;
+}
+
+// Legacy direct-insert path: used ONLY when the guest-checkout.sql
+// migration has not been run yet (RPC missing). Totals are recomputed
+// here from the trusted products catalog — never from DOM values.
+async function placeOrderLegacy(b) {
     try {
         if (!supabase) throw new Error('Supabase not available');
+        // Recompute from the trusted catalog loaded from Supabase —
+        // never from DOM/client totals.
+        const freshSubtotal = orderItems.reduce((sum, item) => {
+            const p = productsData.find(prod => String(prod.id) === String(item.product_id));
+            return sum + (p ? (Number(p.price) || 0) : 0) * (parseInt(item.quantity, 10) || 0);
+        }, 0);
+        const freshShipping = freshSubtotal >= 2000 ? 0 : 100;
+        const method = paymentSettings.find(m => m.method_name === selectedPayment);
+        const freshFee = (method && parseFloat(method.fee)) || 0;
+        const freshTotal = Math.max(0, freshSubtotal + freshShipping + freshFee - Math.min(discount, freshSubtotal));
+
+        const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+        const orderData = {
+            order_number: orderNumber,
+            user_id: user ? user.id : null,
+            customer_name: b.name,
+            customer_email: b.email,
+            customer_phone: b.phone,
+            address_line1: b.address1,
+            address_line2: b.address2,
+            city: b.city,
+            state: b.state,
+            area: b.area,
+            country: b.country,
+            total_amount: freshTotal,
+            discount: Math.min(discount, freshSubtotal),
+            shipping_cost: freshShipping,
+            coupon_code: couponCode || null,
+            payment_method: selectedPayment,
+            payment_status: 'pending',
+            status: 'pending',
+            estimated_delivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            created_at: new Date().toISOString()
+        };
+
         const { data: order, error: orderError } = await withTimeout(
             supabase.from('orders').insert(orderData).select().single(),
             15000, 'Placing order'
@@ -708,10 +976,17 @@ async function placeOrder() {
         }
         clearCoupon();
 
+        try {
+            sessionStorage.setItem('grabby_last_order',
+                JSON.stringify({ id: order.id, number: order.order_number }));
+            sessionStorage.removeItem('grabby_order_key');
+        } catch (_) { /* noop */ }
+        recordOrderTime();
+
         window.location.href = `order-success.html?order_id=${order.id}`;
     } catch (err) {
-        console.error('Order placement error', err);
-        showToastMsg('Failed to place order: ' + err.message, 'error');
+        console.error('Order placement error:', err && (err.code || err.message));
+        showToastMsg('Failed to place order. Please try again.', 'error');
     }
 }
 

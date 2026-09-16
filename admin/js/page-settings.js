@@ -17,6 +17,7 @@
         await admin.loadHeroSettings();
         admin.loadMessengerSettings();
         admin.loadSocialSettings();
+        admin.loadOrderModeSettings();
         admin.populateFlashProductSelect();
 
         DOM.refreshStats?.addEventListener("click", () => {
@@ -27,6 +28,7 @@
             admin.loadHeroSettings();
             admin.loadMessengerSettings();
             admin.loadSocialSettings();
+            admin.loadOrderModeSettings();
             admin.populateFlashProductSelect();
         });
     });

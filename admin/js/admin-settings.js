@@ -888,6 +888,71 @@ async function saveSocialSettings() {
     }
 }
 
+    // ─── CUSTOMER ORDER MODE ─────────────────────────────
+    // Single row in the EXISTING `settings` table:
+    //   customer_order_mode = 'login' | 'guest'
+    // 'login' (default): checkout requires sign-in (existing flow).
+    // 'guest': checkout allows guest orders (secured server-side by
+    // the create_order_secure RPC in guest-checkout.sql).
+    const ORDER_MODE_KEY = 'customer_order_mode';
+    const ORDER_MODE_CACHE = 'grabby_customer_order_mode';
+    const ORDER_MODE_LABELS = {
+        login: 'Customer Order with Login (login required)',
+        guest: 'Customer Order without Login (guest checkout)'
+    };
+
+    function normalizeOrderMode(value) {
+        return value === 'guest' ? 'guest' : 'login';
+    }
+
+    function renderOrderModeUI(mode) {
+        const m = normalizeOrderMode(mode);
+        if (DOM.orderModeSelect) DOM.orderModeSelect.value = m;
+        if (DOM.orderModeCurrent) DOM.orderModeCurrent.textContent = ORDER_MODE_LABELS[m];
+    }
+
+    async function loadOrderModeSettings() {
+        // Cached value first so the current mode shows instantly.
+        try {
+            const cached = localStorage.getItem(ORDER_MODE_CACHE);
+            if (cached) renderOrderModeUI(cached);
+        } catch { /* noop */ }
+        try {
+            const { data, error } = await STATE.supabase
+                .from('settings')
+                .select('value')
+                .eq('key', ORDER_MODE_KEY)
+                .maybeSingle();
+            if (error) throw error;
+            const mode = normalizeOrderMode(data && data.value);
+            renderOrderModeUI(mode);
+            try { localStorage.setItem(ORDER_MODE_CACHE, mode); } catch { /* noop */ }
+        } catch (err) {
+            showToast('Failed to load order mode: ' + (err.message || err), 'error');
+        }
+    }
+
+    async function saveOrderModeSettings() {
+        const mode = normalizeOrderMode(DOM.orderModeSelect && DOM.orderModeSelect.value);
+        if (DOM.orderModeStatus) DOM.orderModeStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase
+                .from('settings')
+                .upsert([{ key: ORDER_MODE_KEY, value: mode }], { onConflict: 'key' });
+            if (error) throw error;
+            renderOrderModeUI(mode);
+            try { localStorage.setItem(ORDER_MODE_CACHE, mode); } catch { /* noop */ }
+            showToast('Customer order mode saved! Checkout updates automatically.', 'success');
+            if (DOM.orderModeStatus) {
+                DOM.orderModeStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.orderModeStatus) DOM.orderModeStatus.textContent = ''; }, 2500);
+            }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.orderModeStatus) DOM.orderModeStatus.textContent = '✗ Error';
+        }
+    }
+
 // ─── SETTINGS PAGE BINDINGS ─────────────────────────────
     function bindSettingsControls() {
         // Marquee controls
@@ -941,6 +1006,11 @@ async function saveSocialSettings() {
         admin.bindHfModePair('dark');
         DOM.saveHfBtn?.addEventListener('click', admin.saveHfColors);
         DOM.resetHfBtn?.addEventListener('click', admin.resetHfColors);
+
+        // Customer order mode
+        DOM.orderModeSelect?.addEventListener('change', () =>
+            renderOrderModeUI(DOM.orderModeSelect.value));
+        DOM.saveOrderModeBtn?.addEventListener('click', admin.saveOrderModeSettings);
     }
 
     function bindThemeSettings() {
@@ -984,6 +1054,7 @@ async function saveSocialSettings() {
         loadHeroSettings, saveHeroSettings, resetHeroSettings, toggleHeroSetting, addHeroSlide, updateHeroAutoplayLabel,
         loadMessengerSettings, saveMessengerSettings,
         loadSocialSettings, saveSocialSettings,
+        loadOrderModeSettings, saveOrderModeSettings,
         bindSettingsControls, bindThemeSettings
     });
 

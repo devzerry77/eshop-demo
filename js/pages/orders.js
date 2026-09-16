@@ -81,7 +81,7 @@ async function loadOrders() {
                         <div class="order-actions">
                             ${order.status === 'pending' ? `<button class="cancel" data-order-id="${order.id}">Cancel</button>` : ''}
                             <button class="reorder" data-order-id="${order.id}">Reorder</button>
-                            <a href="order-tracking.html?order_id=${order.order_number}&phone=${order.customer_phone}" class="track">Track</a>
+                            <a href="order-tracking.html?order_id=${order.order_number}" class="track">Track</a>
                             <a href="#" class="invoice" data-order-id="${order.id}">Invoice</a>
                         </div>
                     </div>

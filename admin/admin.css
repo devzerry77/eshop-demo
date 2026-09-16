@@ -984,7 +984,8 @@ textarea { resize:vertical; }
 .order-status-pill.cancelled { background:#fee2e2; color:#991b1b; border-color:#fecaca; }
 .order-status-pill.returned { background:#fee2e2; color:#991b1b; border-color:#fecaca; }
 .order-status-pill.refunded { background:#fef3c7; color:#92400e; border-color:#fde68a; }
-.order-status-select {
+.order-status-pill.verified { background:#d1fae5; color:#065f46; border-color:#a7f3d0; }
+.order-status-select, .payment-status-select {
     padding: 6px 8px;
     font-size: 0.8rem;
     border-radius: 6px;
