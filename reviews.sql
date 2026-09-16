@@ -24,7 +24,7 @@ RETURNS text
 LANGUAGE sql
 STABLE
 AS $$
-    SELECT 'grabby@tech.com'
+    SELECT 'admin@eshop.demo'
 $$;
 
 -- ────────────────────────────────────────────────────────────────

@@ -1,0 +1,8 @@
+# E-Shop Demo — local overrides (never commit secrets)
+js/supabase/supabase.local.js
+js/supabase/imgbb.local.js
+*.local.js
+.DS_Store
+Thumbs.db
+node_modules/
+.vscode/

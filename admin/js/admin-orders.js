@@ -198,7 +198,7 @@
             o.total_amount, o.discount, o.shipping_cost, o.payment_method, o.payment_status, o.status,
             o.created_at, o.estimated_delivery
         ]);
-        admin.exportCSV(headers, rows, 'grabby_orders.csv');
+        admin.exportCSV(headers, rows, 'eshop-orders.csv');
     }
 
     // ─── PAYMENT SETTINGS ──────────────────────────────────

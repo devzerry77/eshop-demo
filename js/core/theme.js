@@ -2,8 +2,8 @@
 import { STORAGE_KEYS } from './config.js';
 import { createClient } from '../supabase/client.js';
 
-const COLORS_CACHE_KEY = 'grabby_site_colors';
-const HF_CACHE_KEY = 'grabby_header_footer_colors';
+const COLORS_CACHE_KEY = 'eshop_site_colors';
+const HF_CACHE_KEY = 'eshop_header_footer_colors';
 export const HF_DEFAULT = '#000000';
 
 // Map of settings key suffix -> CSS custom property

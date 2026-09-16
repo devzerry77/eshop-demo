@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0a0a0a">
-    <title>Settings — Grabby Admin</title>
+    <title>Settings — E-Shop Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +18,8 @@
     <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
         <div class="login-card glass-card">
             <div class="brand brand-login">
-                <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
-                <span id="loginTitle">Grabby Admin</span>
+                <img class="brand-logo" src="../assets/logo.svg" alt="E-Shop Demo">
+                <span id="loginTitle">E-Shop Admin</span>
             </div>
             <div class="login-heading">
                 <span class="eyebrow">CONTROL CENTER</span>
@@ -57,8 +58,8 @@
             <div class="sidebar-top">
                 <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
                 <div class="brand">
-                    <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
-                    <span>Grabby Tech</span>
+                    <img class="brand-logo" src="../assets/logo.svg" alt="E-Shop Demo">
+                    <span>E-Shop Demo</span>
                 </div>
                 <span class="admin-label">ADMIN</span>
             </div>
@@ -118,7 +119,7 @@
                 <div class="header-left">
                     <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
                     <div>
-                        <span class="eyebrow">GRABBY TECH ADMIN</span>
+                        <span class="eyebrow">E-SHOP DEMO ADMIN</span>
                         <h1 id="pageTitle">Settings</h1>
                     </div>
                 </div>
@@ -160,6 +161,76 @@
                             <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
                                 <button class="button button-primary" id="saveOrderModeBtn">💾 Save Order Mode</button>
                                 <span id="orderModeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Store Profile (demo identity, shown on the website) -->
+                        <div class="setting-card glass-card">
+                            <h3>🏪 Store Profile</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                The website name, tagline and footer note. Shown on every public page instantly after saving.
+                            </p>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="siteName" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Store name</label>
+                                <input type="text" id="siteName" maxlength="60" placeholder="E-Shop Demo" style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="siteTagline" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Tagline</label>
+                                <input type="text" id="siteTagline" maxlength="140" placeholder="Quality demo products for everyday life." style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="siteFooterNote" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Footer note</label>
+                                <input type="text" id="siteFooterNote" maxlength="200" placeholder="© 2026 E-Shop Demo · Demo portfolio project" style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveStoreBtn">💾 Save Store Profile</button>
+                                <span id="storeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Categories (used by homepage filters + sidebar) -->
+                        <div class="setting-card glass-card">
+                            <h3>🗂️ Categories</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Managed categories appear in the homepage filter and sidebar.
+                                Product categories not listed here are added automatically.
+                                Delete all rows to use product categories only.
+                            </p>
+                            <div id="catList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <input type="text" id="catLabel" maxlength="40" placeholder="New category label, e.g. Audio" style="flex:1; min-width:160px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                <button class="button button-primary" id="addCatBtn">＋ Add</button>
+                                <span id="catsStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Image Uploads (ImgBB key, not stored in code) -->
+                        <div class="setting-card glass-card">
+                            <h3>🖼️ Image Uploads</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                ImgBB API key used for product, banner and review photo uploads.
+                                Saved in the database (Settings table) so all admin devices share it — never in the code.
+                                Get a free key at imgbb.com/api.
+                            </p>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <input type="text" id="imgbbKey" maxlength="80" placeholder="Paste ImgBB API key" autocomplete="off" spellcheck="false" style="flex:1; min-width:180px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                <button class="button button-primary" id="saveImgbbBtn">💾 Save Key</button>
+                                <span id="imgbbStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Admin Access (who can open the admin panel) -->
+                        <div class="setting-card glass-card">
+                            <h3>🔑 Admin Access</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Only signed-in users listed here can open the admin panel.
+                                Requires the <code>admin_users</code> table from <code>eshop-demo-setup.sql</code>.
+                            </p>
+                            <div id="adminList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <input type="email" id="adminEmail" maxlength="320" placeholder="teammate@example.com" style="flex:1; min-width:180px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                <button class="button button-primary" id="addAdminBtn">＋ Add Admin</button>
+                                <span id="adminsStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
                             </div>
                         </div>
 
@@ -318,7 +389,7 @@
                                 <div style="padding:6px 12px; background:var(--secondary-bg); font-size:0.7rem; color:var(--text-secondary); border-bottom:1px solid var(--border);">Live Preview</div>
                                 <div id="marqueePreviewContainer" style="padding:8px; overflow:hidden;">
                                     <div id="marqueePreview" style="white-space:nowrap; animation: marqueeScroll 20s linear infinite; display:inline-block; padding:4px 0; font-weight:500; font-size:0.85rem;">
-                                        🚚 Free delivery all over Bangladesh &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout
+                                        🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout
                                     </div>
                                 </div>
                             </div>
@@ -485,7 +556,7 @@
                                 <label for="messengerLink" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">
                                     Messenger / Facebook Contact Link
                                 </label>
-                                <input type="url" id="messengerLink" placeholder="https://m.me/GrabbyTech or https://fb.com/..." style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                                <input type="url" id="messengerLink" placeholder="https://m.me/your-demo-page" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
                             </div>
                             <div class="setting-item" style="flex-wrap:wrap;">
                                 <span>The website chatbot's "Contact us on Messenger" button uses this link.</span>
@@ -579,6 +650,7 @@
     <!-- TOAST -->
     <div id="toastContainer" class="toast-container"></div>
 
+    <script src="../js/supabase/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>

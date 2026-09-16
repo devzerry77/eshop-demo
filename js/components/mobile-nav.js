@@ -16,7 +16,7 @@
         sb.className = 'sidebar';
         sb.id = 'sidebar';
         sb.setAttribute('aria-label', 'Main navigation');
-        sb.innerHTML = '<div class="sidebar-brand"><button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button><img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" /><span class="brand-title">GRABBY TECH</span></div><div class="sidebar-menu"><div class="menu-section"><h3>MAIN</h3><ul><li><a href="index.html" data-home-link>Home</a></li></ul></div><div class="menu-section"><h3>SHOP</h3><ul><li><a href="collection.html?category=all">Collections</a></li><li><a href="collection.html?category=audio">Audio</a></li><li><a href="collection.html?category=electronics">Electronics</a></li><li><a href="collection.html?category=gaming">Gaming</a></li><li><a href="collection.html?category=wearables">Wearables</a></li><li><a href="collection.html?category=accessories">Accessories</a></li></ul></div><div class="menu-section"><h3>ABOUT</h3><ul><li><a href="about.html">About Us</a></li><li><a href="#">Our Story</a></li><li><a href="#">Sustainability</a></li></ul></div><div class="menu-section"><h3>CONNECT</h3><ul><li><a href="#">Contact Us</a></li><li><a href="#">Shipping</a></li></ul></div></div>';
+        sb.innerHTML = '<div class="sidebar-brand"><button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button><img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" /><span class="brand-title">E-SHOP DEMO</span></div><div class="sidebar-menu"><div class="menu-section"><h3>MAIN</h3><ul><li><a href="index.html" data-home-link>Home</a></li></ul></div><div class="menu-section"><h3>SHOP</h3><ul><li><a href="collection.html?category=all">Collections</a></li><li><a href="collection.html?category=audio">Audio</a></li><li><a href="collection.html?category=electronics">Electronics</a></li><li><a href="collection.html?category=gaming">Gaming</a></li><li><a href="collection.html?category=wearables">Wearables</a></li><li><a href="collection.html?category=accessories">Accessories</a></li></ul></div><div class="menu-section"><h3>ABOUT</h3><ul><li><a href="about.html">About This Demo</a></li></ul></div></div>';
         const ov = document.createElement('div');
         ov.className = 'overlay';
         ov.id = 'overlay';
@@ -45,7 +45,7 @@
         ov?.addEventListener('click', () => toggleSidebar(false));
     }
 
-    const CART_KEY = 'grabby_cart';
+    const CART_KEY = 'eshop_cart';
     let badgeEl = null;
 
     function getCartCount() {

@@ -9,6 +9,7 @@ import { fetchIPAndLocation, logCartActivity, trackVisitor, trackCartAdd } from 
 import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core/search.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
 import { ensureProducts } from '../core/products-loader.js';
+import { getCategories, renderFilterChips, renderSidebarLinks } from '../core/categories.js';
 
 // ─── CACHE MANAGER ─────────────────────────────────────
 function getCache() {
@@ -195,6 +196,28 @@ function showToast(message, duration = 2000) {
     }, duration);
 }
 
+// ─── DYNAMIC CATEGORIES (DB-driven, fallback to catalog) ──
+function pickCategory(category) {
+    currentCategory = category;
+    displayedCount = 8;
+    allLoaded = false;
+    renderProducts(true);
+    if (filterPanel) filterPanel.classList.remove('active');
+    setTimeout(() => setupInfiniteScroll(), 200);
+}
+
+async function setupDynamicCategories() {
+    try {
+        const categories = await getCategories(productsData);
+        const chips = document.getElementById('filterChips');
+        if (chips) renderFilterChips(chips, categories, currentCategory, pickCategory);
+        const shopList = document.querySelector('[data-shop-list]');
+        if (shopList) renderSidebarLinks(shopList, categories);
+    } catch (e) {
+        console.warn('Dynamic categories failed, keeping defaults:', e);
+    }
+}
+
 // ─── INIT ───────────────────────────────────────────────
 async function init() {
     getRefs();
@@ -204,6 +227,8 @@ async function init() {
         productsData = await ensureProducts();
         setCache(productsData);
     }
+
+    await setupDynamicCategories();
 
     loadMarquee();
     initHeroBanners();
@@ -249,7 +274,7 @@ async function init() {
     });
 
     window.addEventListener('storage', (e) => {
-        if (e.key && e.key.startsWith('grabby_marquee_')) {
+        if (e.key && e.key.startsWith('eshop_marquee_')) {
             loadMarquee();
         }
         if (e.key === STORAGE_KEYS.currency) {
@@ -660,18 +685,16 @@ function bindEvents() {
         if (filterPanel) filterPanel.classList.remove('active');
     });
 
+    // Filter chips are rendered dynamically (setupDynamicCategories) with
+    // their own handlers; the static fallback below only covers the case
+    // where dynamic render did not run.
+    if (!document.getElementById('filterChips')?.hasChildNodes()) {
     document.querySelectorAll('.filter-chip').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentCategory = btn.dataset.category;
-            displayedCount = 8;
-            allLoaded = false;
-            renderProducts(true);
-            if (filterPanel) filterPanel.classList.remove('active');
-            setTimeout(() => setupInfiniteScroll(), 200);
+            pickCategory(btn.dataset.category);
         });
     });
+    }
 
     if (sortSelect) sortSelect.addEventListener('change', (e) => {
         currentSort = e.target.value;

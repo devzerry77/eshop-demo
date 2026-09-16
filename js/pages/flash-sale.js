@@ -31,7 +31,7 @@ let countdownTimer = null;
 function readLocalSettings() {
     const s = {};
     FLASH_KEYS.forEach(k => {
-        const v = localStorage.getItem('grabby_' + k);
+        const v = localStorage.getItem('eshop_' + k) ?? localStorage.getItem('grabby_' + k);
         if (v !== null) s[k] = v;
     });
     return s;
@@ -40,7 +40,7 @@ function readLocalSettings() {
 function persistLocalSettings(settings) {
     FLASH_KEYS.forEach(k => {
         if (settings[k] !== undefined && settings[k] !== null) {
-            try { localStorage.setItem('grabby_' + k, String(settings[k])); } catch (e) { /* noop */ }
+            try { localStorage.setItem('eshop_' + k, String(settings[k])); } catch (e) { /* noop */ }
         }
     });
 }
@@ -128,7 +128,7 @@ function openProduct(id) {
 
 // ─── COUNTDOWN ────────────────────────────────────────────
 function getCountdownEnd(durationMin) {
-    const key = 'grabby_flash_ends_at';
+    const key = 'eshop_flash_ends_at';
     const now = Date.now();
     try {
         const stored = parseInt(localStorage.getItem(key), 10);
@@ -264,7 +264,7 @@ function renderSwiper(settings) {
 
 // Reload when the admin saves / changes settings or products in another tab.
 window.addEventListener('storage', (e) => {
-    if (e.key && (e.key.startsWith('grabby_flash_') || e.key === 'grabby_products')) {
+    if (e.key && (e.key.startsWith('eshop_flash_') || e.key.startsWith('grabby_flash_') || e.key === 'eshop_products')) {
         initFlashSale(productsCache);
     }
 });

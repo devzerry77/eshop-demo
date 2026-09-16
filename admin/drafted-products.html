@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0a0a0a">
-    <title>Drafted Products — Grabby Admin</title>
+    <title>Drafted Products — E-Shop Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +18,8 @@
     <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
         <div class="login-card glass-card">
             <div class="brand brand-login">
-                <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
-                <span id="loginTitle">Grabby Admin</span>
+                <img class="brand-logo" src="../assets/logo.svg" alt="E-Shop Demo">
+                <span id="loginTitle">E-Shop Admin</span>
             </div>
             <div class="login-heading">
                 <span class="eyebrow">CONTROL CENTER</span>
@@ -57,8 +58,8 @@
             <div class="sidebar-top">
                 <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
                 <div class="brand">
-                    <img class="brand-logo" src="../assets/logos/logo.png" alt="Grabby Tech">
-                    <span>Grabby Tech</span>
+                    <img class="brand-logo" src="../assets/logo.svg" alt="E-Shop Demo">
+                    <span>E-Shop Demo</span>
                 </div>
                 <span class="admin-label">ADMIN</span>
             </div>
@@ -118,7 +119,7 @@
                 <div class="header-left">
                     <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
                     <div>
-                        <span class="eyebrow">GRABBY TECH ADMIN</span>
+                        <span class="eyebrow">E-SHOP DEMO ADMIN</span>
                         <h1 id="pageTitle">Drafted Products</h1>
                     </div>
                 </div>
@@ -173,6 +174,7 @@
     <!-- TOAST -->
     <div id="toastContainer" class="toast-container"></div>
 
+    <script src="../js/supabase/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>

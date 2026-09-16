@@ -100,13 +100,13 @@ async function loadOrders() {
                         .select('*')
                         .eq('order_id', orderId);
                     if (items && items.length) {
-                        let cart = JSON.parse(localStorage.getItem('grabby_cart') || '[]');
+                        let cart = JSON.parse(localStorage.getItem('eshop_cart') || '[]');
                         items.forEach(item => {
                             const existing = cart.find(c => String(c.id) === String(item.product_id));
                             if (existing) existing.quantity += item.quantity;
                             else cart.push({ id: item.product_id, quantity: item.quantity });
                         });
-                        localStorage.setItem('grabby_cart', JSON.stringify(cart));
+                        localStorage.setItem('eshop_cart', JSON.stringify(cart));
                         showToastMsg('Items added to cart!');
                         window.location.href = 'checkout.html?cart=true';
                     }
@@ -136,7 +136,7 @@ async function loadOrders() {
                 const orderId = this.dataset.orderId;
                 const order = orders.find(o => String(o.id) === String(orderId));
                 if (!order) return;
-                const text = `Invoice\nOrder #${order.order_number}\nDate: ${new Date(order.created_at).toLocaleString()}\nTotal: ${formatPrice(order.total_amount)}\nPayment: ${order.payment_method}\nStatus: ${order.status}\n\nThank you for shopping with Grabby Tech!`;
+                const text = `Invoice\nOrder #${order.order_number}\nDate: ${new Date(order.created_at).toLocaleString()}\nTotal: ${formatPrice(order.total_amount)}\nPayment: ${order.payment_method}\nStatus: ${order.status}\n\nThank you for shopping with E-Shop Demo!`;
                 const blob = new Blob([text], { type: 'text/plain' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
@@ -164,7 +164,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', async () => {
 // ─── INIT ───────────────────────────────────────────────
 loadTheme();
 loadSitePalette();
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
 loadOrders();

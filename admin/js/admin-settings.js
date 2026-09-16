@@ -6,7 +6,7 @@
     const admin = window.admin;
     const { STATE, DOM, showToast, escapeHTML } = admin;
 
-    const DEFAULT_MARQUEE_TEXT = '🚚 Free delivery all over Bangladesh &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout';
+    const DEFAULT_MARQUEE_TEXT = '🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout';
 
     async function loadMarqueeSettings() {
         try {
@@ -71,7 +71,7 @@
             showToast('Marquee settings saved!', 'success');
             DOM.marqueeStatus.textContent = '✓ Saved';
             settings.forEach(s => {
-                localStorage.setItem('grabby_' + s.key, s.value);
+                localStorage.setItem('eshop_' + s.key, s.value);
             });
             updateMarqueePreview();
         } catch (err) {
@@ -213,7 +213,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
             if (error) throw error;
-            settings.forEach(s => { localStorage.setItem('grabby_' + s.key, s.value); });
+            settings.forEach(s => { localStorage.setItem('eshop_' + s.key, s.value); });
             showToast('Flash sale settings saved! The homepage will update within seconds.', 'success');
             DOM.flashStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.flashStatus.textContent = ''; }, 2500);
@@ -488,7 +488,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
             if (error) throw error;
-            settings.forEach(s => { localStorage.setItem('grabby_' + s.key, s.value); });
+            settings.forEach(s => { localStorage.setItem('eshop_' + s.key, s.value); });
             showToast('Hero banners saved! The homepage will update within seconds.', 'success');
             DOM.heroStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2500);
@@ -505,7 +505,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
             if (error) throw error;
-            localStorage.setItem('grabby_hero_enabled', String(isEnabled));
+            localStorage.setItem('eshop_hero_enabled', String(isEnabled));
             showToast(isEnabled ? 'Hero banners enabled' : 'Hero banners disabled', 'success');
             DOM.heroStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2000);
@@ -532,7 +532,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
             if (error) throw error;
-            settings.forEach(s => { localStorage.setItem('grabby_' + s.key, s.value); });
+            settings.forEach(s => { localStorage.setItem('eshop_' + s.key, s.value); });
             showToast('Hero banners reset to default', 'success');
             DOM.heroStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.heroStatus.textContent = ''; }, 2000);
@@ -631,7 +631,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
             if (error) throw error;
-            localStorage.setItem('grabby_site_colors', JSON.stringify({ preset, colors: customColors }));
+            localStorage.setItem('eshop_site_colors', JSON.stringify({ preset, colors: customColors }));
             showToast('Theme saved! The website now uses these colors.', 'success');
             DOM.themeStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.themeStatus.textContent = ''; }, 2500);
@@ -654,7 +654,7 @@
     //   header_footer_bg_light + header_footer_bg_dark
     const HF_KEYS = ['header_footer_bg_light', 'header_footer_bg_dark'];
     const HF_DEFAULT = '#000000';
-    const HF_CACHE_KEY = 'grabby_header_footer_colors';
+    const HF_CACHE_KEY = 'eshop_header_footer_colors';
 
     function normalizeHfHex(value) {
         if (typeof value !== 'string') return null;
@@ -784,11 +784,11 @@
 
     // ─── MESSENGER / CHAT SUPPORT ─────────────────────────────
     const MESSENGER_KEY = 'messenger_link';
-    const DEFAULT_MESSENGER_LINK = 'https://m.me/GrabbyTech';
+    const DEFAULT_MESSENGER_LINK = '';
 
     function loadMessengerSettings() {
         if (!DOM.messengerLink) return;
-        const cached = localStorage.getItem('grabby_messenger_link');
+        const cached = localStorage.getItem('eshop_messenger_link');
         DOM.messengerLink.value = cached || '';
         try {
             STATE.supabase
@@ -800,7 +800,7 @@
                     const row = data && data[0];
                     if (row && row.value) {
                         DOM.messengerLink.value = row.value;
-                        localStorage.setItem('grabby_messenger_link', row.value);
+                        localStorage.setItem('eshop_messenger_link', row.value);
                     }
                 })
                 .catch(err => {
@@ -823,7 +823,7 @@
         try {
             const { error } = await STATE.supabase.from('settings').upsert(setting, { onConflict: 'key' });
             if (error) throw error;
-            localStorage.setItem('grabby_messenger_link', link);
+            localStorage.setItem('eshop_messenger_link', link);
             showToast('Messenger link saved!', 'success');
             DOM.messengerStatus.textContent = '✓ Saved';
             setTimeout(() => { DOM.messengerStatus.textContent = ''; }, 2500);
@@ -853,7 +853,7 @@ async function loadSocialSettings() {
             const inputId = SOCIAL_INPUT_IDS[id];
             if (id && inputId && DOM[inputId]) {
                 DOM[inputId].value = row.value || '';
-                localStorage.setItem('grabby_social_' + id, row.value || '');
+                localStorage.setItem('eshop_social_' + id, row.value || '');
             }
         });
     } catch (err) {
@@ -878,7 +878,7 @@ async function saveSocialSettings() {
     try {
         const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
         if (error) throw error;
-        settings.forEach(s => localStorage.setItem('grabby_' + s.key, s.value));
+        settings.forEach(s => localStorage.setItem('eshop_' + s.key, s.value));
         showToast('Social links saved! The public footer updates automatically.', 'success');
         DOM.socialStatus.textContent = '✓ Saved';
         setTimeout(() => { DOM.socialStatus.textContent = ''; }, 2500);
@@ -895,7 +895,7 @@ async function saveSocialSettings() {
     // 'guest': checkout allows guest orders (secured server-side by
     // the create_order_secure RPC in guest-checkout.sql).
     const ORDER_MODE_KEY = 'customer_order_mode';
-    const ORDER_MODE_CACHE = 'grabby_customer_order_mode';
+    const ORDER_MODE_CACHE = 'eshop_customer_order_mode';
     const ORDER_MODE_LABELS = {
         login: 'Customer Order with Login (login required)',
         guest: 'Customer Order without Login (guest checkout)'
@@ -1011,6 +1011,24 @@ async function saveSocialSettings() {
         DOM.orderModeSelect?.addEventListener('change', () =>
             renderOrderModeUI(DOM.orderModeSelect.value));
         DOM.saveOrderModeBtn?.addEventListener('click', admin.saveOrderModeSettings);
+
+        // Store profile
+        DOM.saveStoreBtn?.addEventListener('click', admin.saveStoreSettings);
+
+        // Categories
+        DOM.addCatBtn?.addEventListener('click', admin.addCategory);
+        DOM.catLabel?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); admin.addCategory(); }
+        });
+
+        // Image upload key
+        DOM.saveImgbbBtn?.addEventListener('click', admin.saveImgbbKey);
+
+        // Admin access
+        DOM.addAdminBtn?.addEventListener('click', admin.addAdmin);
+        DOM.adminEmail?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); admin.addAdmin(); }
+        });
     }
 
     function bindThemeSettings() {
@@ -1045,6 +1063,237 @@ async function saveSocialSettings() {
         admin.bindAutoSave();
     }
 
+    // ─── STORE PROFILE (site_name / site_tagline / footer_note) ──
+    // Shown on every public page via js/core/site.js. Fully admin-editable.
+    const STORE_KEYS = ['site_name', 'site_tagline', 'footer_note'];
+    const STORE_DEFAULTS = {
+        site_name: 'E-Shop Demo',
+        site_tagline: 'Quality demo products for everyday life.',
+        footer_note: '© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.'
+    };
+
+    async function loadStoreSettings() {
+        if (!DOM.siteName) return;
+        try {
+            const cached = JSON.parse(localStorage.getItem('eshop_site_profile') || 'null');
+            if (cached) {
+                DOM.siteName.value = cached.site_name || '';
+                DOM.siteTagline.value = cached.site_tagline || '';
+                DOM.siteFooterNote.value = cached.footer_note || '';
+            }
+        } catch (_) { /* noop */ }
+        try {
+            const { data, error } = await STATE.supabase.from('settings').select('*').in('key', STORE_KEYS);
+            if (error) throw error;
+            const map = {};
+            (data || []).forEach(row => { map[row.key] = row.value; });
+            if (map.site_name) DOM.siteName.value = map.site_name;
+            if (map.site_tagline) DOM.siteTagline.value = map.site_tagline;
+            if (map.footer_note) DOM.siteFooterNote.value = map.footer_note;
+        } catch (err) {
+            showToast('Failed to load store profile: ' + (err.message || err), 'error');
+        }
+    }
+
+    async function saveStoreSettings() {
+        const name = (DOM.siteName.value || '').trim().slice(0, 60) || STORE_DEFAULTS.site_name;
+        const tagline = (DOM.siteTagline.value || '').trim().slice(0, 140) || STORE_DEFAULTS.site_tagline;
+        const footer = (DOM.siteFooterNote.value || '').trim().slice(0, 200) || STORE_DEFAULTS.footer_note;
+        const settings = [
+            { key: 'site_name', value: name },
+            { key: 'site_tagline', value: tagline },
+            { key: 'footer_note', value: footer }
+        ];
+        if (DOM.storeStatus) DOM.storeStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            try { localStorage.setItem('eshop_site_profile', JSON.stringify({ site_name: name, site_tagline: tagline, footer_note: footer })); } catch (_) { /* noop */ }
+            showToast('Store profile saved! The website updates automatically.', 'success');
+            if (DOM.storeStatus) {
+                DOM.storeStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.storeStatus) DOM.storeStatus.textContent = ''; }, 2500);
+            }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.storeStatus) DOM.storeStatus.textContent = '✗ Error';
+        }
+    }
+
+    // ─── CATEGORIES (admin-managed `categories` table) ─────────
+    function slugifyCat(value) {
+        return String(value || '').trim().toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+    }
+
+    function renderCatList(rows) {
+        if (!DOM.catList) return;
+        if (!rows || !rows.length) {
+            DOM.catList.innerHTML = '<span style="font-size:0.8rem; color:var(--text-secondary);">No managed categories yet — the site uses product categories automatically.</span>';
+            return;
+        }
+        DOM.catList.innerHTML = rows.map(r =>
+            '<div style="display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:8px;">' +
+            '<strong style="flex:1; font-size:0.85rem;">' + escapeHTML(r.label) + '</strong>' +
+            '<code style="font-size:0.75rem; color:var(--text-secondary);">' + escapeHTML(r.slug) + '</code>' +
+            '<button type="button" class="button button-secondary del-cat" data-slug="' + escapeHTML(r.slug) + '" style="padding:4px 10px; font-size:0.75rem;">Delete</button>' +
+            '</div>'
+        ).join('');
+        DOM.catList.querySelectorAll('.del-cat').forEach(btn => {
+            btn.addEventListener('click', () => deleteCategory(btn.dataset.slug));
+        });
+    }
+
+    async function loadCategories() {
+        if (!DOM.catList) return;
+        try {
+            const { data, error } = await STATE.supabase
+                .from('categories')
+                .select('slug,label,sort_order')
+                .order('sort_order', { ascending: true })
+                .order('label', { ascending: true });
+            if (error) throw error;
+            renderCatList(data || []);
+        } catch (err) {
+            renderCatList([]);
+            if (DOM.catsStatus) {
+                DOM.catsStatus.textContent = 'Categories table missing — run eshop-demo-setup.sql';
+                setTimeout(() => { if (DOM.catsStatus) DOM.catsStatus.textContent = ''; }, 4000);
+            }
+        }
+    }
+
+    async function addCategory() {
+        const label = (DOM.catLabel.value || '').trim().slice(0, 40);
+        if (!label) { showToast('Type a category label first.', 'warning'); return; }
+        const slug = slugifyCat(label);
+        if (!slug) { showToast('Could not make a URL slug from that label.', 'warning'); return; }
+        if (DOM.catsStatus) DOM.catsStatus.textContent = 'Saving...';
+        try {
+            const { data: existing } = await STATE.supabase
+                .from('categories').select('sort_order').order('sort_order', { ascending: false }).limit(1);
+            const nextOrder = (existing && existing[0] && Number(existing[0].sort_order) + 1) || 0;
+            const { error } = await STATE.supabase
+                .from('categories').upsert([{ slug, label, sort_order: nextOrder, active: true }], { onConflict: 'slug' });
+            if (error) throw error;
+            DOM.catLabel.value = '';
+            showToast('Category added!', 'success');
+            if (DOM.catsStatus) {
+                DOM.catsStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.catsStatus) DOM.catsStatus.textContent = ''; }, 2000);
+            }
+            loadCategories();
+        } catch (err) {
+            showToast('Failed to add category: ' + (err.message || err), 'error');
+            if (DOM.catsStatus) DOM.catsStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function deleteCategory(slug) {
+        try {
+            const { error } = await STATE.supabase.from('categories').delete().eq('slug', slug);
+            if (error) throw error;
+            showToast('Category deleted.', 'info');
+            loadCategories();
+        } catch (err) {
+            showToast('Failed to delete: ' + (err.message || err), 'error');
+        }
+    }
+
+    // ─── IMAGE UPLOAD KEY (shared via settings, never in code) ──
+    async function loadImgbbKey() {
+        if (!DOM.imgbbKey) return;
+        try { DOM.imgbbKey.value = localStorage.getItem('eshop_imgbb_key') || ''; } catch (_) { /* noop */ }
+        try {
+            const { data, error } = await STATE.supabase.from('settings').select('value').eq('key', 'imgbb_key').maybeSingle();
+            if (!error && data && data.value) {
+                DOM.imgbbKey.value = data.value;
+                try { localStorage.setItem('eshop_imgbb_key', data.value); } catch (_) { /* noop */ }
+            }
+        } catch (_) { /* keep local value */ }
+    }
+
+    async function saveImgbbKey() {
+        const key = (DOM.imgbbKey.value || '').trim();
+        if (!key) { showToast('Paste an ImgBB API key first.', 'warning'); return; }
+        if (DOM.imgbbStatus) DOM.imgbbStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert([{ key: 'imgbb_key', value: key }], { onConflict: 'key' });
+            if (error) throw error;
+            try { localStorage.setItem('eshop_imgbb_key', key); } catch (_) { /* noop */ }
+            showToast('Upload key saved!', 'success');
+            if (DOM.imgbbStatus) {
+                DOM.imgbbStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.imgbbStatus) DOM.imgbbStatus.textContent = ''; }, 2500);
+            }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.imgbbStatus) DOM.imgbbStatus.textContent = '✗ Error';
+        }
+    }
+
+    // ─── ADMIN ACCESS (`admin_users` allow-list) ───────────────
+    const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    function renderAdminList(rows) {
+        if (!DOM.adminList) return;
+        if (!rows || !rows.length) {
+            DOM.adminList.innerHTML = '<span style="font-size:0.8rem; color:var(--text-secondary);">No admins listed (or table missing). Run eshop-demo-setup.sql, then add your login email here.</span>';
+            return;
+        }
+        DOM.adminList.innerHTML = rows.map(r =>
+            '<div style="display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:8px;">' +
+            '<span style="flex:1; font-size:0.85rem;">' + escapeHTML(r.email) + '</span>' +
+            '<button type="button" class="button button-secondary del-admin" data-email="' + escapeHTML(r.email) + '" style="padding:4px 10px; font-size:0.75rem;">Remove</button>' +
+            '</div>'
+        ).join('');
+        DOM.adminList.querySelectorAll('.del-admin').forEach(btn => {
+            btn.addEventListener('click', () => removeAdmin(btn.dataset.email));
+        });
+    }
+
+    async function loadAdmins() {
+        if (!DOM.adminList) return;
+        try {
+            const { data, error } = await STATE.supabase.from('admin_users').select('email').order('email');
+            if (error) throw error;
+            renderAdminList(data || []);
+        } catch (_) {
+            renderAdminList([]);
+        }
+    }
+
+    async function addAdmin() {
+        const email = (DOM.adminEmail.value || '').trim().toLowerCase();
+        if (!EMAIL_RE.test(email)) { showToast('Enter a valid email address.', 'warning'); return; }
+        if (DOM.adminsStatus) DOM.adminsStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('admin_users').upsert([{ email }], { onConflict: 'email' });
+            if (error) throw error;
+            DOM.adminEmail.value = '';
+            showToast('Admin added!', 'success');
+            if (DOM.adminsStatus) {
+                DOM.adminsStatus.textContent = '✓ Saved';
+                setTimeout(() => { if (DOM.adminsStatus) DOM.adminsStatus.textContent = ''; }, 2000);
+            }
+            loadAdmins();
+        } catch (err) {
+            showToast('Failed to add admin: ' + (err.message || err), 'error');
+            if (DOM.adminsStatus) DOM.adminsStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function removeAdmin(email) {
+        try {
+            const { error } = await STATE.supabase.from('admin_users').delete().eq('email', email);
+            if (error) throw error;
+            showToast('Admin removed.', 'info');
+            loadAdmins();
+        } catch (err) {
+            showToast('Failed to remove: ' + (err.message || err), 'error');
+        }
+    }
+
     Object.assign(admin, {
         loadMarqueeSettings, saveMarqueeSettings, resetMarqueeToDefault, updateMarqueePreview,
         loadThemeSettings, saveThemeSettings, resetThemeSettings,
@@ -1055,6 +1304,10 @@ async function saveSocialSettings() {
         loadMessengerSettings, saveMessengerSettings,
         loadSocialSettings, saveSocialSettings,
         loadOrderModeSettings, saveOrderModeSettings,
+        loadStoreSettings, saveStoreSettings,
+        loadCategories, addCategory, deleteCategory,
+        loadImgbbKey, saveImgbbKey,
+        loadAdmins, addAdmin, removeAdmin,
         bindSettingsControls, bindThemeSettings
     });
 

@@ -6,7 +6,7 @@ import { ensureProducts } from '../core/products-loader.js';
 
 loadTheme();
 loadSitePalette();
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
 // ─── CART SIDEBAR (same shared component as other public pages) ──

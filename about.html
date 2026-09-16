@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <title>About Us — Grabby Tech</title>
-    <meta name="description" content="Learn about Grabby Tech — who we are, what we stand for, and why Bangladesh shops with us." />
+    <title>About Us — E-Shop Demo</title>
+    <meta name="description" content="Learn about E-Shop Demo — who we are, what we stand for, and why Bangladesh shops with us." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
     (function () {
         try {
-            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            if (localStorage.getItem('eshop_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
             var C = null;
-            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            try { C = JSON.parse(localStorage.getItem('eshop_site_colors') || 'null'); } catch (e) {}
             if (C) {
                 var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
             var H = null;
-            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            try { H = JSON.parse(localStorage.getItem('eshop_header_footer_colors') || 'null'); } catch (e) {}
             if (H) {
                 if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
                 if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
@@ -53,8 +54,8 @@
 
     <header class="header">
         <div class="header-inner">
-            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
-                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            <a href="index.html" class="logo" aria-label="E-Shop Demo Home">
+                <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
             </a>
             <div class="header-actions">
                 <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
@@ -88,50 +89,51 @@
 
             <!-- HERO -->
             <div class="about-hero">
-                <div class="eyebrow">About Us</div>
-                <h1>Grabby Tech</h1>
-                <p>Modern gadgets for modern life. We bring you the latest audio, electronics, gaming, wearables and accessories — delivered across Bangladesh with a 7-day easy return promise.</p>
+                <div class="eyebrow">About this demo</div>
+                <h1 data-site-name>E-Shop Demo</h1>
+                <p data-site-tagline>Quality demo products for everyday life.</p>
+                <p style="margin-top:0.75rem; font-size:0.85rem; opacity:0.8;">This is a generic portfolio demo store — not a real business. Products, prices and reviews are sample data you can fully manage from the admin panel.</p>
             </div>
 
             <!-- WHO WE ARE -->
             <section class="about-section">
-                <h2>Who We Are</h2>
-                <p>Grabby Tech started with a simple idea: ordering the latest gadgets in Bangladesh should be fast, safe and genuinely pleasant. What began as a small side project has grown into a trusted online store serving customers in every corner of the country.</p>
-                <p>Every product on our shelves is hand-picked, verified and tested before it ever reaches you. We partner with reliable suppliers and keep honest, transparent pricing — no hidden fees, no surprises.</p>
+                <h2>What Is This?</h2>
+                <p>E-Shop Demo is a portfolio project showing a complete e-commerce front-end built with vanilla HTML, CSS and JavaScript, backed by Supabase for products, orders, coupons and site settings.</p>
+                <p>Everything on this site is editable without touching code: products, categories, prices, stock, banners, coupons, payment instructions and theme colors are all managed from the admin panel.</p>
             </section>
 
             <!-- VALUES -->
             <section class="about-section">
-                <h2>Why Shop With Us</h2>
+                <h2>What You Can Try</h2>
                 <div class="about-values">
                     <div class="about-value">
-                        <div class="icon">🚚</div>
-                        <h3>Nationwide Delivery</h3>
-                        <p>Free delivery all over Bangladesh on orders over a small threshold. Doorstep, on time.</p>
+                        <div class="icon">🛍️</div>
+                        <h3>Browse &amp; Search</h3>
+                        <p>Filter by category, sort, search and open product pages with galleries and reviews.</p>
                     </div>
                     <div class="about-value">
-                        <div class="icon">↩️</div>
-                        <h3>7-Day Easy Returns</h3>
-                        <p>Changed your mind? Return any verified product within seven days, no questions asked.</p>
+                        <div class="icon">🧾</div>
+                        <h3>Cart &amp; Checkout</h3>
+                        <p>Add items to the cart, apply a coupon and place a demo order with bKash, Nagad, Rocket or Cash on Delivery instructions.</p>
                     </div>
                     <div class="about-value">
-                        <div class="icon">🔒</div>
-                        <h3>Secure Checkout</h3>
-                        <p>Pay your way — bKash, Nagad, Rocket, cards or Cash on Delivery. Every transaction is protected.</p>
+                        <div class="icon">📦</div>
+                        <h3>Orders &amp; Tracking</h3>
+                        <p>Sign in to see your orders, follow their status and track delivery on the tracking page.</p>
                     </div>
                     <div class="about-value">
-                        <div class="icon">💬</div>
-                        <h3>Real Support</h3>
-                        <p>Friendly, human support that answers your questions and takes care of problems fast.</p>
+                        <div class="icon">⚙️</div>
+                        <h3>Admin Panel</h3>
+                        <p>Open the admin panel to manage products, stock, orders, coupons, banners and theme — no code changes needed.</p>
                     </div>
                 </div>
             </section>
 
             <!-- OUR PROMISE -->
             <section class="about-section">
-                <h2>Our Promise</h2>
-                <p>We measure success in happy unboxings. From the moment you hit "Place Order" to the delivery at your door, we track every step so you always know where your parcel is. Comprehensive order tracking, real payment instructions and a dedicated follow-up team are all part of the Grabby Tech experience.</p>
-                <p>Thank you for shopping with us. If you need anything, reach out — we're here to help. 🎁</p>
+                <h2>Demo Notice</h2>
+                <p>No real orders are fulfilled and no real payments are processed. Sample data (including product images) is for demonstration only.</p>
+                <p>Thanks for looking around. 🎁</p>
             </section>
 
         </div>
@@ -142,9 +144,9 @@
             <div class="footer-top">
                 <div class="footer-brand-col">
                     <div class="footer-brand">
-                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                        <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
                     </div>
-                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                    <p class="footer-tagline" data-site-tagline>Quality demo products for everyday life.</p>
                 </div>
                 <nav class="footer-nav" aria-label="Footer">
                     <div class="footer-col">
@@ -175,7 +177,7 @@
                     </div>
                 </nav>
             </div>
-            <div class="footer-copy">© 2026 Grabby Tech</div>
+            <div class="footer-copy" data-footer-note>© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.</div>
         </div>
     </footer>
 
@@ -184,5 +186,8 @@
     <script type="module" src="js/components/footer-social.js"></script>
     <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/about.js"></script>
+    <script src="js/supabase/supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script type="module" src="js/components/site-init.js"></script>
 </body>
 </html>

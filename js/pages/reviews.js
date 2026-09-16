@@ -11,8 +11,8 @@ import { renderStars, escapeHtml, isYouTubeUrl, getYouTubeEmbedUrl, getYouTubeTh
 import { createClient } from '../supabase/client.js';
 import { showToast } from '../components/toast.js';
 import { initAuthModal, openAuthModal } from '../components/auth-modal.js';
+import { getImgBBKey } from '../core/imgbb.js';
 
-const IMGBB_API_KEY = 'c849986a59aa08b8bc5593a21a744e57';
 const TOAST_ID = 'pageToastContainer';
 
 function showToastMsg(msg, type = 'info') {
@@ -23,13 +23,15 @@ function getSupabase() {
     return createClient();
 }
 
-// ─── IMG UPLOAD (reuses the existing ImgBB system used by admin) ──
+// ─── IMG UPLOAD (uses the store's ImgBB key configured in Admin → Settings) ──
 export async function uploadReviewImage(file) {
     if (!file) throw new Error('No file selected');
     if (!file.type.startsWith('image/')) throw new Error('Please select an image file');
+    const key = getImgBBKey();
+    if (!key) throw new Error('Photo uploads are disabled on this demo store.');
     const formData = new FormData();
     formData.append('image', file);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    const res = await fetch('https://api.imgbb.com/1/upload?key=' + encodeURIComponent(key), {
         method: 'POST',
         body: formData
     });
@@ -119,7 +121,7 @@ function reviewMediaHtml(media) {
 function renderReviewCard(review) {
     const media = normalizeMedia(review);
     const date = review.created_at ? new Date(review.created_at).toLocaleDateString() : '';
-    const tag = review.source === 'admin' ? '<span class="review-source-tag">GrabbyTech</span>' : '<span class="review-source-tag verified">Verified Purchase</span>';
+    const tag = review.source === 'admin' ? '<span class="review-source-tag">Demo store</span>' : '<span class="review-source-tag verified">Verified Purchase</span>';
     return `
         <div class="review-item" data-review-id="${escapeHtml(review.id)}">
             <div class="review-avatar-wrap">${reviewAvatar(review.reviewer_name)}</div>

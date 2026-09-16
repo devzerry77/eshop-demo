@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Grabby Tech — Modern Gadgets</title>
-    <meta name="description" content="Modern gadgets for modern life. Shop audio, electronics, gaming, wearables and more at Grabby Tech." />
+    <title>E-Shop Demo — Demo Online Store</title>
+    <meta name="description" content="E-Shop Demo — a generic demo e-commerce portfolio project. Browse demo products, try the cart, checkout and admin panel." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
     (function () {
         try {
-            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            if (localStorage.getItem('eshop_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
             var C = null;
-            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            try { C = JSON.parse(localStorage.getItem('eshop_site_colors') || 'null'); } catch (e) {}
             if (C) {
                 var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
             var H = null;
-            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            try { H = JSON.parse(localStorage.getItem('eshop_header_footer_colors') || 'null'); } catch (e) {}
             if (H) {
                 if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
                 if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
@@ -37,9 +38,9 @@
             var isOAuth = params.has('code') || params.has('state') || params.has('error')
                            || hash.indexOf('access_token') !== -1;
             if (isOAuth) return;
-            var intent = sessionStorage.getItem('grabby_auth_return');
+            var intent = sessionStorage.getItem('eshop_auth_return');
             if (intent) {
-                sessionStorage.removeItem('grabby_auth_return');
+                sessionStorage.removeItem('eshop_auth_return');
                 var u = new URL(intent, window.location.origin);
                 if (u.origin === window.location.origin && u.pathname !== window.location.pathname) {
                     window.location.replace(u.href);
@@ -97,8 +98,8 @@
             <button class="hamburger" id="menuBtn" aria-label="Open menu">
                 <span></span><span></span><span></span>
             </button>
-            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
-                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            <a href="index.html" class="logo" aria-label="E-Shop Demo Home">
+                <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
             </a>
             <a href="index.html" class="header-home" data-home-link aria-label="Home">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22v-8h6v8"/></svg>
@@ -132,9 +133,9 @@
             </div>
         </div>
 
-        <!-- MARQUEE: Free delivery -->
+        <!-- MARQUEE: demo announcement (admin-editable via Settings) -->
         <div class="marquee-bar">
-            <span>🚚 Free delivery all over Bangladesh &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Free gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;</span>
+            <span>🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Demo gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp;</span>
         </div>
     </header>
 
@@ -143,8 +144,8 @@
     <nav class="sidebar" id="sidebar" aria-label="Main navigation">
         <div class="sidebar-brand">
             <button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button>
-            <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
-            <span class="brand-title">GRABBY TECH</span>
+            <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
+            <span class="brand-title">E-SHOP DEMO</span>
         </div>
         <div class="sidebar-menu">
             <div class="menu-section">
@@ -155,7 +156,7 @@
             </div>
             <div class="menu-section">
                 <h3>SHOP</h3>
-                <ul>
+                <ul data-shop-list>
                     <li><a href="collection.html?category=all">Collections</a></li>
                     <li><a href="collection.html?category=audio">Audio</a></li>
                     <li><a href="collection.html?category=electronics">Electronics</a></li>
@@ -167,9 +168,7 @@
             <div class="menu-section">
                 <h3>ABOUT</h3>
                 <ul>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="#">Our Story</a></li>
-                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="about.html">About This Demo</a></li>
                 </ul>
             </div>
             <div class="menu-section">
@@ -231,8 +230,8 @@
                 <h2 class="hero-title"></h2>
                 <div class="swiper hero-swiper" id="heroSwiper">
                     <div class="swiper-wrapper hero-swiper-wrapper"></div>
-                    <div class="hero-nav hero-swiper-prev" aria-label="Previous banner">‹</div>
-                    <div class="hero-nav hero-swiper-next" aria-label="Next banner">›</div>
+                    <div class="hero-nav hero-swiper-prev" aria-label="Previous banner" role="button" tabindex="0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg></div>
+                    <div class="hero-nav hero-swiper-next" aria-label="Next banner" role="button" tabindex="0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></div>
                     <div class="swiper-pagination hero-swiper-pagination"></div>
                 </div>
             </div>
@@ -290,7 +289,7 @@
                 </div>
                 <div class="filter-section">
                     <h4>Category</h4>
-                    <div class="filter-chips">
+                    <div class="filter-chips" id="filterChips">
                         <button class="filter-chip active" data-category="all">All</button>
                         <button class="filter-chip" data-category="audio">Audio</button>
                         <button class="filter-chip" data-category="electronics">Electronics</button>
@@ -342,9 +341,9 @@
             <div class="footer-top">
                 <div class="footer-brand-col">
                     <div class="footer-brand">
-                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                        <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
                     </div>
-                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                    <p class="footer-tagline" data-site-tagline>Quality demo products for everyday life.</p>
                 </div>
                 <nav class="footer-nav" aria-label="Footer">
                     <div class="footer-col">
@@ -375,11 +374,12 @@
                     </div>
                 </nav>
             </div>
-            <div class="footer-copy">© 2026 Grabby Tech</div>
+            <div class="footer-copy" data-footer-note>© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.</div>
         </div>
     </footer>
 
     <!-- SCRIPTS -->
+    <script src="js/supabase/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
@@ -399,7 +399,7 @@
             if (params.has('error')) {
                 var errUrl = 'login.html?error=' + encodeURIComponent(params.get('error'));
                 if (params.has('error_description')) errUrl += '&error_description=' + encodeURIComponent(params.get('error_description'));
-                sessionStorage.removeItem('grabby_auth_return');
+                sessionStorage.removeItem('eshop_auth_return');
                 window.location.replace(errUrl);
                 return;
             }
@@ -407,9 +407,9 @@
             var supabase = createClient();
             if (!supabase) return;
             await supabase.auth.getSession();
-            var intent = sessionStorage.getItem('grabby_auth_return');
+            var intent = sessionStorage.getItem('eshop_auth_return');
             if (intent) {
-                sessionStorage.removeItem('grabby_auth_return');
+                sessionStorage.removeItem('eshop_auth_return');
                 var u = new URL(intent, window.location.origin);
                 if (u.origin === window.location.origin) {
                     window.location.replace(u.href);
@@ -422,5 +422,6 @@
         } catch (e) {}
     })();
     </script>
+    <script type="module" src="js/components/site-init.js"></script>
 </body>
 </html>

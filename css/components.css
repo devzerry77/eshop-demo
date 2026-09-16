@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   GRABBY TECH — COMPONENTS
+   E-SHOP DEMO — COMPONENTS
    Modal / Products Header / Filter Panel / Product Grid /
    Load More / Toasts / Page Header / Skeleton / Zoom / Admin Gallery
    ═══════════════════════════════════════════════════════════════ */
@@ -289,6 +289,7 @@
 .hero-swiper-prev { left:12px; }
 .hero-swiper-next { right:12px; }
 .hero-nav.swiper-button-disabled { opacity:0; pointer-events:none; }
+.hero-nav svg { width:20px; height:20px; display:block; flex-shrink:0; }
 .hero-swiper .swiper-pagination { bottom:6px !important; }
 .hero-swiper .hero-swiper-pagination .swiper-pagination-bullet { width:8px; height:8px; background:#fff; opacity:0.7; box-shadow:0 1px 3px rgba(0,0,0,0.4); }
 .hero-swiper .hero-swiper-pagination .swiper-pagination-bullet-active { width:22px; border-radius:5px; background:var(--accent-text, #5b8def); opacity:1; }

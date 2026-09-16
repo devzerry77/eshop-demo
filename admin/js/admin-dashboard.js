@@ -7,9 +7,9 @@
     const { STATE, DOM, showToast, escapeHTML, formatPrice } = admin;
 
     function renderStats() {
-        const visits = Number(localStorage.getItem("grabby_visits")) || 0;
-        const live = Number(localStorage.getItem("grabby_live")) || 0;
-        const cartAdds = Number(localStorage.getItem("grabby_total_cart_adds")) || 0;
+        const visits = Number(localStorage.getItem("eshop_visits")) || 0;
+        const live = Number(localStorage.getItem("eshop_live")) || 0;
+        const cartAdds = Number(localStorage.getItem("eshop_total_cart_adds")) || 0;
         if (DOM.statVisits) DOM.statVisits.textContent = visits;
         if (DOM.statLive) DOM.statLive.textContent = live;
         if (DOM.statCartAdds) DOM.statCartAdds.textContent = cartAdds;
@@ -96,14 +96,14 @@
                 for (const item of byIp.get(ip)) { item.location = loc; changed = true; }
             }
         }
-        if (changed) localStorage.setItem("grabby_cart_activity", JSON.stringify(activity));
+        if (changed) localStorage.setItem("eshop_cart_activity", JSON.stringify(activity));
         return changed;
     }
 
     async function renderActivity() {
         if (!DOM.activityTableBody) return;
         let activity;
-        try { activity = JSON.parse(localStorage.getItem("grabby_cart_activity") || "[]"); } catch { activity = []; }
+        try { activity = JSON.parse(localStorage.getItem("eshop_cart_activity") || "[]"); } catch { activity = []; }
         if (!activity.length) {
             DOM.activityTableBody.innerHTML = `<tr><td colspan="5" class="empty-state">No activity recorded yet.</td></tr>`;
             return;

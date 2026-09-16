@@ -1,21 +1,46 @@
 // ─── CONFIG ──────────────────────────────────────────────
+// E-Shop Demo — generic portfolio demo shop (Vanilla JS + Supabase).
 export const STORAGE_KEYS = {
-    cache: 'grabby_cache',
-    products: 'grabby_products',
-    cart: 'grabby_cart',
-    theme: 'grabby_theme',
-    currency: 'grabby_currency',
-    visits: 'grabby_visits',
-    live: 'grabby_live',
-    totalCartAdds: 'grabby_total_cart_adds',
-    userIP: 'grabby_user_ip',
-    userLocation: 'grabby_user_location',
-    cartActivity: 'grabby_cart_activity',
-    coupon: 'grabby_coupon'
+    cache: 'eshop_cache',
+    products: 'eshop_products',
+    cart: 'eshop_cart',
+    theme: 'eshop_theme',
+    currency: 'eshop_currency',
+    visits: 'eshop_visits',
+    live: 'eshop_live',
+    totalCartAdds: 'eshop_total_cart_adds',
+    userIP: 'eshop_user_ip',
+    userLocation: 'eshop_user_location',
+    cartActivity: 'eshop_cart_activity',
+    coupon: 'eshop_coupon'
 };
 
 export const CACHE_KEY = STORAGE_KEYS.cache;
 export const CACHE_EXPIRY = 5 * 60 * 1000;
+
+// One-time migration: copy legacy `grabby_*` localStorage keys (from the
+// previous branding) to the new `eshop_*` keys so returning visitors keep
+// their cart, theme and cached settings.
+try {
+    Object.values(STORAGE_KEYS).forEach(k => {
+        if (localStorage.getItem(k) === null) {
+            const legacy = k.replace(/^eshop_/, 'grabby_');
+            const v = localStorage.getItem(legacy);
+            if (v !== null) localStorage.setItem(k, v);
+        }
+    });
+    ['eshop_site_colors', 'eshop_header_footer_colors', 'eshop_messenger_link',
+     'eshop_customer_order_mode', 'eshop_auth_return', 'eshop_order_key',
+     'eshop_last_order', 'eshop_order_times'].forEach(k => {
+        if (localStorage.getItem(k) === null && sessionStorage.getItem(k) === null) {
+            const legacy = k.replace(/^eshop_/, 'grabby_');
+            const v = localStorage.getItem(legacy) ?? sessionStorage.getItem(legacy);
+            if (v !== null) {
+                try { localStorage.setItem(k, v); } catch (_) { /* noop */ }
+            }
+        }
+    });
+} catch (_) { /* storage unavailable */ }
 
 export const CURRENCY = 'BDT';
 export const SHIPPING_FREE_ABOVE = 2000;

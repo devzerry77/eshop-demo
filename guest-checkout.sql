@@ -72,7 +72,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'grabby_admin_email') THEN
         EXECUTE $fn$
             CREATE FUNCTION public.grabby_admin_email()
-            RETURNS text LANGUAGE sql STABLE AS $$ SELECT 'grabby@tech.com' $$;
+            RETURNS text LANGUAGE sql STABLE AS $$ SELECT 'admin@eshop.demo' $$;
         $fn$;
     END IF;
 END

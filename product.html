@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Grabby Tech — Product</title>
+    <title>E-Shop Demo — Product</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
     (function () {
         try {
-            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            if (localStorage.getItem('eshop_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
             var C = null;
-            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            try { C = JSON.parse(localStorage.getItem('eshop_site_colors') || 'null'); } catch (e) {}
             if (C) {
                 var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
             var H = null;
-            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            try { H = JSON.parse(localStorage.getItem('eshop_header_footer_colors') || 'null'); } catch (e) {}
             if (H) {
                 if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
                 if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
@@ -53,8 +54,8 @@
     <!-- HEADER -->
     <header class="header">
         <div class="header-inner">
-            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
-                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            <a href="index.html" class="logo" aria-label="E-Shop Demo Home">
+                <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
             </a>
             <div class="header-actions">
                 <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -232,9 +233,9 @@
             <div class="footer-top">
                 <div class="footer-brand-col">
                     <div class="footer-brand">
-                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                        <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
                     </div>
-                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                    <p class="footer-tagline" data-site-tagline>Quality demo products for everyday life.</p>
                 </div>
                 <nav class="footer-nav" aria-label="Footer">
                     <div class="footer-col">
@@ -265,16 +266,18 @@
                     </div>
                 </nav>
             </div>
-            <div class="footer-copy">© 2026 Grabby Tech</div>
+            <div class="footer-copy" data-footer-note>© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.</div>
         </div>
     </footer>
 
     <!-- SCRIPTS -->
+    <script src="js/supabase/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
     <script type="module" src="js/components/chatbot.js"></script>
     <script type="module" src="js/components/footer-social.js"></script>
     <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/product-detail.js"></script>
+    <script type="module" src="js/components/site-init.js"></script>
 </body>
 </html>

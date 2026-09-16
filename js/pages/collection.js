@@ -6,17 +6,11 @@ import { buildProductCardHTML } from '../core/product-grid.js';
 import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core/search.js';
 import { getCachedProducts, ensureProducts } from '../core/products-loader.js';
 import { STORAGE_KEYS } from '../core/config.js';
+import { getCategories, renderSidebarLinks } from '../core/categories.js';
 
-// ─── CATEGORY LABELS ────────────────────────────────────
+// ─── CATEGORY LABELS (static fallback; DB-driven list preferred) ──
 const CATEGORY_NAMES = {
-    all: 'All Products',
-    audio: 'Audio',
-    electronics: 'Electronics',
-    gaming: 'Gaming',
-    wearables: 'Wearables',
-    accessories: 'Accessories',
-    camera: 'Camera',
-    lifestyle: 'Lifestyle'
+    all: 'All Products'
 };
 
 // ─── STATE ──────────────────────────────────────────────
@@ -408,6 +402,16 @@ async function init() {
     }
 
     productsData = await ensureProducts();
+    try {
+        const categories = await getCategories(productsData);
+        const found = categories.find(c => c.slug === currentCategory);
+        if (heading) heading.textContent = found ? found.label : (CATEGORY_NAMES[currentCategory] || 'Collection');
+        const shopList = document.querySelector('[data-shop-list]');
+        if (shopList) renderSidebarLinks(shopList, categories);
+    } catch (e) {
+        console.warn('Dynamic categories failed:', e);
+        if (heading) heading.textContent = (CATEGORY_NAMES[currentCategory] || 'Collection');
+    }
     render(true);
     updateCartUI();
     bindEvents();

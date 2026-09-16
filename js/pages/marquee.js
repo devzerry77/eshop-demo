@@ -29,16 +29,16 @@ export async function loadMarquee() {
     if (!bar || !span) return;
 
     // Try localStorage first
-    const text = localStorage.getItem('grabby_marquee_text');
-    const enabled = localStorage.getItem('grabby_marquee_enabled');
-    const glow = localStorage.getItem('grabby_marquee_glow') !== 'false';
-    const glowColor = localStorage.getItem('grabby_marquee_glow_color') || '#ff6b6b';
-    const glowIntensity = parseInt(localStorage.getItem('grabby_marquee_glow_intensity')) || 20;
-    const borderGlow = localStorage.getItem('grabby_marquee_border_glow') !== 'false';
-    const borderColor = localStorage.getItem('grabby_marquee_border_color') || '#667eea';
-    const speed = parseInt(localStorage.getItem('grabby_marquee_speed')) || 20;
-    const bgColor = localStorage.getItem('grabby_marquee_bg_color') || '#0a0a0a';
-    const textColor = localStorage.getItem('grabby_marquee_text_color') || '#ffffff';
+    const text = localStorage.getItem('eshop_marquee_text');
+    const enabled = localStorage.getItem('eshop_marquee_enabled');
+    const glow = localStorage.getItem('eshop_marquee_glow') !== 'false';
+    const glowColor = localStorage.getItem('eshop_marquee_glow_color') || '#ff6b6b';
+    const glowIntensity = parseInt(localStorage.getItem('eshop_marquee_glow_intensity')) || 20;
+    const borderGlow = localStorage.getItem('eshop_marquee_border_glow') !== 'false';
+    const borderColor = localStorage.getItem('eshop_marquee_border_color') || '#667eea';
+    const speed = parseInt(localStorage.getItem('eshop_marquee_speed')) || 20;
+    const bgColor = localStorage.getItem('eshop_marquee_bg_color') || '#0a0a0a';
+    const textColor = localStorage.getItem('eshop_marquee_text_color') || '#ffffff';
 
     if (enabled !== 'false' && text) {
         applyMarqueeStyles(bar, span, text, speed, glow, glowColor, glowIntensity, borderGlow, borderColor, bgColor, textColor);
@@ -63,7 +63,7 @@ export async function loadMarquee() {
                 const settings = {};
                 data.forEach(row => { settings[row.key] = row.value; });
                 Object.keys(settings).forEach(key => {
-                    localStorage.setItem('grabby_' + key, settings[key]);
+                    localStorage.setItem('eshop_' + key, settings[key]);
                 });
                 if (settings.marquee_enabled !== 'false' && settings.marquee_text) {
                     applyMarqueeStyles(

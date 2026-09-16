@@ -76,7 +76,7 @@ async function loadOrder() {
             // back to the public RPC using the order number saved at
             // placement time. Never exposes other customers' data.
             let lastOrder = null;
-            try { lastOrder = JSON.parse(sessionStorage.getItem('grabby_last_order') || 'null'); } catch { /* noop */ }
+            try { lastOrder = JSON.parse(sessionStorage.getItem('eshop_last_order') || 'null'); } catch { /* noop */ }
             if (lastOrder && String(lastOrder.id) === String(orderId) && lastOrder.number) {
                 if (await loadOrderViaPublicRpc(supabase, lastOrder.number)) return;
             }
@@ -126,7 +126,7 @@ async function loadOrder() {
 // ─── INIT ───────────────────────────────────────────────
 loadTheme();
 loadSitePalette();
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
 loadOrder();

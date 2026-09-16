@@ -10,7 +10,7 @@ import { createClient } from '../supabase/client.js';
     if (document.getElementById('chatbotWidget')) return;
 
     const MESSENGER_KEY = 'messenger_link';
-    let messengerLink = localStorage.getItem('grabby_messenger_link') || '';
+    let messengerLink = localStorage.getItem('eshop_messenger_link') || '';
 
     const HELP_OPTIONS = [
         {
@@ -36,7 +36,7 @@ import { createClient } from '../supabase/client.js';
     ];
 
     const INTRO = [
-        'Hi! 👋 Welcome to Grabby Tech 🛍️ Great to have you here!',
+        'Hi! 👋 Welcome to E-Shop Demo 🛍️ Great to have you here!',
         'Hi, is delivery free on all gadgets? 🙂',
         'Free delivery across Bangladesh above our threshold, plus 7-day easy returns! 🚚 Pick an option below for details 👇'
     ];
@@ -50,13 +50,13 @@ import { createClient } from '../supabase/client.js';
         const panel = document.createElement('div');
         panel.className = 'chatbot-panel';
         panel.setAttribute('role', 'dialog');
-        panel.setAttribute('aria-label', 'Grabby Tech help chat');
+        panel.setAttribute('aria-label', 'E-Shop Demo help chat');
         panel.innerHTML = `
             <div class="chatbot-head">
                 <div class="chatbot-head-persona">
-                    <img class="chatbot-head-avatar" src="assets/logos/chatbot logo.svg" alt="Grabby Tech">
+                    <img class="chatbot-head-avatar" src="assets/logos/chatbot logo.svg" alt="E-Shop Demo">
                     <div class="chatbot-head-title">
-                        <strong>Grabby Tech Support</strong>
+                        <strong>E-Shop Demo Support</strong>
                         <span class="chatbot-head-status"><i></i>Online — replies in minutes</span>
                     </div>
                 </div>
@@ -271,7 +271,7 @@ import { createClient } from '../supabase/client.js';
         function showTyping() {
             const t = document.createElement('div');
             t.className = 'chatbot-typing';
-            t.setAttribute('aria-label', 'Grabby Tech is typing');
+            t.setAttribute('aria-label', 'E-Shop Demo is typing');
             t.innerHTML = '<span></span><span></span><span></span>';
             body.appendChild(t);
             scrollChat();
@@ -292,7 +292,7 @@ import { createClient } from '../supabase/client.js';
             const value = (data[0] && data[0].value) || '';
             if (!value) return;
             messengerLink = value;
-            try { localStorage.setItem('grabby_messenger_link', value); } catch (e) { /* noop */ }
+            try { localStorage.setItem('eshop_messenger_link', value); } catch (e) { /* noop */ }
         } catch (e) { /* keep cached link */ }
     }
 

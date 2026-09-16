@@ -1,5 +1,5 @@
 -- ────────────────────────────────────────────────────────────────
--- stock-quantity.sql — Product stock quantities (Grabby Tech)
+-- stock-quantity.sql — Product stock quantities (E-Shop Demo)
 --
 -- Run this in Supabase: SQL Editor -> open stock-quantity.sql -> Run.
 -- Safe to re-run (all statements are idempotent).

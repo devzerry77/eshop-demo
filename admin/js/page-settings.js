@@ -18,6 +18,10 @@
         admin.loadMessengerSettings();
         admin.loadSocialSettings();
         admin.loadOrderModeSettings();
+        admin.loadStoreSettings();
+        admin.loadCategories();
+        admin.loadImgbbKey();
+        admin.loadAdmins();
         admin.populateFlashProductSelect();
 
         DOM.refreshStats?.addEventListener("click", () => {
@@ -29,6 +33,10 @@
             admin.loadMessengerSettings();
             admin.loadSocialSettings();
             admin.loadOrderModeSettings();
+            admin.loadStoreSettings();
+            admin.loadCategories();
+            admin.loadImgbbKey();
+            admin.loadAdmins();
             admin.populateFlashProductSelect();
         });
     });

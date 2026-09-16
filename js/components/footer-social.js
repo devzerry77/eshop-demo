@@ -54,7 +54,7 @@ function render() {
     const el = getContainer();
     if (!el) return;
     el.innerHTML = SOCIALS.map(s => {
-        const url = (localStorage.getItem('grabby_social_' + s.id) || '').trim();
+        const url = (localStorage.getItem('eshop_social_' + s.id) || '').trim();
         const attrs = url
             ? `href="${escapeAttr(url)}" target="_blank" rel="noopener"`
             : `tabindex="-1" aria-disabled="true"`;
@@ -78,7 +78,7 @@ async function load() {
         if (error) throw error;
         (data || []).forEach(row => {
             const id = String(row.key).replace(/^social_/, '');
-            localStorage.setItem('grabby_social_' + id, row.value || '');
+            localStorage.setItem('eshop_social_' + id, row.value || '');
         });
         render();
     } catch (e) {
@@ -89,6 +89,6 @@ async function load() {
 document.addEventListener('DOMContentLoaded', () => {
     load();
     window.addEventListener('storage', (e) => {
-        if (e.key && e.key.startsWith('grabby_social_')) render();
+        if (e.key && e.key.startsWith('eshop_social_')) render();
     });
 });

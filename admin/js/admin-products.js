@@ -320,7 +320,7 @@
         const rows = STATE.products.map(p => [
             p.id, p.title, p.category, p.price, p.originalPrice ?? '', p.rating, p.reviews, p.stockQuantity ?? '', p.inStock, p.badge
         ]);
-        admin.exportCSV(headers, rows, 'grabby_products.csv');
+        admin.exportCSV(headers, rows, 'eshop_products.csv');
     }
 
     Object.assign(admin, {

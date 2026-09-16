@@ -1,5 +1,5 @@
 /* ============================================================
-   GRABBY ADMIN – Modern UI Enhancement (no workflow changes)
+   E-SHOP ADMIN – Modern UI Enhancement (no workflow changes)
    ============================================================ */
 
 :root {
@@ -246,6 +246,13 @@ textarea { resize:vertical; }
 .form-error, .rate-limit { display:none; color:#e53e3e; font-size:0.85rem; margin-top:8px; }
 .form-error.show, .rate-limit.show { display:block; }
 .login-footer { margin-top:20px; color:var(--text-secondary); font-size:0.8rem; }
+.demo-creds { margin-top:16px; padding:12px 14px; border:1px dashed var(--border, #d0d0d0); border-radius:10px; background:rgba(0,0,0,0.03); font-size:0.82rem; text-align:left; }
+[data-theme="dark"] .demo-creds { background:rgba(255,255,255,0.05); }
+.demo-creds strong { display:block; margin-bottom:6px; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-secondary); }
+.demo-creds code { font-family:ui-monospace,monospace; font-size:0.82rem; }
+.demo-creds-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 0; }
+.demo-fill-btn { background:transparent; border:1px solid var(--border, #d0d0d0); border-radius:8px; padding:6px 12px; font-size:0.78rem; font-weight:700; cursor:pointer; margin-top:8px; width:100%; }
+.demo-fill-btn:hover { background:var(--accent, #111); color:#fff; border-color:var(--accent, #111); }
 
 /* ─── ADMIN LAYOUT ─── */
 .admin-layout {

@@ -19,7 +19,7 @@ let swiperInstance = null;
 function readLocalSettings() {
     const s = {};
     HERO_KEYS.forEach(k => {
-        const v = localStorage.getItem('grabby_' + k);
+        const v = localStorage.getItem('eshop_' + k) ?? localStorage.getItem('grabby_' + k);
         if (v !== null) s[k] = v;
     });
     return s;
@@ -28,7 +28,7 @@ function readLocalSettings() {
 function persistLocalSettings(settings) {
     HERO_KEYS.forEach(k => {
         if (settings[k] !== undefined && settings[k] !== null) {
-            try { localStorage.setItem('grabby_' + k, String(settings[k])); } catch (e) { /* noop */ }
+            try { localStorage.setItem('eshop_' + k, String(settings[k])); } catch (e) { /* noop */ }
         }
     });
 }
@@ -203,7 +203,7 @@ export async function initHeroBanners() {
 
 // Reload when the admin saves hero settings in another tab.
 window.addEventListener('storage', (e) => {
-    if (e.key && e.key.startsWith('grabby_hero_')) {
+    if (e.key && (e.key.startsWith('eshop_hero_') || e.key.startsWith('grabby_hero_'))) {
         initHeroBanners();
     }
 });

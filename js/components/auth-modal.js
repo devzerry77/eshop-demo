@@ -4,7 +4,7 @@
 // Used by the checkout page before a purchase can continue.
 import { createClient } from '../supabase/client.js';
 
-const RETURN_KEY = 'grabby_auth_return';
+const RETURN_KEY = 'eshop_auth_return';
 
 const FRIENDLY_ERRORS = {
     invalidCredentials: 'Email or password is incorrect.',

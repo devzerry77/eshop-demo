@@ -11,7 +11,7 @@
 
         DOM.clearActivityBtn?.addEventListener("click", () => {
             if (confirm("Clear all activity?")) {
-                localStorage.removeItem("grabby_cart_activity");
+                localStorage.removeItem("eshop_cart_activity");
                 admin.renderActivity();
                 showToast("Activity cleared.", "info");
             }

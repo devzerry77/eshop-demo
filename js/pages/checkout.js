@@ -34,7 +34,7 @@ function withTimeout(promise, ms = 10000, label = 'Request') {
 // The saved setting lives in the existing `settings` table
 // (key = customer_order_mode) and is cached for instant paint.
 const ORDER_MODE_KEY = 'customer_order_mode';
-const ORDER_MODE_CACHE = 'grabby_customer_order_mode';
+const ORDER_MODE_CACHE = 'eshop_customer_order_mode';
 const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 let orderMode = 'login';
 let isGuestCheckout = false;
@@ -102,12 +102,12 @@ function validateBilling(b) {
 // server returns the existing order instead of a duplicate).
 function getIdempotencyKey() {
     try {
-        let k = sessionStorage.getItem('grabby_order_key');
+        let k = sessionStorage.getItem('eshop_order_key');
         if (!k) {
             k = (window.crypto && crypto.randomUUID)
                 ? crypto.randomUUID()
                 : 'key-' + Date.now() + '-' + Math.random().toString(36).slice(2);
-            sessionStorage.setItem('grabby_order_key', k);
+            sessionStorage.setItem('eshop_order_key', k);
         }
         return k;
     } catch {
@@ -120,7 +120,7 @@ function getIdempotencyKey() {
 function orderRateHit() {
     try {
         const now = Date.now();
-        const arr = JSON.parse(localStorage.getItem('grabby_order_times') || '[]')
+        const arr = JSON.parse(localStorage.getItem('eshop_order_times') || '[]')
             .filter(t => typeof t === 'number' && now - t < 3600000);
         if (arr.length >= 5) return true;
         if (arr.length && now - arr[arr.length - 1] < 10000) return true;
@@ -131,10 +131,10 @@ function orderRateHit() {
 function recordOrderTime() {
     try {
         const now = Date.now();
-        const arr = JSON.parse(localStorage.getItem('grabby_order_times') || '[]')
+        const arr = JSON.parse(localStorage.getItem('eshop_order_times') || '[]')
             .filter(t => typeof t === 'number' && now - t < 3600000);
         arr.push(now);
-        localStorage.setItem('grabby_order_times', JSON.stringify(arr));
+        localStorage.setItem('eshop_order_times', JSON.stringify(arr));
     } catch { /* noop */ }
 }
 
@@ -198,7 +198,7 @@ async function loadProducts() {
                     stock_quantity: parseStockQty(row)
                 };
             });
-            localStorage.setItem('grabby_products', JSON.stringify(productsData));
+            localStorage.setItem('eshop_products', JSON.stringify(productsData));
             return true;
         }
     } catch (e) {
@@ -206,7 +206,7 @@ async function loadProducts() {
     }
 
     // Fallback to localStorage
-    const stored = localStorage.getItem('grabby_products');
+    const stored = localStorage.getItem('eshop_products');
     if (stored) {
         try {
             productsData = JSON.parse(stored);
@@ -405,6 +405,7 @@ function showPaymentDetails(methodName) {
 
 // ─── COUPON ──────────────────────────────────────────────────
 async function applyCoupon(code, showFeedback = true) {
+    code = String(code || '').trim().toUpperCase().slice(0, 32);
     if (!code) return false;
     try {
         const { data, error } = await withTimeout(
@@ -526,7 +527,7 @@ async function initCheckout() {
     supabase = getSupabase();
     if (!supabase) {
         showToastMsg('Supabase connection failed. Some features may not work.', 'warning');
-        const stored = localStorage.getItem('grabby_products');
+        const stored = localStorage.getItem('eshop_products');
         if (stored) {
             try { productsData = JSON.parse(stored); } catch (e) { /* noop */ }
         }
@@ -551,7 +552,7 @@ async function initCheckout() {
     const productsLoaded = await loadProducts();
     if (!productsLoaded) {
         showToastMsg('Could not load products. Please refresh.', 'error');
-        const stored = localStorage.getItem('grabby_products');
+        const stored = localStorage.getItem('eshop_products');
         if (stored) {
             try { productsData = JSON.parse(stored); } catch (e) { /* noop */ }
         }
@@ -593,9 +594,9 @@ let authWired = false;
 
 function restoreIntendedCheckout() {
     let stored = null;
-    try { stored = sessionStorage.getItem('grabby_auth_return'); } catch { stored = null; }
+    try { stored = sessionStorage.getItem('eshop_auth_return'); } catch { stored = null; }
     if (!stored) return false;
-    try { sessionStorage.removeItem('grabby_auth_return'); } catch { /* noop */ }
+    try { sessionStorage.removeItem('eshop_auth_return'); } catch { /* noop */ }
     try {
         const target = new URL(stored, window.location.origin);
         if (target.origin !== window.location.origin) return false;
@@ -871,13 +872,13 @@ async function afterOrderPlaced(orderId, orderNumber, b) {
 
     recordOrderTime();
     try {
-        sessionStorage.setItem('grabby_last_order',
+        sessionStorage.setItem('eshop_last_order',
             JSON.stringify({ id: orderId, number: orderNumber }));
-        sessionStorage.removeItem('grabby_order_key');
+        sessionStorage.removeItem('eshop_order_key');
     } catch (_) { /* noop */ }
 
     if (!window.location.search.includes('product_id')) {
-        localStorage.setItem('grabby_cart', '[]');
+        localStorage.setItem('eshop_cart', '[]');
     }
     clearCoupon();
 
@@ -965,21 +966,21 @@ async function placeOrderLegacy(b) {
                 }
             } catch (e) { console.warn('Stock decrement failed for', item.product_id, e); }
         }
-        try { localStorage.setItem('grabby_products', JSON.stringify(productsData)); } catch (_) { /* noop */ }
+        try { localStorage.setItem('eshop_products', JSON.stringify(productsData)); } catch (_) { /* noop */ }
 
         if (couponCode) {
             await supabase.rpc('increment_coupon_used', { code: couponCode }).catch(() => {});
         }
 
         if (!window.location.search.includes('product_id')) {
-            localStorage.setItem('grabby_cart', '[]');
+            localStorage.setItem('eshop_cart', '[]');
         }
         clearCoupon();
 
         try {
-            sessionStorage.setItem('grabby_last_order',
+            sessionStorage.setItem('eshop_last_order',
                 JSON.stringify({ id: order.id, number: order.order_number }));
-            sessionStorage.removeItem('grabby_order_key');
+            sessionStorage.removeItem('eshop_order_key');
         } catch (_) { /* noop */ }
         recordOrderTime();
 
@@ -1008,4 +1009,4 @@ document.getElementById('placeOrderBtn')?.addEventListener('click', placeOrder);
 loadTheme();
 loadSitePalette();
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });

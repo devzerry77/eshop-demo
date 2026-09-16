@@ -2,25 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Search — Grabby Tech</title>
-    <meta name="description" content="Search products at Grabby Tech. Modern gadgets for modern life." />
+    <title>Search — E-Shop Demo</title>
+    <meta name="description" content="Search products at E-Shop Demo. Modern gadgets for modern life." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
     (function () {
         try {
-            if (localStorage.getItem('grabby_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            if (localStorage.getItem('eshop_theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
             var C = null;
-            try { C = JSON.parse(localStorage.getItem('grabby_site_colors') || 'null'); } catch (e) {}
+            try { C = JSON.parse(localStorage.getItem('eshop_site_colors') || 'null'); } catch (e) {}
             if (C) {
                 var props = { bg: '--bg', card: '--card-bg', secondary: '--secondary-bg', text: '--text', textSecondary: '--text-secondary', border: '--border', accent: '--accent', headerBg: '--header-bg', headerText: '--header-text' };
                 if (C.preset && C.preset !== 'custom') document.documentElement.setAttribute('data-chrome', C.preset);
                 else if (C.colors) for (var k in props) { if (C.colors[k]) document.documentElement.style.setProperty(props[k], C.colors[k]); }
             }
             var H = null;
-            try { H = JSON.parse(localStorage.getItem('grabby_header_footer_colors') || 'null'); } catch (e) {}
+            try { H = JSON.parse(localStorage.getItem('eshop_header_footer_colors') || 'null'); } catch (e) {}
             if (H) {
                 if (H.light) document.documentElement.style.setProperty('--hf-bg-light', H.light);
                 if (H.dark) document.documentElement.style.setProperty('--hf-bg-dark', H.dark);
@@ -57,8 +58,8 @@
             <button class="hamburger" id="menuBtn" aria-label="Open menu">
                 <span></span><span></span><span></span>
             </button>
-            <a href="index.html" class="logo" aria-label="Grabby Tech Home">
-                <img class="logo-img" src="assets/logos/header logo.png" alt="Grabby Tech" />
+            <a href="index.html" class="logo" aria-label="E-Shop Demo Home">
+                <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
             </a>
             <a href="index.html" class="header-home" data-home-link aria-label="Home">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22v-8h6v8"/></svg>
@@ -98,8 +99,8 @@
     <nav class="sidebar" id="sidebar" aria-label="Main navigation">
         <div class="sidebar-brand">
             <button class="sidebar-close" id="closeBtn" aria-label="Close menu">✕</button>
-            <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
-            <span class="brand-title">GRABBY TECH</span>
+            <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
+            <span class="brand-title">E-SHOP DEMO</span>
         </div>
         <div class="sidebar-menu">
             <div class="menu-section">
@@ -220,9 +221,9 @@
             <div class="footer-top">
                 <div class="footer-brand-col">
                     <div class="footer-brand">
-                        <img class="logo-img" src="assets/logos/logo.png" alt="Grabby Tech" />
+                        <img class="logo-img" src="assets/logo.svg" alt="E-Shop Demo" />
                     </div>
-                    <p class="footer-tagline">Modern gadgets for modern life.</p>
+                    <p class="footer-tagline" data-site-tagline>Quality demo products for everyday life.</p>
                 </div>
                 <nav class="footer-nav" aria-label="Footer">
                     <div class="footer-col">
@@ -253,11 +254,12 @@
                     </div>
                 </nav>
             </div>
-            <div class="footer-copy">© 2026 Grabby Tech</div>
+            <div class="footer-copy" data-footer-note>© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.</div>
         </div>
     </footer>
 
     <!-- SCRIPTS -->
+    <script src="js/supabase/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
     <script type="module" src="js/components/search-toggle.js"></script>
@@ -266,5 +268,6 @@
     <script type="module" src="js/components/home-link.js"></script>
     <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/search.js"></script>
+    <script type="module" src="js/components/site-init.js"></script>
 </body>
 </html>

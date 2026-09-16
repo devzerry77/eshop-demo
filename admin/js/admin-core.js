@@ -5,9 +5,20 @@
 
     const admin = window.admin = window.admin || {};
 
-    const SUPABASE_URL = "https://arzzuvnuyrhfbqaiwily.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyenp1dm51eXJoZmJxYWl3aWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyODc0NDksImV4cCI6MjEwNDg2MzQ0OX0.q1cPuElRwIrX8uhoq-Hhv-JDZL7hF2QLfmX15ok6_tc";
-    const IMGBB_API_KEY = "c849986a59aa08b8bc5593a21a744e57";
+    // Credentials resolve from window.ESHOP_* (js/supabase/supabase-config.js
+    // or git-ignored overrides). The anon key is public by design — NEVER
+    // put the service_role key in frontend code or this repo.
+    const SUPABASE_URL = (typeof window !== 'undefined' && window.ESHOP_SUPABASE_URL) || "https://qjbttdimbnurqslknwvn.supabase.co";
+    const SUPABASE_ANON_KEY = (typeof window !== 'undefined' && window.ESHOP_SUPABASE_ANON_KEY) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqYnR0ZGltYm51cnFzbGtud3ZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzA1OTEsImV4cCI6MjEwNTE0NjU5MX0.KNI5wt5I2mRmBWJRlfsIi0nbWPk9aC3BQ2oTHKe18xQ";
+
+    // Image-upload key is NOT hardcoded: window.ESHOP_IMGBB_KEY or
+    // localStorage 'eshop_imgbb_key' (Admin → Settings → Image Uploads).
+    function getImgBBKey() {
+        try {
+            if (typeof window !== 'undefined' && window.ESHOP_IMGBB_KEY) return window.ESHOP_IMGBB_KEY;
+            return localStorage.getItem('eshop_imgbb_key') || '';
+        } catch (_) { return ''; }
+    }
 
     const STATE = {
         products: [],
@@ -124,7 +135,12 @@
             "socialFacebook", "socialInstagram", "socialYouTube", "socialTiktok", "socialX",
             "saveSocialBtn", "socialStatus",
             // Customer order mode (new)
-            "orderModeSelect", "orderModeCurrent", "saveOrderModeBtn", "orderModeStatus"
+            "orderModeSelect", "orderModeCurrent", "saveOrderModeBtn", "orderModeStatus",
+            // Store profile / categories / uploads / admin access (new)
+            "siteName", "siteTagline", "siteFooterNote", "saveStoreBtn", "storeStatus",
+            "catList", "catLabel", "addCatBtn", "catsStatus",
+            "imgbbKey", "saveImgbbBtn", "imgbbStatus",
+            "adminList", "adminEmail", "addAdminBtn", "adminsStatus"
         ].forEach(id => DOM[id] = $(id));
     }
 
@@ -173,9 +189,13 @@
 
     // ─── IMGBB UPLOAD ──────────────────────────────────
     async function uploadToImgBB(file) {
+        const key = getImgBBKey();
+        if (!key) {
+            throw new Error('Image upload key not configured. Set it in Admin → Settings → Image Uploads.');
+        }
         const formData = new FormData();
         formData.append('image', file);
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        const response = await fetch('https://api.imgbb.com/1/upload?key=' + encodeURIComponent(key), {
             method: 'POST',
             body: formData
         });
@@ -191,7 +211,7 @@
 
     // ─── THEME ─────────────────────────────────────────────
     function loadTheme() {
-        const saved = localStorage.getItem('grabby_theme');
+        const saved = localStorage.getItem('eshop_theme');
         const themeToggle = DOM.themeToggle;
         if (saved === 'light') {
             document.documentElement.removeAttribute('data-theme');
@@ -205,7 +225,7 @@
                 themeToggle.querySelector('.theme-icon').textContent = '☀️';
                 themeToggle.querySelector('.theme-label').textContent = 'Light';
             }
-            if (!saved) localStorage.setItem('grabby_theme', 'dark');
+            if (!saved) localStorage.setItem('eshop_theme', 'dark');
         }
     }
 
@@ -214,14 +234,14 @@
         const themeToggle = DOM.themeToggle;
         if (isDark) {
             document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('grabby_theme', 'light');
+            localStorage.setItem('eshop_theme', 'light');
             if (themeToggle) {
                 themeToggle.querySelector('.theme-icon').textContent = '🌙';
                 themeToggle.querySelector('.theme-label').textContent = 'Dark';
             }
         } else {
             document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('grabby_theme', 'dark');
+            localStorage.setItem('eshop_theme', 'dark');
             if (themeToggle) {
                 themeToggle.querySelector('.theme-icon').textContent = '☀️';
                 themeToggle.querySelector('.theme-label').textContent = 'Light';
@@ -230,8 +250,8 @@
     }
 
     // ─── ADMIN PREFS (shared across all pages) ─────────────
-    const PREFS_KEY = 'grabby_admin_settings';
-    const DRAFT_KEY = 'grabby_admin_product_draft';
+    const PREFS_KEY = 'eshop_admin_settings';
+    const DRAFT_KEY = 'eshop_admin_product_draft';
     const DEFAULT_PREFS = { dark: null, autoDark: false, animations: true, compact: false, autoSave: true };
     let prefs = Object.assign({}, DEFAULT_PREFS);
 
@@ -261,7 +281,7 @@
         const root = document.documentElement;
         if (dark) root.setAttribute('data-theme', 'dark');
         else root.removeAttribute('data-theme');
-        try { localStorage.setItem('grabby_theme', dark ? 'dark' : 'light'); } catch { /* noop */ }
+        try { localStorage.setItem('eshop_theme', dark ? 'dark' : 'light'); } catch { /* noop */ }
         updateThemeToggleUI(dark);
         if (DOM.settingsDarkMode) DOM.settingsDarkMode.checked = !!dark;
         if (DOM.settingsAutoDark) DOM.settingsAutoDark.checked = !!prefs.autoDark;
@@ -384,11 +404,45 @@
         return true;
     }
 
+    // Demo credentials shown on the login panel (portfolio demo only).
+    // NOTE: this user must exist in Supabase Dashboard → Authentication → Users.
+    // Create: admin@eshop.demo / Demo123! (auto-confirm email), then allow-list it:
+    //   INSERT INTO public.admin_users (email) VALUES ('admin@eshop.demo')
+    //   ON CONFLICT (email) DO NOTHING;
+    const DEMO_ADMIN_EMAIL = "admin@eshop.demo";
+    const DEMO_ADMIN_PASSWORD = "Demo123!";
+
+    function injectDemoCreds() {
+        try {
+            const card = document.querySelector(".login-card");
+            if (!card || card.querySelector(".demo-creds")) return;
+            const box = document.createElement("div");
+            box.className = "demo-creds";
+            box.innerHTML =
+                '<strong>Demo access</strong>' +
+                '<div class="demo-creds-row"><span>Email: <code></code></span></div>' +
+                '<div class="demo-creds-row"><span>Password: <code></code></span></div>' +
+                '<button type="button" class="demo-fill-btn">Fill demo credentials</button>';
+            box.querySelectorAll("code")[0].textContent = DEMO_ADMIN_EMAIL;
+            box.querySelectorAll("code")[1].textContent = DEMO_ADMIN_PASSWORD;
+            box.querySelector(".demo-fill-btn").addEventListener("click", () => {
+                if (DOM.loginEmail) DOM.loginEmail.value = DEMO_ADMIN_EMAIL;
+                if (DOM.loginPassword) DOM.loginPassword.value = DEMO_ADMIN_PASSWORD;
+                if (DOM.loginError) DOM.loginError.classList.remove("show");
+                DOM.loginEmail?.focus();
+            });
+            const footer = card.querySelector(".login-footer");
+            if (footer) footer.before(box);
+            else card.appendChild(box);
+        } catch (_) { /* noop */ }
+    }
+
     function showLogin() {
         STATE.loggedIn = false;
         DOM.loginOverlay?.classList.remove("hidden");
         DOM.adminLayout?.classList.remove("active");
         clearTimeout(STATE.timeout);
+        injectDemoCreds();
     }
 
     function showAdmin() {
@@ -405,10 +459,49 @@
 
     async function checkSession() {
         const { data: { session } } = await STATE.supabase.auth.getSession();
-        session ? showAdmin() : showLogin();
+        if (!session) { showLogin(); return; }
+        const allowed = await isAdminUser(session.user);
+        if (allowed) showAdmin();
+        else {
+            await STATE.supabase.auth.signOut();
+            showLogin();
+            if (DOM.loginError) {
+                DOM.loginError.textContent = 'This account is not an admin. Ask the store owner to add it in Admin → Settings → Admin Access.';
+                DOM.loginError.classList.add('show');
+            }
+            showToast('Not an admin account', 'error');
+        }
+    }
+
+    // Admin allow-list backed by the `admin_users` table (see
+    // eshop-demo-setup.sql). Backwards compatible: if the table does not
+    // exist yet (or is empty), any signed-in user is allowed so existing
+    // setups keep working until the setup SQL is run.
+    async function isAdminUser(user) {
+        if (!user || !user.email) return false;
+        try {
+            const { data, error } = await STATE.supabase
+                .from('admin_users')
+                .select('email')
+                .eq('email', user.email)
+                .maybeSingle();
+            if (error) return true; // table missing → legacy open behavior
+            if (data) return true;
+            // Table exists: allow only listed emails, unless nobody is
+            // listed yet (fresh setup → first login claims admin).
+            const { data: any, error: err2 } = await STATE.supabase
+                .from('admin_users')
+                .select('email')
+                .limit(1);
+            if (err2) return true;
+            return !any || !any.length;
+        } catch (_) {
+            return true;
+        }
     }
 
     function initLogin() {
+        injectDemoCreds();
         DOM.togglePassword?.addEventListener("click", () => {
             const isPassword = DOM.loginPassword.type === "password";
             DOM.loginPassword.type = isPassword ? "text" : "password";
@@ -432,7 +525,7 @@
             try {
                 const { error } = await STATE.supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                showAdmin();
+                await checkSession();
             } catch (error) {
                 DOM.loginError.textContent = error.message || "Invalid login details.";
                 DOM.loginError.classList.add("show");
@@ -493,7 +586,7 @@
         STATE, DOM, $, $$,
         showToast, cacheDOM, escapeHTML, formatPrice, debounce,
         isYouTubeUrl, extractYouTubeId, getYouTubeThumbnail, getYouTubeEmbedUrl, isValidUrl,
-        uploadToImgBB,
+        uploadToImgBB, getImgBBKey,
         loadTheme, toggleTheme,
         loadPrefs, savePrefs, applyPrefsAll, applyDarkFromPrefs, setAdminDark,
         updateThemeToggleUI, applyMotionPref, applyCompactPref, setPrefs, syncPrefsFromThemeToggle,

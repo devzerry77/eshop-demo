@@ -74,9 +74,9 @@ function addToCart(productId, products) {
         setTimeout(() => { barBtn.textContent = 'Add to Cart'; }, 1200);
     }
     showPageToast('Added to cart');
-    let total = parseInt(localStorage.getItem('grabby_total_cart_adds') || '0');
+    let total = parseInt(localStorage.getItem('eshop_total_cart_adds') || '0');
     total++;
-    localStorage.setItem('grabby_total_cart_adds', total);
+    localStorage.setItem('eshop_total_cart_adds', total);
 }
 
 function removeFromCart(productId, products) {
@@ -185,7 +185,7 @@ async function loadProduct() {
     } catch (e) { console.warn('Supabase load failed on product page'); }
 
     if (!productsData.length) {
-        const stored = localStorage.getItem('grabby_products');
+        const stored = localStorage.getItem('eshop_products');
         if (stored) { try { productsData = JSON.parse(stored); } catch { productsData = []; } }
     }
 
@@ -202,7 +202,7 @@ async function loadProduct() {
         return;
     }
 
-    document.title = p.title + ' — Grabby Tech';
+    document.title = p.title + ' — E-Shop Demo';
     const cart = getCart();
 
     let mediaItems = p.images || [p.image];
@@ -313,8 +313,8 @@ async function loadProduct() {
                         <div class="gallery-track" id="galleryTrack">
                             ${slidesHtml}
                         </div>
-                        <button class="gallery-nav prev" id="galleryPrev">‹</button>
-                        <button class="gallery-nav next" id="galleryNext">›</button>
+                        <button class="gallery-nav prev" id="galleryPrev" aria-label="Previous image"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg></button>
+                        <button class="gallery-nav next" id="galleryNext" aria-label="Next image"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
                         <span class="image-counter" id="imageCounter">1/${mediaItems.length}</span>
                     </div>
                 </div>
@@ -525,7 +525,7 @@ async function loadProduct() {
         if (navigator.share) {
             navigator.share({
                 title: p.title,
-                text: `Check out ${p.title} on Grabby Tech!`,
+                text: `Check out ${p.title} on E-Shop Demo!`,
                 url: window.location.href
             }).catch(() => { });
         } else {
@@ -623,7 +623,7 @@ async function loadProduct() {
 // ─── INIT ───────────────────────────────────────────────
 loadTheme();
 loadSitePalette();
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
 window.addEventListener('pageshow', () => {

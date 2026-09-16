@@ -399,7 +399,7 @@ async function renderProfile() {
 // ─── INIT ───────────────────────────────────────────────
 loadTheme();
 loadSitePalette();
-document.addEventListener('storage', (e) => { if (e.key === 'grabby_theme') loadTheme(); });
+document.addEventListener('storage', (e) => { if (e.key === 'eshop_theme') loadTheme(); });
 document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
 
 renderProfile();

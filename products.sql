@@ -239,5 +239,5 @@ INSERT INTO products (title, category, price, original_price, rating, reviews, d
   '{"brand":"Walton","sold":"1.9K+ sold","shortDesc":"Fast-boiling stainless steel kettle.","fullDesc":"The Walton 1.8L kettle boils water quickly with a 1200W element, stainless steel body, automatic shut-off and boil-dry protection for complete safety.","sections":[{"title":"Highlights","body":"1200W quick boil | Auto shut-off | 1-year national warranty"},{"title":"In the box","body":"Kettle, base, manual"}],"related":[]}'
 );
 
--- Done. 15 products seeded. Use the Admin panel -> Products to edit images/details,
+-- Done. 18 products seeded. Use the Admin panel -> Products to edit images/details,
 -- or run additional INSERT statements following the same format.
