@@ -78,6 +78,31 @@ export function firstImage(p) {
     return p.image || '';
 }
 
+// ─── STOCK (single source of truth: DB `products.stock_quantity`) ───
+// Rows written before the stock-quantity migration carry no value, which
+// parses to null (unknown) and must NEVER be treated as 0 — that fallback
+// was the root cause of newly added products showing "Available: 0".
+export function parseStockQty(row) {
+    if (!row) return null;
+    const v = row.stock_quantity;
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : null;
+}
+
+export function resolveStock(row) {
+    const stockQty = parseStockQty(row);
+    const inStock = (row ? row.in_stock : undefined) !== false && (stockQty === null || stockQty > 0);
+    return { stockQty, inStock };
+}
+
+// How many more units of `product` can be added (null stockQty = uncapped).
+export function canFulfill(product, wantedQty) {
+    if (!product || !product.inStock) return false;
+    if (product.stockQty === null || product.stockQty === undefined) return true;
+    return Number(wantedQty) <= product.stockQty;
+}
+
 // ─── MISC ───────────────────────────────────────────────
 export function debounce(callback, delay = 300) {
     let timer;

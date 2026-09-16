@@ -103,7 +103,14 @@ import { createClient } from '../supabase/client.js';
 
         let introPlayed = false;
         const wait = ms => new Promise(r => setTimeout(r, ms));
-        const scrollChat = () => { body.scrollTop = body.scrollHeight; };
+        // Smoothly keep the newest content visible. Deferred to a double
+        // rAF so the new nodes have actually rendered (and scrollHeight is
+        // final) before scrolling. Only the chat body scrolls — never the page.
+        const scrollChat = () => {
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+            }));
+        };
 
         toggle.addEventListener('click', () => {
             const open = panel.classList.toggle('open');
@@ -124,7 +131,9 @@ import { createClient } from '../supabase/client.js';
             if (!btn) return;
             const item = HELP_OPTIONS.find(o => o.key === btn.dataset.option);
             if (!item) return;
-            options.hidden = true;
+            // Keep the help-options section (4 options + Contact With Us, which
+            // lives inside #chatbotOptions) visible below the reply so Contact
+            // stays available and scrolls naturally with the options list.
             body.appendChild(reply);
             reply.hidden = false;
             reply.innerHTML = `
@@ -136,6 +145,7 @@ import { createClient } from '../supabase/client.js';
                 reply.hidden = true;
                 body.appendChild(options);
                 options.hidden = false;
+                scrollChat();
             });
             scrollChat();
         });
@@ -212,7 +222,9 @@ import { createClient } from '../supabase/client.js';
                 });
             }
             wrap.appendChild(btn);
-            body.appendChild(wrap);
+            // Permanently part of the help-options area: moves, shows, hides
+            // and scrolls together with the 4 option buttons. Never duplicated.
+            options.appendChild(wrap);
             scrollChat();
         }
 

@@ -43,7 +43,7 @@ async function trackOrder(orderId, phone) {
 
         let itemsHtml = items ? items.map(item => `
             <div style="display:flex; justify-content:space-between; padding:0.3rem 0; border-bottom:1px solid var(--border);">
-                <span>${item.product_name} × ${item.quantity}</span>
+                    <span>${item.product_name} × ${item.quantity}</span>
                 <span>${formatPrice(item.product_price * item.quantity)}</span>
             </div>
         `).join('') : '';

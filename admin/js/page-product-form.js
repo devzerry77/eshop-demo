@@ -33,6 +33,11 @@
 
         // Form bindings
         DOM.productForm?.addEventListener("submit", admin.submitForm);
+        // Top "Save Changes" uses the exact same submit/save logic as the bottom button.
+        DOM.topSaveBtn?.addEventListener("click", () => {
+            if (DOM.productForm?.requestSubmit) DOM.productForm.requestSubmit();
+            else DOM.productForm?.dispatchEvent(new Event("submit", { cancelable: true }));
+        });
         DOM.cancelEdit?.addEventListener("click", admin.resetForm);
         DOM.formResetButton?.addEventListener("click", admin.resetForm);
         DOM.addSpecBtn?.addEventListener("click", () => admin.addSpecGroup('', ''));

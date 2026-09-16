@@ -1,5 +1,5 @@
 // ─── COLLECTION PAGE (dedicated category route) ─────────
-import { formatPrice, escapeHtml } from '../core/utils.js';
+import { formatPrice, escapeHtml, canFulfill } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { getCart, saveCart, getCartCount, addCartItem, removeCartItem, getCartItem, computeCartTotal } from '../core/storage.js';
 import { buildProductCardHTML } from '../core/product-grid.js';
@@ -255,6 +255,11 @@ function updateCartUI() {
 function addToCart(id) {
     const p = getProduct(id);
     if (!p || !p.inStock) return;
+    const inCartQty = (cart.find(item => String(item.id) === String(id)) || {}).quantity || 0;
+    if (!canFulfill(p, inCartQty + 1)) {
+        showToast(`Only ${p.stockQty} available in stock`);
+        return;
+    }
     addCartItem(cart, id);
     saveCart(cart);
     updateCartUI();

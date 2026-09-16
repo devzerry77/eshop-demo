@@ -1,5 +1,5 @@
 // ─── PRODUCT DETAIL PAGE ────────────────────────────────
-import { formatPrice, renderStars, escapeHtml, renderDescription, isYouTubeUrl, getYouTubeEmbedUrl } from '../core/utils.js';
+import { formatPrice, renderStars, escapeHtml, renderDescription, isYouTubeUrl, getYouTubeEmbedUrl, parseStockQty, resolveStock, canFulfill } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { createClient } from '../supabase/client.js';
 import { showToast } from '../components/toast.js';
@@ -171,7 +171,8 @@ async function loadProduct() {
                         image: row.image || images[0],
                         images: images,
                         badge: row.badge || '',
-                        inStock: row.in_stock !== false,
+                        stockQty: parseStockQty(row),
+                        inStock: resolveStock(row).inStock,
                         specs: row.specs || {},
                         shortDesc: details.shortDesc || '',
                         fullDesc: details.fullDesc || '',
@@ -347,7 +348,9 @@ async function loadProduct() {
                     <button class="detail-add-btn" id="detailAddBtn" ${!p.inStock ? 'disabled' : ''}>${btnText}</button>
                 </div>
                 <div class="product-detail-meta">
-                    <span class="${p.inStock ? 'stock-in' : 'stock-out'}">📦 ${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                    ${!p.inStock
+                        ? `<span class="stock-out">● Out of Stock</span>`
+                        : `<span class="stock-in">● In Stock</span>${(p.stockQty !== null && p.stockQty !== undefined) ? `<span class="stock-available">Available: <strong>${p.stockQty}</strong></span>` : ''}`}
                     <span>Verified Product ✅</span>
                     <span>↩️ 7-day return</span>
                 </div>
@@ -492,9 +495,15 @@ async function loadProduct() {
     // ─── ADD TO CART ──────────────────────────────────────
     function handleAddToCart() {
         if (!p.inStock) return;
-        addToCart(p.id, productsData);
         const cartNow = getCart();
-        const inCartNow = cartNow.some(item => String(item.id) === String(p.id));
+        const inCartQty = (cartNow.find(item => String(item.id) === String(p.id)) || {}).quantity || 0;
+        if (!canFulfill(p, inCartQty + 1)) {
+            showPageToast(`Only ${p.stockQty} available in stock`);
+            return;
+        }
+        addToCart(p.id, productsData);
+        const cartAfter = getCart();
+        const inCartNow = cartAfter.some(item => String(item.id) === String(p.id));
         const btn = document.getElementById('detailAddBtn');
         if (btn) btn.textContent = inCartNow ? '✓ In Cart' : 'Add to Cart';
         const barBtn = document.getElementById('barAddCartBtn');
@@ -507,6 +516,7 @@ async function loadProduct() {
     // ─── BUY NOW ─────────────────────────────────────────
     document.getElementById('barBuyNowBtn')?.addEventListener('click', () => {
         if (!p.inStock) { showPageToast('Out of stock'); return; }
+        if (!canFulfill(p, 1)) { showPageToast(`Only ${p.stockQty} available in stock`); return; }
         window.location.href = `checkout.html?product_id=${encodeURIComponent(p.id)}&quantity=1`;
     });
 
@@ -539,7 +549,14 @@ async function loadProduct() {
         const remove = e.target.closest('[data-action="cart-remove"]');
         if (inc) {
             const id = parseInt(inc.dataset.id);
-            addToCart(id, productsData);
+            const prod = productsData.find(prod => String(prod.id) === String(id));
+            const cartNow = getCart();
+            const inCartQty = (cartNow.find(item => String(item.id) === String(id)) || {}).quantity || 0;
+            if (prod && !canFulfill(prod, inCartQty + 1)) {
+                showPageToast(`Only ${prod.stockQty} available in stock`);
+            } else {
+                addToCart(id, productsData);
+            }
         } else if (dec) {
             const id = parseInt(dec.dataset.id);
             removeFromCart(id, productsData);
@@ -597,6 +614,10 @@ async function loadProduct() {
     }
 
     document.getElementById('stickyBar').style.display = 'block';
+    const stickyAdd = document.getElementById('barAddCartBtn');
+    if (stickyAdd && !p.inStock) { stickyAdd.textContent = 'Sold Out'; stickyAdd.disabled = true; }
+    const stickyBuy = document.getElementById('barBuyNowBtn');
+    if (stickyBuy && !p.inStock) { stickyBuy.textContent = 'Sold Out'; stickyBuy.disabled = true; }
 }
 
 // ─── INIT ───────────────────────────────────────────────

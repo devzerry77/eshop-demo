@@ -1,6 +1,7 @@
 // ─── PRODUCTS LOADER ────────────────────────────────────
 import { DEFAULT_PRODUCTS, STORAGE_KEYS, CACHE_KEY } from './config.js';
 import { createClient } from '../supabase/client.js';
+import { parseStockQty, resolveStock } from './utils.js';
 
 const SUPABASE_LOAD_TIMEOUT_MS = 8000;
 
@@ -26,7 +27,8 @@ function normalizeProductRow(row) {
         image: row.image || images[0],
         images: images,
         badge: row.badge || '',
-        inStock: row.in_stock !== false,
+        stockQty: parseStockQty(row),
+        inStock: resolveStock(row).inStock,
         specs: row.specs || {},
         shortDesc: details.shortDesc || '',
         fullDesc: details.fullDesc || '',

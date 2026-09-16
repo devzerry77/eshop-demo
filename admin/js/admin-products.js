@@ -33,6 +33,11 @@
         }
         images.sort((a, b) => (a.order || 0) - (b.order || 0));
         const urls = images.map(img => img.url);
+        // Pre-migration rows carry no quantity → null (unknown), never 0.
+        const rawQty = row.stock_quantity;
+        const stockQuantity = (rawQty === null || rawQty === undefined || rawQty === '')
+            ? null
+            : Math.max(0, Math.floor(Number(rawQty) || 0));
         return {
             id: row.id,
             title: row.title || "Untitled",
@@ -44,7 +49,8 @@
             reviews: Number(row.reviews) || 0,
             sold: details.sold || '',
             badge: row.badge || '',
-            inStock: row.in_stock !== false,
+            stockQuantity: stockQuantity,
+            inStock: row.in_stock !== false && (stockQuantity === null || stockQuantity > 0),
             image: row.image || (urls.length ? urls[0] : 'https://picsum.photos/seed/default/400/400'),
             images: images,
             specs: row.specs || {},
@@ -92,6 +98,7 @@
             sections: product.sections || [],
             related: product.related || []
         };
+        const qty = Number.isFinite(Number(product.stockQuantity)) ? Math.max(0, Math.floor(Number(product.stockQuantity))) : 0;
         return {
             title: product.title,
             category: product.category,
@@ -103,7 +110,8 @@
             image: urls[0],
             images: images,
             badge: product.badge,
-            in_stock: product.inStock,
+            stock_quantity: qty,
+            in_stock: product.inStock && qty > 0,
             specs: product.specs || {},
             details: details
         };
@@ -156,11 +164,11 @@
         }
         DOM.adminProductsTable.innerHTML = items.map(p => {
             const imgSrc = p.images && p.images.length ? p.images[0].url : p.image;
-            return `<tr>
+            return `<tr data-product-id="${escapeHTML(p.id)}">
                 <td><div class="product-cell"><img class="cell-img" src="${escapeHTML(imgSrc)}" alt=""><div><div class="product-name" title="${escapeHTML(p.title)}">${escapeHTML(p.title)}</div><div class="product-id">ID: ${escapeHTML(p.id)}</div></div></div></td>
                 <td><span class="category-pill">${escapeHTML(p.category)}</span></td>
                 <td><strong>${formatPrice(p.price)}</strong></td>
-                <td><span class="stock-pill ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In stock' : 'Out of stock'}</span></td>
+                <td><div class="product-name">${p.stockQuantity === null || p.stockQuantity === undefined ? '—' : escapeHTML(String(p.stockQuantity))}</div><div><span class="stock-pill ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In stock' : 'Out of stock'}</span></div></td>
                 <td><div class="table-actions"><button class="table-action" data-edit="${escapeHTML(p.id)}">Edit</button><button class="table-action delete" data-delete="${escapeHTML(p.id)}">Delete</button></div></td>
             </tr>`;
         }).join("");
@@ -206,6 +214,7 @@
             reviews: Math.max(0, Number(DOM.prodReviews.value) || 0),
             sold: DOM.prodSold.value.trim(),
             badge: DOM.prodBadge.value.trim(),
+            stockQuantity: DOM.prodStock.value === '' ? NaN : Math.floor(Number(DOM.prodStock.value)),
             inStock: DOM.prodInStock.checked,
             image: images[0]?.url || '',
             images: images.map(item => ({
@@ -227,6 +236,7 @@
         const product = readForm();
         if (!product.title) { showToast("Product title is required.", "warning"); DOM.prodTitle.focus(); return; }
         if (product.price < 0) { showToast("Price cannot be negative.", "warning"); return; }
+        if (!Number.isFinite(product.stockQuantity) || product.stockQuantity < 0) { showToast("Stock quantity is required (0 or more).", "warning"); DOM.prodStock.focus(); return; }
         STATE.busy = true;
         try {
             await saveProduct(product);
@@ -252,6 +262,7 @@
         DOM.prodSold.value = product.sold || '';
         DOM.prodRating.value = product.rating;
         DOM.prodReviews.value = product.reviews;
+        DOM.prodStock.value = (product.stockQuantity === null || product.stockQuantity === undefined) ? '' : product.stockQuantity;
         DOM.prodInStock.checked = product.inStock;
         DOM.prodShortDesc.value = product.shortDesc || '';
         DOM.prodFullDesc.value = product.fullDesc || '';
@@ -278,6 +289,7 @@
         DOM.productForm.reset();
         DOM.editId.value = "";
         DOM.formTitle.textContent = "Add Product";
+        DOM.prodStock.value = '50';
         DOM.prodBrand.value = '';
         DOM.prodSold.value = '';
         DOM.prodShortDesc.value = '';
@@ -304,9 +316,9 @@
 
     // ─── EXPORT CSV (products) ──────────────────────────────
     function exportProductsCSV() {
-        const headers = ['ID', 'Title', 'Category', 'Price', 'Original Price', 'Rating', 'Reviews', 'In Stock', 'Badge'];
+        const headers = ['ID', 'Title', 'Category', 'Price', 'Original Price', 'Rating', 'Reviews', 'Stock Qty', 'In Stock', 'Badge'];
         const rows = STATE.products.map(p => [
-            p.id, p.title, p.category, p.price, p.originalPrice ?? '', p.rating, p.reviews, p.inStock, p.badge
+            p.id, p.title, p.category, p.price, p.originalPrice ?? '', p.rating, p.reviews, p.stockQuantity ?? '', p.inStock, p.badge
         ]);
         admin.exportCSV(headers, rows, 'grabby_products.csv');
     }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0a0a0a">
-    <title>Add / Edit Product — Grabby Admin</title>
+    <title>Drafted Products — Grabby Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -71,11 +71,11 @@
                     <span class="nav-icon">▦</span>
                     <span>Products</span>
                 </a>
-                <a href="product-form.html" data-section="add" class="active">
+                <a href="product-form.html" data-section="add">
                     <span class="nav-icon">＋</span>
                     <span>Add Product</span>
                 </a>
-                <a href="drafted-products.html" data-section="drafts">
+                <a href="drafted-products.html" data-section="drafts" class="active">
                     <span class="nav-icon">✎</span>
                     <span>Drafted Products</span>
                 </a>
@@ -119,7 +119,7 @@
                     <button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button>
                     <div>
                         <span class="eyebrow">GRABBY TECH ADMIN</span>
-                        <h1 id="pageTitle">Add Product</h1>
+                        <h1 id="pageTitle">Drafted Products</h1>
                     </div>
                 </div>
                 <div class="header-right">
@@ -133,60 +133,22 @@
 
             <div class="admin-content">
 
-                <!-- ADD / EDIT PRODUCT -->
-                <section class="panel" id="addSection">
-                    <div class="panel-header">
-                        <div>
-                            <span class="eyebrow">CATALOG</span>
-                            <h2 id="formTitle">Add Product</h2>
-                        </div>
-                        <button type="button" class="button button-ghost" id="cancelEdit">Reset</button>
-                        <button type="button" class="button button-primary" id="topSaveBtn">Save Changes</button>
+                <!-- DRAFTED PRODUCTS LIST -->
+                <section class="panel" id="draftsSection">
+                    <div class="panel-header panel-header-stack-mobile">
+                        <div><span class="eyebrow">CATALOG</span><h2>Drafted Products</h2></div>
+                        <a class="button button-primary" href="product-form.html" style="margin-left:auto;">➕ Add New Product</a>
                     </div>
-                    <form class="product-form" id="productForm" novalidate>
-                        <input type="hidden" id="editId">
-                        <label class="field field-wide"><span>Product Title *</span><input type="text" id="prodTitle" placeholder="Enter product title" required></label>
-                        <div class="field field-wide"><span>Media Gallery (Images & YouTube)</span><div id="imageGalleryContainer"><div class="image-gallery-inputs" id="imageInputsWrapper"></div><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button type="button" class="button button-secondary" id="addImageBtn">➕ Add Image</button><button type="button" class="button button-secondary" id="addMediaBtn">➕ Add Media (Image/YouTube)</button></div></div><div id="imageGalleryPreview" class="image-gallery-preview"></div></div>
-                        <label class="field"><span>Category</span><select id="prodCategory"><option value="audio">Audio</option><option value="electronics">Electronics</option><option value="gaming">Gaming</option><option value="wearables">Wearables</option><option value="accessories">Accessories</option><option value="camera">Camera</option><option value="lifestyle">Lifestyle</option></select></label>
-                        <label class="field"><span>Brand</span><input type="text" id="prodBrand" placeholder="e.g. Apple, Samsung"></label>
-                        <label class="field"><span>Price (৳) *</span><input type="number" id="prodPrice" min="0" step="1" placeholder="0" required></label>
-                        <label class="field"><span>Compare Price (Original)</span><input type="number" id="prodOriginal" min="0" step="1" placeholder="Optional"></label>
-                        <label class="field"><span>Badge</span><input type="text" id="prodBadge" placeholder="Sale, New, Hot..."></label>
-                        <label class="field"><span>Sold Count</span><input type="text" id="prodSold" placeholder="e.g. 1.2K, 10K+, Popular"></label>
-                        <label class="field"><span>Rating</span><input type="number" id="prodRating" min="0" max="5" step="0.1" placeholder="0"></label>
-                        <label class="field"><span>Reviews</span><input type="number" id="prodReviews" min="0" step="1" placeholder="0"></label>
-                        <label class="field"><span>Stock Quantity *</span><input type="number" id="prodStock" min="0" step="1" placeholder="e.g. 50" required></label>
-                        <label class="checkbox-field"><input type="checkbox" id="prodInStock" checked><span>Product is in stock</span></label>
-                        <label class="field field-wide"><span>Short Description</span><textarea id="prodShortDesc" rows="2" placeholder="Brief summary"></textarea></label>
-                        <label class="field field-wide"><span>Full Description</span><textarea id="prodFullDesc" rows="6" placeholder="Supports paragraphs, line breaks, bullets (- or *), emojis"></textarea><div class="desc-preview" id="descPreview" style="display:none;"></div><button type="button" class="mini-button" id="toggleDescPreview" style="margin-top:4px;">Preview</button></label>
-                        <div class="field field-wide"><span>Specifications</span><div id="specsContainer"><div class="spec-group"><input type="text" class="spec-key" placeholder="Key"><input type="text" class="spec-value" placeholder="Value"><button type="button" class="mini-button remove-spec" style="background:var(--danger); color:#fff;">✕</button></div></div><button type="button" class="mini-button" id="addSpecBtn">➕ Add Spec</button></div>
-                        <div class="field field-wide"><span>Product Sections</span><div id="sectionsContainer"></div><button type="button" class="button button-secondary" id="addSectionBtn" style="margin-top:10px;">➕ Add Custom Section</button></div>
-                        <div class="field field-wide"><span>Related Products</span><select id="relatedProductsSelect" multiple style="height:100px; width:100%;"></select><small>Hold Ctrl/Cmd to select multiple</small></div>
-                        <div class="form-actions field-wide"><button type="submit" class="button button-primary">Save Product</button><button type="button" class="button button-secondary" id="formResetButton">Clear</button></div>
-                    </form>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                            <tbody id="draftProductsTable"><tr><td colspan="5" class="empty-state">Loading drafts...</td></tr></tbody>
+                        </table>
+                    </div>
                 </section>
 
             </div>
         </main>
-    </div>
-
-    <!-- CONFIRM MODAL -->
-    <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true">
-        <div class="modal-card">
-            <span class="eyebrow">CONFIRM ACTION</span>
-            <h2 id="confirmTitle">Delete Product?</h2>
-            <p>This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="button button-danger" id="confirmYes">Delete</button>
-                <button class="button button-secondary" id="confirmNo">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- IMAGE LIGHTBOX -->
-    <div class="lightbox" id="imageLightbox" role="dialog" aria-modal="true">
-        <button class="lightbox-close" id="lightboxClose" aria-label="Close preview">×</button>
-        <img id="lightboxImg" alt="Full image preview">
     </div>
 
     <!-- AI CHAT -->
@@ -220,6 +182,6 @@
     <script src="js/admin-dashboard.js"></script>
     <script src="js/admin-settings.js"></script>
     <script src="js/admin-main.js"></script>
-    <script src="js/page-product-form.js"></script>
+    <script src="js/page-drafted-products.js"></script>
 </body>
 </html>

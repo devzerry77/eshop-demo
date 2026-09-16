@@ -86,11 +86,11 @@
             "savePaymentBtn", "cancelPaymentBtn",
             "productForm", "editId", "prodTitle", "prodCategory",
             "prodBrand", "prodPrice", "prodOriginal", "prodBadge", "prodSold",
-            "prodRating", "prodReviews", "prodInStock", "prodShortDesc", "prodFullDesc",
+            "prodRating", "prodReviews", "prodStock", "prodInStock", "prodShortDesc", "prodFullDesc",
             "descPreview", "toggleDescPreview", "specsContainer", "addSpecBtn",
             "sectionsContainer", "addSectionBtn", "imageInputsWrapper", "addImageBtn",
             "addMediaBtn", "imageGalleryPreview", "relatedProductsSelect", "formTitle",
-            "cancelEdit", "formResetButton", "adminProductsTable", "adminSearch",
+            "topSaveBtn", "cancelEdit", "formResetButton", "adminProductsTable", "adminSearch",
             "adminPagination", "activityTableBody", "clearActivityBtn", "confirmOverlay",
             "confirmYes", "confirmNo", "imageLightbox", "lightboxImg", "lightboxClose",
             "aiChatPanel", "aiChatToggle", "aiChatClose", "aiChatClear", "aiChatSend",
@@ -322,6 +322,7 @@
             sold: DOM.prodSold.value,
             rating: DOM.prodRating.value,
             reviews: DOM.prodReviews.value,
+            stock: DOM.prodStock.value,
             inStock: DOM.prodInStock.checked,
             shortDesc: DOM.prodShortDesc.value,
             fullDesc: DOM.prodFullDesc.value
@@ -331,6 +332,11 @@
 
     function clearDraft() {
         try { localStorage.removeItem(DRAFT_KEY); } catch { /* noop */ }
+    }
+
+    // Read-only accessor for the Drafted Products page (same draft system).
+    function getProductDraft() {
+        try { return JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch { return null; }
     }
 
     function restoreDraft() {
@@ -348,6 +354,7 @@
         DOM.prodSold.value = draft.sold || '';
         DOM.prodRating.value = draft.rating || '';
         DOM.prodReviews.value = draft.reviews || '';
+        DOM.prodStock.value = draft.stock || '';
         DOM.prodInStock.checked = draft.inStock !== false;
         DOM.prodShortDesc.value = draft.shortDesc || '';
         DOM.prodFullDesc.value = draft.fullDesc || '';
@@ -488,7 +495,7 @@
         loadTheme, toggleTheme,
         loadPrefs, savePrefs, applyPrefsAll, applyDarkFromPrefs, setAdminDark,
         updateThemeToggleUI, applyMotionPref, applyCompactPref, setPrefs, syncPrefsFromThemeToggle,
-        saveDraft, clearDraft, restoreDraft, onFormValue, bindAutoSave,
+        saveDraft, clearDraft, getProductDraft, restoreDraft, onFormValue, bindAutoSave,
         initSupabase, showLogin, showAdmin, checkSession, initLogin, logout, resetSession,
         openLightbox, closeLightbox,
         exportCSV

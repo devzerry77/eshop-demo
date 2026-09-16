@@ -1,5 +1,5 @@
 // ─── CHECKOUT PAGE ──────────────────────────────────────
-import { formatPrice, escapeHtml } from '../core/utils.js';
+import { formatPrice, escapeHtml, parseStockQty, resolveStock, canFulfill } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { createClient } from '../supabase/client.js';
 import { showToast } from '../components/toast.js';
@@ -77,14 +77,15 @@ async function loadProducts() {
                     image: row.image || images[0],
                     images: images,
                     badge: row.badge || '',
-                    inStock: row.in_stock !== false,
+                    inStock: resolveStock(row).inStock,
                     specs: row.specs || {},
                     shortDesc: details.shortDesc || '',
                     fullDesc: details.fullDesc || '',
                     sections: details.sections || [],
                     related: details.related || [],
-                    stock: row.stock_quantity || 0,
-                    stock_quantity: row.stock_quantity || 0
+                    stockQty: parseStockQty(row),
+                    stock: parseStockQty(row),
+                    stock_quantity: parseStockQty(row)
                 };
             });
             localStorage.setItem('grabby_products', JSON.stringify(productsData));
@@ -597,8 +598,9 @@ async function placeOrder() {
     if (supabase) {
         for (let item of orderItems) {
             const p = productsData.find(prod => String(prod.id) === String(item.product_id));
-            if (p && p.stock !== undefined && p.stock < item.quantity) {
-                showToastMsg(`Insufficient stock for ${p.title}. Available: ${p.stock}`, 'error');
+            if (p && !canFulfill(p, item.quantity)) {
+                const avail = (p.stockQty === null || p.stockQty === undefined) ? 0 : p.stockQty;
+                showToastMsg(`Insufficient stock for ${p.title}. Available: ${avail}`, 'error');
                 return;
             }
         }
@@ -676,12 +678,26 @@ async function placeOrder() {
         );
         if (itemsError) throw itemsError;
 
+        // Best-effort stock decrement: never fail an already-placed order
+        // when the RPC is missing, and skip rows with unknown stock so the
+        // migration backfill is the only thing that sets quantities.
         for (let item of orderItems) {
-            await withTimeout(
-                supabase.rpc('decrement_stock', { product_id: item.product_id, quantity: item.quantity }),
-                8000, 'Updating stock'
-            );
+            try {
+                const p = productsData.find(prod => String(prod.id) === String(item.product_id));
+                if (p && (p.stockQty === null || p.stockQty === undefined)) continue;
+                await withTimeout(
+                    supabase.rpc('decrement_stock', { product_id: item.product_id, quantity: item.quantity }),
+                    8000, 'Updating stock'
+                );
+                if (p && p.stockQty !== null && p.stockQty !== undefined) {
+                    p.stockQty = Math.max(0, p.stockQty - item.quantity);
+                    p.stock = p.stockQty;
+                    p.stock_quantity = p.stockQty;
+                    if (p.stockQty <= 0) p.inStock = false;
+                }
+            } catch (e) { console.warn('Stock decrement failed for', item.product_id, e); }
         }
+        try { localStorage.setItem('grabby_products', JSON.stringify(productsData)); } catch (_) { /* noop */ }
 
         if (couponCode) {
             await supabase.rpc('increment_coupon_used', { code: couponCode }).catch(() => {});

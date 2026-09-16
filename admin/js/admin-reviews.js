@@ -186,6 +186,14 @@
             showToast("Select a product first.", "warning");
             return;
         }
+        // Mobile: a leftover sidebar backdrop (z-index 90) or open chat panel
+        // sits above the form and swallows the Save tap. Dismiss both using
+        // the exact same form logic — no separate mobile flow.
+        try {
+            document.getElementById("adminSidebar")?.classList.remove("active");
+            document.getElementById("sidebarBackdrop")?.classList.remove("active");
+            document.getElementById("aiChatPanel")?.classList.remove("active");
+        } catch { /* noop */ }
         DOM.reviewFormArea.style.display = "block";
         DOM.reviewFormTitle.textContent = review ? "Edit Review" : "Add Custom Review";
         DOM.reviewRating.innerHTML = buildRatingSelect(review ? review.rating : 5);
@@ -197,7 +205,13 @@
         DOM.reviewPublished.checked = review ? review.is_published : true;
         uploadedImages = review ? [...(review.images || [])] : [];
         renderImagePreviews();
-        DOM.reviewFormArea.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Keep the sticky mobile header from covering the form title.
+        try {
+            DOM.reviewFormArea.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (window.innerWidth <= 768) window.setTimeout(() => window.scrollBy({ top: -70, behavior: "smooth" }), 350);
+        } catch {
+            DOM.reviewFormArea.scrollIntoView();
+        }
     }
 
     function hideForm() {
@@ -270,6 +284,13 @@
     }
 
     async function saveReview() {
+        // Mobile keyboard is still open when Save is tapped; dismiss it now
+        // (click already fired) so toasts/errors are visible. Same payload.
+        try {
+            if (window.innerWidth <= 768 && document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+        } catch { /* noop */ }
         let payload;
         try {
             payload = collectPayload();

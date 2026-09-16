@@ -20,10 +20,18 @@
             const del = e.target.closest("[data-delete]");
             if (edit) {
                 window.location.href = `product-form.html?id=${encodeURIComponent(edit.dataset.edit)}`;
+                return;
             }
             if (del) {
                 STATE.deleteId = del.dataset.delete;
                 DOM.confirmOverlay.classList.add("active");
+                return;
+            }
+            // Clicking anywhere else on a product row opens the existing
+            // Edit Product page with that product's data loaded.
+            const row = e.target.closest("tr[data-product-id]");
+            if (row) {
+                window.location.href = `product-form.html?id=${encodeURIComponent(row.dataset.productId)}`;
             }
         });
 

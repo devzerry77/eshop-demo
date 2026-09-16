@@ -1,6 +1,6 @@
 // ─── HOME PAGE ──────────────────────────────────────────
 import { CACHE_KEY, CACHE_EXPIRY, STORAGE_KEYS } from '../core/config.js';
-import { formatPrice, renderStars, escapeHtml } from '../core/utils.js';
+import { formatPrice, renderStars, escapeHtml, canFulfill } from '../core/utils.js';
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { loadMarquee } from './marquee.js';
 import { initFlashSale } from './flash-sale.js';
@@ -371,6 +371,10 @@ function addToCart(id) {
     const p = getProduct(id);
     if (!p || !p.inStock) return;
     const existing = getCartItem(id);
+    if (!canFulfill(p, (existing ? existing.quantity : 0) + 1)) {
+        showToast(`Only ${p.stockQty} available in stock`);
+        return;
+    }
     if (existing) existing.quantity += 1;
     else cart.push({ id, quantity: 1 });
     trackCartAdd();
