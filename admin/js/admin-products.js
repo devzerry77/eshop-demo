@@ -43,6 +43,12 @@
             title: row.title || "Untitled",
             category: row.category || "uncategorized",
             brand: details.brand || '',
+            sku: row.sku || ('ESH-' + String(row.id).padStart(6, '0')),
+            lowStockThreshold: row.low_stock_threshold ?? 5,
+            isFeatured: !!row.is_featured,
+            isFlash: !!row.is_flash,
+            seoTitle: row.seo_title || '',
+            seoDescription: row.seo_description || '',
             price: Number(row.price) || 0,
             originalPrice: row.original_price === null ? null : Number(row.original_price) || null,
             rating: Number(row.rating) || 0,
@@ -99,6 +105,7 @@
             related: product.related || []
         };
         const qty = Number.isFinite(Number(product.stockQuantity)) ? Math.max(0, Math.floor(Number(product.stockQuantity))) : 0;
+        // Premium v1 columns are optional — legacy DBs without the migration ignore unknown keys via try/catch in saveProduct.
         return {
             title: product.title,
             category: product.category,
@@ -113,19 +120,30 @@
             stock_quantity: qty,
             in_stock: product.inStock && qty > 0,
             specs: product.specs || {},
-            details: details
+            details: details,
+            sku: (product.sku || '').trim() || null,
+            low_stock_threshold: Number.isFinite(Number(product.lowStockThreshold)) ? Math.max(0, Number(product.lowStockThreshold)) : 5,
+            is_featured: !!product.isFeatured,
+            is_flash: !!product.isFlash,
+            seo_title: product.seoTitle || null,
+            seo_description: product.seoDescription || null
         };
     }
 
+    const PREMIUM_KEYS = ['sku', 'low_stock_threshold', 'is_featured', 'is_flash', 'seo_title', 'seo_description'];
     async function saveProduct(product) {
         const isNew = !product.id;
-        const payload = productPayload(product);
+        let payload = productPayload(product);
+        const stripPremium = () => { PREMIUM_KEYS.forEach(k => delete payload[k]); };
+        const isMissingColumn = e => e && (e.code === '42703' || /column .* does not exist|Could not find the .* column/i.test(e.message || ''));
         if (isNew) {
-            const { data, error } = await STATE.supabase.from("products").insert(payload).select().single();
+            let { data, error } = await STATE.supabase.from("products").insert(payload).select().single();
+            if (error && isMissingColumn(error)) { stripPremium(); ({ data, error } = await STATE.supabase.from("products").insert(payload).select().single()); }
             if (error) throw error;
             STATE.products.unshift(normalizeProduct(data));
         } else {
-            const { error } = await STATE.supabase.from("products").update(payload).eq("id", product.id);
+            let { error } = await STATE.supabase.from("products").update(payload).eq("id", product.id);
+            if (error && isMissingColumn(error)) { stripPremium(); ({ error } = await STATE.supabase.from("products").update(payload).eq("id", product.id)); }
             if (error) throw error;
             const index = STATE.products.findIndex(item => String(item.id) === String(product.id));
             if (index !== -1) STATE.products[index] = product;
@@ -208,6 +226,12 @@
             title: DOM.prodTitle.value.trim(),
             category: DOM.prodCategory.value,
             brand: DOM.prodBrand.value.trim(),
+            sku: document.getElementById('prodSku')?.value.trim() || '',
+            lowStockThreshold: Number(document.getElementById('prodLowStock')?.value) || 5,
+            isFeatured: !!document.getElementById('prodFeatured')?.checked,
+            isFlash: !!document.getElementById('prodFlash')?.checked,
+            seoTitle: document.getElementById('prodSeoTitle')?.value.trim() || '',
+            seoDescription: document.getElementById('prodSeoDesc')?.value.trim() || '',
             price: Number(DOM.prodPrice.value) || 0,
             originalPrice: DOM.prodOriginal.value ? Number(DOM.prodOriginal.value) : null,
             rating: Math.max(0, Math.min(5, Number(DOM.prodRating.value) || 0)),
@@ -264,6 +288,13 @@
         DOM.prodReviews.value = product.reviews;
         DOM.prodStock.value = (product.stockQuantity === null || product.stockQuantity === undefined) ? '' : product.stockQuantity;
         DOM.prodInStock.checked = product.inStock;
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el) (el.type === 'checkbox' ? el.checked = !!v : el.value = v ?? ''); };
+        setVal('prodSku', product.sku || '');
+        setVal('prodLowStock', product.lowStockThreshold ?? 5);
+        setVal('prodFeatured', product.isFeatured);
+        setVal('prodFlash', product.isFlash);
+        setVal('prodSeoTitle', product.seoTitle || '');
+        setVal('prodSeoDesc', product.seoDescription || '');
         DOM.prodShortDesc.value = product.shortDesc || '';
         DOM.prodFullDesc.value = product.fullDesc || '';
         admin.setSpecs(product.specs || {});

@@ -93,7 +93,7 @@
             // Payments (new)
             "paymentSection", "paymentMethodsAdmin", "addPaymentBtn", "paymentFormArea",
             "pmId", "pmFormTitle", "pmName", "pmType", "pmNumber", "pmMerchant", "pmEmail",
-            "pmAccount", "pmInstructions", "pmQr", "pmFee", "pmOrder", "pmEnabled", "pmStatus",
+            "pmAccount", "pmInstructions", "pmQr", "pmLogo", "pmFee", "pmOrder", "pmEnabled", "pmStatus",
             "savePaymentBtn", "cancelPaymentBtn",
             "productForm", "editId", "prodTitle", "prodCategory",
             "prodBrand", "prodPrice", "prodOriginal", "prodBadge", "prodSold",
@@ -140,7 +140,15 @@
             "siteName", "siteTagline", "siteFooterNote", "saveStoreBtn", "storeStatus",
             "catList", "catLabel", "addCatBtn", "catsStatus",
             "imgbbKey", "saveImgbbBtn", "imgbbStatus",
-            "adminList", "adminEmail", "addAdminBtn", "adminsStatus"
+            "adminList", "adminEmail", "addAdminBtn", "adminsStatus",
+            // 100% dynamic storefront (new)
+            "shipFreeAbove", "shipCost", "currencyCode", "currencySymbol",
+            "saveShipBtn", "shipStatus",
+            "brandLogoUrl", "saveBrandBtn", "brandStatus",
+            "footerLinksJson", "saveFooterLinksBtn", "footerLinksStatus",
+            "aboutEyebrow", "aboutNotice", "aboutSectionsJson", "aboutValuesJson",
+            "saveAboutBtn", "aboutStatus",
+            "chatIntro", "chatOptionsJson", "saveChatBtn", "chatStatus"
         ].forEach(id => DOM[id] = $(id));
     }
 
@@ -151,7 +159,9 @@
     }
 
     function formatPrice(value) {
-        return "৳ " + Math.round(Number(value) || 0).toLocaleString("bn-BD");
+        let symbol = "৳";
+        try { symbol = localStorage.getItem("eshop_currency_symbol") || symbol; } catch (_) { /* noop */ }
+        return symbol + " " + Math.round(Number(value) || 0).toLocaleString("bn-BD");
     }
 
     function debounce(callback, delay = 300) {
@@ -399,6 +409,13 @@
 
     // ─── AUTH ──────────────────────────────────────────────
     function initSupabase() {
+        // Demo mode (Supabase frozen): use the localStorage emulator.
+        try {
+            if (window.LocalBackend && window.LocalBackend.useLocal()) {
+                STATE.supabase = window.LocalBackend.createClient();
+                return true;
+            }
+        } catch (_) { /* fall through to Supabase */ }
         if (!window.supabase || !window.supabase.createClient) return false;
         STATE.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         return true;

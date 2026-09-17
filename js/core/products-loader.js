@@ -13,11 +13,14 @@ function normalizeProductRow(row) {
     } else if (row.image) { images = [row.image]; }
     if (!images.length) images = ['https://picsum.photos/seed/default/400/400'];
     const details = row.details || {};
+    const createdAt = row.created_at ? new Date(row.created_at).getTime() : 0;
     return {
         id: row.id,
         title: row.title,
         category: row.category,
-        brand: details.brand || '',
+        brand: details.brand || row.brand_name || '',
+        brandId: row.brand_id || null,
+        sku: row.sku || ('ESH-' + String(row.id).padStart(6, '0')),
         price: parseFloat(row.price) || 0,
         originalPrice: row.original_price ? parseFloat(row.original_price) : null,
         rating: parseFloat(row.rating) || 0,
@@ -29,6 +32,10 @@ function normalizeProductRow(row) {
         badge: row.badge || '',
         stockQty: parseStockQty(row),
         inStock: resolveStock(row).inStock,
+        lowStockThreshold: row.low_stock_threshold ?? 5,
+        isFeatured: !!row.is_featured,
+        isFlash: !!row.is_flash,
+        isNew: createdAt > Date.now() - 30 * 24 * 3600 * 1000,
         specs: row.specs || {},
         shortDesc: details.shortDesc || '',
         fullDesc: details.fullDesc || '',

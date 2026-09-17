@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Marketing & SEO — E-Shop Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="../css/premium.css"></head>
+<body>
+<section class="login-overlay" id="loginOverlay"><div class="login-card glass-card">
+<div class="brand brand-login"><img class="brand-logo" src="../assets/logo.svg" alt=""><span>E-Shop Admin</span></div>
+<form id="loginForm" novalidate><label class="field"><span>Email</span><input type="email" id="loginEmail" required></label>
+<label class="field"><span>Password</span><input type="password" id="loginPassword" required></label>
+<p class="form-error" id="loginError"></p><p class="rate-limit" id="loginRateLimit">Too many attempts.</p>
+<button class="button button-primary button-full" id="loginBtn"><span class="button-label">Sign in</span><span class="button-loader"></span></button></form></div></section>
+<div class="admin-layout" id="adminLayout"><div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<aside class="admin-sidebar" id="adminSidebar"><div class="sidebar-top"><button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button><div class="brand"><img class="brand-logo" src="../assets/logo.svg" alt=""><span>E-Shop Demo</span></div><span class="admin-label">ADMIN</span></div>
+<nav class="admin-nav"><a href="dashboard.html">⌂ Dashboard</a><a href="products.html">▦ Products</a><a href="orders.html">☰ Orders</a><a href="coupons.html">◈ Coupons</a><a href="inventory.html">⬢ Inventory</a><a href="customers.html">◉ Customers</a><a href="roles.html">⬣ Staff & Roles</a><a href="logs.html">◷ Activity Logs</a><a href="marketing.html" class="active">✦ Marketing & SEO</a><a href="payments.html">◎ Payments</a><a href="settings.html">⚙ Settings</a></nav>
+<div class="sidebar-bottom"><button class="sidebar-action" id="logoutBtn">↪ Sign out</button></div></aside>
+<main class="admin-main"><header class="admin-header"><div class="header-left"><button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button><div><span class="eyebrow">GROWTH</span><h1>Marketing & SEO</h1></div></div>
+<div class="header-right"><button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode"><span class="theme-icon">🌙</span><span class="theme-label">Dark</span></button><button class="button button-primary" id="saveMarketing">Save all</button></div></header>
+<div class="admin-content">
+<div class="p-chart-card"><b>🔍 SEO</b><p style="font-size:.85rem;color:var(--text-secondary)">Controls <code>seo_title</code>, meta description/keywords, Open Graph tags on the storefront. Sitemap at <code>/sitemap.xml</code>, robots at <code>/robots.txt</code>.</p>
+<div style="display:grid;gap:10px;margin-top:.6rem">
+<label>SEO title <input id="mSeoTitle" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+<label>Meta description <textarea id="mSeoDesc" rows="2" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></textarea></label>
+<label>Meta keywords <input id="mSeoKw" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+</div></div>
+<div class="p-chart-card"><b>📣 Announcement & newsletter</b>
+<div style="display:grid;gap:10px;margin-top:.6rem">
+<label>Announcement bar <input id="mAnnounce" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+<label>Newsletter title <input id="mNewsTitle" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+<label>Newsletter subtitle <input id="mNewsSub" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+</div></div>
+<div class="p-chart-card"><b>🚚 Courier-ready shipping</b><p style="font-size:.85rem;color:var(--text-secondary)">Zones live in <code>shipping_zones</code> (run premium-v1.sql). Orders carry <code>courier_name</code> + <code>tracking_number</code>. When you sign a Pathao / Steadfast / RedX contract, add the API call in <code>js/core/shipping.js</code> — UI fields are already wired.</p>
+<div class="p-table-wrap" style="margin-top:.6rem"><table class="p-table"><thead><tr><th>Zone</th><th>Fee</th><th>Free above</th><th>ETA</th><th>Courier</th></tr></thead><tbody id="zoneRows"><tr><td colspan="5">Loading…</td></tr></tbody></table></div></div>
+<div class="p-chart-card"><b>💳 Future payment gateways</b><p style="font-size:.85rem;color:var(--text-secondary)">bKash / Nagad / Rocket / COD stay manual-verify (account number + instructions + trxID). For official gateway integration (e.g. SSLCommerz, ShurjoPay, Stripe), implement the create-session call server-side (Supabase Edge Function) and store only the public key in <code>payment_settings</code> — never the secret. See <code>docs/PAYMENTS-COURIER.md</code>.</p></div>
+</div></main></div>
+<div id="toastContainer" class="toast-container"></div>
+<script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/admin-core.js"></script><script src="js/admin-main.js"></script><script src="js/page-marketing.js"></script>
+</body></html>

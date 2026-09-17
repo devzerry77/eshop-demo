@@ -1,8 +1,67 @@
-// ─── ABOUT PAGE ───────────────────────────────────────
+// ─── ABOUT PAGE (content 100% admin-editable) ────────────
+// Static HTML in about.html is the fallback. When
+// `settings.about_content` exists it replaces eyebrow, notice, info
+// sections and value cards (Admin → Settings → About Page).
 import { loadTheme, toggleTheme, loadSitePalette } from '../core/theme.js';
 import { formatPrice, escapeHtml } from '../core/utils.js';
 import { getCart, getCartCount } from '../core/storage.js';
 import { ensureProducts } from '../core/products-loader.js';
+import { createClient } from '../supabase/client.js';
+
+async function loadAboutContent() {
+    // 1. Instant paint from cache.
+    try {
+        const raw = localStorage.getItem('eshop_about_content') || '';
+        if (raw) applyAboutContent(JSON.parse(raw));
+    } catch (_) { /* keep static fallback */ }
+    // 2. Refresh from Supabase.
+    try {
+        const supabase = createClient();
+        if (!supabase) return;
+        const { data, error } = await supabase.from('settings')
+            .select('value').eq('key', 'about_content').maybeSingle();
+        if (error || !data || !data.value) return;
+        try { localStorage.setItem('eshop_about_content', data.value); } catch (_) { /* noop */ }
+        applyAboutContent(JSON.parse(data.value));
+    } catch (_) { /* keep fallback */ }
+}
+
+function applyAboutContent(content) {
+    if (!content || typeof content !== 'object') return;
+    if (content.eyebrow) {
+        const el = document.getElementById('aboutEyebrow');
+        if (el) el.textContent = String(content.eyebrow);
+    }
+    if (content.notice) {
+        const el = document.getElementById('aboutNotice');
+        if (el) el.textContent = String(content.notice);
+    }
+    if (Array.isArray(content.sections) && content.sections.length) {
+        const wrap = document.getElementById('aboutSections');
+        if (wrap) {
+            wrap.innerHTML = content.sections.map(s =>
+                `<section class="about-section"><h2>${escapeHtml(s.title || '')}</h2>` +
+                `<p>${escapeHtml(s.body || '')}</p></section>`
+            ).join('');
+        }
+    }
+    if (Array.isArray(content.values) && content.values.length) {
+        const grid = document.getElementById('aboutValues');
+        if (grid) {
+            grid.innerHTML = content.values.map(v =>
+                `<div class="about-value"><div class="icon">${escapeHtml(v.icon || '✨')}</div>` +
+                `<h3>${escapeHtml(v.title || '')}</h3><p>${escapeHtml(v.body || '')}</p></div>`
+            ).join('');
+        }
+    }
+}
+
+loadAboutContent();
+window.addEventListener('storage', (e) => {
+    if (e.key === 'eshop_about_content' && e.newValue) {
+        try { applyAboutContent(JSON.parse(e.newValue)); } catch (_) { /* noop */ }
+    }
+});
 
 loadTheme();
 loadSitePalette();

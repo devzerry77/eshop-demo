@@ -96,6 +96,12 @@
                     <span class="nav-icon">◷</span>
                     <span>Cart Activity</span>
                 </a>
+                <a href="coupons.html"><span class="nav-icon">◈</span><span>Coupons</span></a>
+                <a href="inventory.html"><span class="nav-icon">⬢</span><span>Inventory</span></a>
+                <a href="customers.html"><span class="nav-icon">◉</span><span>Customers</span></a>
+                <a href="roles.html"><span class="nav-icon">⬣</span><span>Roles</span></a>
+                <a href="logs.html"><span class="nav-icon">◷</span><span>Logs</span></a>
+                <a href="marketing.html"><span class="nav-icon">✦</span><span>Marketing</span></a>
                 <a href="payments.html" data-section="payments">
                     <span class="nav-icon">◉</span>
                     <span>Payment Settings</span>
@@ -185,6 +191,119 @@
                             <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
                                 <button class="button button-primary" id="saveStoreBtn">💾 Save Store Profile</button>
                                 <span id="storeStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping & Currency (100% dynamic checkout) -->
+                        <div class="setting-card glass-card">
+                            <h3>🚚 Shipping & Currency</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Free-delivery threshold, delivery fee and currency. Applies to checkout totals
+                                instantly (server recomputes via create_order_secure — run dynamic-store.sql).
+                            </p>
+                            <div class="setting-item">
+                                <span>Free delivery above</span>
+                                <input type="number" id="shipFreeAbove" min="0" step="1" value="2000" style="width:120px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item">
+                                <span>Delivery fee</span>
+                                <input type="number" id="shipCost" min="0" step="1" value="100" style="width:120px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item">
+                                <span>Currency code</span>
+                                <input type="text" id="currencyCode" maxlength="6" placeholder="BDT" style="width:120px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="border-bottom:none;">
+                                <span>Currency symbol</span>
+                                <input type="text" id="currencySymbol" maxlength="4" placeholder="৳" style="width:120px; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveShipBtn">💾 Save Shipping & Currency</button>
+                                <span id="shipStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Logo & Branding (100% dynamic) -->
+                        <div class="setting-card glass-card">
+                            <h3>🎨 Logo & Branding</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Logo shown in the header, footer, sidebar and favicon on every public page.
+                                Paste an image URL or upload first via Image Uploads.
+                            </p>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:none; padding-bottom:12px;">
+                                <label for="brandLogoUrl" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Logo URL</label>
+                                <input type="url" id="brandLogoUrl" placeholder="assets/logo.svg or https://..." style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveBrandBtn">💾 Save Logo</button>
+                                <span id="brandStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Footer Links (100% dynamic) -->
+                        <div class="setting-card glass-card">
+                            <h3>🔗 Footer & Sidebar Links</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                JSON with <code>policies</code>, <code>about</code> and <code>connect</code> link lists.
+                                Connect links also render in the sidebar CONNECT section.
+                                Example: {"policies":[{"label":"Privacy Policy","url":"#"}],...}
+                            </p>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:none; padding-bottom:12px;">
+                                <label for="footerLinksJson" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Footer links JSON</label>
+                                <textarea id="footerLinksJson" rows="6" spellcheck="false" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-family:monospace; font-size:0.75rem;"></textarea>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveFooterLinksBtn">💾 Save Links</button>
+                                <span id="footerLinksStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- About Page (100% dynamic) -->
+                        <div class="setting-card glass-card">
+                            <h3>📄 About Page</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Eyebrow, notice, info sections and value cards on about.html.
+                                Sections/values are JSON arrays.
+                            </p>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="aboutEyebrow" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Eyebrow</label>
+                                <input type="text" id="aboutEyebrow" maxlength="80" placeholder="About this demo" style="padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);">
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="aboutNotice" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Hero notice</label>
+                                <textarea id="aboutNotice" rows="2" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);"></textarea>
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="aboutSectionsJson" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Sections JSON [{"title":"...","body":"..."}]</label>
+                                <textarea id="aboutSectionsJson" rows="4" spellcheck="false" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-family:monospace; font-size:0.75rem;"></textarea>
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:none; padding-bottom:12px;">
+                                <label for="aboutValuesJson" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Value cards JSON [{"icon":"🛍️","title":"...","body":"..."}]</label>
+                                <textarea id="aboutValuesJson" rows="4" spellcheck="false" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-family:monospace; font-size:0.75rem;"></textarea>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveAboutBtn">💾 Save About Page</button>
+                                <span id="aboutStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
+                            </div>
+                        </div>
+
+                        <!-- Chatbot (100% dynamic) -->
+                        <div class="setting-card glass-card">
+                            <h3>🤖 Chatbot Messages</h3>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                                Welcome messages (one per line) and help options as JSON.
+                            </p>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+                                <label for="chatIntro" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Welcome messages (one per line)</label>
+                                <textarea id="chatIntro" rows="3" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text);"></textarea>
+                            </div>
+                            <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:6px; border-bottom:none; padding-bottom:12px;">
+                                <label for="chatOptionsJson" style="font-weight:500; font-size:0.85rem; color:var(--text-secondary);">Help options JSON [{"key":"...","label":"...","reply":"..."}]</label>
+                                <textarea id="chatOptionsJson" rows="5" spellcheck="false" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); font-family:monospace; font-size:0.75rem;"></textarea>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                                <button class="button button-primary" id="saveChatBtn">💾 Save Chatbot</button>
+                                <span id="chatStatus" style="font-size:0.8rem; color:var(--text-secondary); align-self:center;"></span>
                             </div>
                         </div>
 
@@ -651,6 +770,7 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>

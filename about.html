@@ -43,6 +43,7 @@
     <link rel="stylesheet" href="css/components.css" media="all" />
     <link rel="stylesheet" href="css/pages.css" media="all" />
     <link rel="stylesheet" href="css/responsive.css" media="all" />
+    <link rel="stylesheet" href="css/premium.css" media="all" />
     <link rel="stylesheet" href="css/demo-contact.css" />
     <noscript>
         <link rel="stylesheet" href="css/layout.css" />
@@ -88,25 +89,27 @@
         <div class="about-container">
             <a href="index.html" class="back-btn"><img class="back-btn-arrow" src="assets/logos/back-arrow.svg" alt=""> Back to Shop</a>
 
-            <!-- HERO -->
+            <!-- HERO (eyebrow / notice are admin-editable via Settings → About Page) -->
             <div class="about-hero">
-                <div class="eyebrow">About this demo</div>
+                <div class="eyebrow" id="aboutEyebrow">About this demo</div>
                 <h1 data-site-name>E-Shop Demo</h1>
                 <p data-site-tagline>Quality demo products for everyday life.</p>
-                <p style="margin-top:0.75rem; font-size:0.85rem; opacity:0.8;">This is a generic portfolio demo store — not a real business. Products, prices and reviews are sample data you can fully manage from the admin panel.</p>
+                <p id="aboutNotice" style="margin-top:0.75rem; font-size:0.85rem; opacity:0.8;">This is a generic portfolio demo store — not a real business. Products, prices and reviews are sample data you can fully manage from the admin panel.</p>
             </div>
 
-            <!-- WHO WE ARE -->
+            <!-- DYNAMIC SECTIONS (admin-editable, rendered by js/pages/about.js) -->
+            <div id="aboutSections">
             <section class="about-section">
                 <h2>What Is This?</h2>
                 <p>E-Shop Demo is a portfolio project showing a complete e-commerce front-end built with vanilla HTML, CSS and JavaScript, backed by Supabase for products, orders, coupons and site settings.</p>
                 <p>Everything on this site is editable without touching code: products, categories, prices, stock, banners, coupons, payment instructions and theme colors are all managed from the admin panel.</p>
             </section>
+            </div>
 
             <!-- VALUES -->
-            <section class="about-section">
-                <h2>What You Can Try</h2>
-                <div class="about-values">
+            <section class="about-section" id="aboutValuesSection">
+                <h2 id="aboutValuesTitle">What You Can Try</h2>
+                <div class="about-values" id="aboutValues">
                     <div class="about-value">
                         <div class="icon">🛍️</div>
                         <h3>Browse &amp; Search</h3>
@@ -188,6 +191,7 @@
     <script type="module" src="js/components/account-link.js"></script>
     <script type="module" src="js/pages/about.js"></script>
     <script src="js/supabase/supabase-config.js"></script>
+    <script src="js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module" src="js/components/site-init.js"></script>
     <script type="module" src="js/components/demo-contact.js"></script>

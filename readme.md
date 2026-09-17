@@ -1,14 +1,40 @@
-# E-Shop Demo
+# E-Shop Demo — Premium Full-Stack E-Commerce Platform
 
-A generic demo e-commerce portfolio project built with vanilla HTML, CSS, and JavaScript, backed by Supabase for database and authentication.
+A generic demo e-commerce portfolio project built with vanilla HTML, CSS, and JavaScript.
 
 It is **not a real store**: products, prices, reviews and orders are sample data. Everything on the site is manageable from the admin panel without editing code.
 
-## Supabase Setup
+## Demo Mode (default — no backend needed)
+
+Supabase is **frozen**: the whole demo runs 100% on `localStorage` via `js/supabase/local-backend.js`, a Supabase-compatible emulator (same `from/rpc/auth` API, same tables, same RPC rules). Just serve the folder — no database, no keys, no network calls to Supabase:
+
+```bash
+npx serve .
+```
+
+Demo accounts (sign in on `login.html`, checkout, or the admin panel):
+
+| Role | Email | Password |
+|---|---|---|
+| Admin (admin panel) | `admin@eshop.demo` | `Demo123!` |
+| Shopper | `demo@eshop.demo` | `demo123` |
+
+- New shoppers can **sign up** (stored locally); the **Google button** signs in a demo Google shopper instantly; **forgot password** resets to `demo1234`.
+- Admin product edits, orders, coupons, settings, reviews, inventory and audit logs all persist in the browser.
+- **Reset the demo:** run `LocalBackend.reset()` in the browser console (re-seeds products, users, orders, coupons, settings).
+- **Switch back to live Supabase:** run `localStorage.eshop_backend = 'supabase'` in the console and reload (requires the Supabase setup below + network). Run `localStorage.removeItem('eshop_backend')` to return to demo mode.
+
+> ⚠️ Demo auth is demo-grade (local password hashing, no email delivery) — fine for a portfolio demo, never for production user data.
+
+## Supabase Setup (frozen — only needed if you switch back to live mode)
 
 **Option A — one file (recommended):** open **SQL Editor** and run the whole **`all.sql`** bundle. It contains everything below in dependency order: base schema + RPCs + RLS + seeds, `stock-quantity`, `eshop-demo-setup` (categories, store profile, admin allow-list), `reviews`, `guest-checkout`, the 18-product demo catalog, and sample reviews.
 
-**Option B — existing database:** if your tables already exist (e.g. this project's live DB), run only the standalone migration files you need, in order: `stock-quantity.sql`, `reviews.sql`, `guest-checkout.sql`, `eshop-demo-setup.sql`, optionally `products.sql` + `demo_reviews.sql`. (The base tables themselves live in section 1 of the bundle.)
+**Option B — existing database:** if your tables already exist (e.g. this project's live DB), run only the standalone migration files you need, in order: `stock-quantity.sql`, `reviews.sql`, `guest-checkout.sql`, `eshop-demo-setup.sql`, `dynamic-store.sql`, optionally `products.sql` + `demo_reviews.sql`. (The base tables themselves live in section 1 of the bundle.)
+
+**Premium v1 (new):** after either option, run **`premium-v1.sql`** once. It is additive + idempotent and adds brands, subcategories, SKU, product variants, inventory ledger, shipping zones, staff roles, audit logs, coupon engine v2 columns, SEO/marketing settings, secure RPCs (`validate_coupon`, `adjust_stock`, `set_order_status`, `admin_stats`) and tightened RLS (public read, admin/RPC write). Safe to re-run.
+
+> ✅ **100% dynamic:** every storefront string is now admin-editable — shipping rates, currency, logo, footer/sidebar links, about page, chatbot messages and per-method payment logos. Run `dynamic-store.sql` once on an existing DB (fresh `all.sql` runs already include it).
 
 > ⚠️ Pick **one** option. `products.sql` / `demo_reviews.sql` use plain `INSERT`s, so running them *after* the bundle duplicates seed rows.
 
@@ -35,6 +61,13 @@ Then:
 | Orders + statuses | `orders`, `order_items` | Orders |
 | Messenger + social links | `settings.messenger_link`, `social_*` | Settings |
 | Order mode (login/guest) | `settings.customer_order_mode` | Settings |
+| Shipping threshold + fee | `settings.shipping_free_above`, `shipping_cost` | Settings → Shipping & Currency |
+| Currency code + symbol | `settings.currency_code`, `currency_symbol` | Settings → Shipping & Currency |
+| Logo (header/footer/favicon) | `settings.logo_url` | Settings → Logo & Branding |
+| Footer + sidebar links | `settings.footer_links` (JSON) | Settings → Footer & Sidebar Links |
+| About page content | `settings.about_content` (JSON) | Settings → About Page |
+| Chatbot messages | `settings.chatbot_intro`, `chatbot_options` (JSON) | Settings → Chatbot Messages |
+| Payment logos | `payment_settings.logo_url` | Payment Settings |
 | Image upload key | `settings.imgbb_key` | Settings → Image Uploads |
 | Admin allow-list | `admin_users` | Settings → Admin Access |
 
@@ -79,6 +112,7 @@ eshop-demo/
 │   ├── core/
 │   │   ├── config.js          # Storage keys (+ legacy key migration)
 │   │   ├── site.js            # DB-driven store profile loader
+│   │   ├── store-settings.js  # 100%-dynamic loader: shipping, currency, logo, footer, about, chatbot
 │   │   ├── categories.js      # DB-driven categories loader/render
 │   │   ├── imgbb.js           # Upload-key resolution (no hardcoded secret)
 │   │   ├── utils.js           # formatPrice, stock helpers
@@ -86,7 +120,8 @@ eshop-demo/
 │   │   └── theme.js           # Dark/light toggle + site colors
 │   │
 │   ├── components/
-│   │   ├── site-init.js       # Applies store profile on every page
+│   │   ├── site-init.js       # Applies store profile + logo/footer/shipping cache on every page
+│   │   ├── footer-links.js    # DB-driven footer + sidebar CONNECT links
 │   │   └── …                 # toast, auth-modal, chatbot, footer-social
 │   │
 │   ├── supabase/
@@ -127,7 +162,7 @@ npx serve .
 
 | Layer    | Tool                        |
 |----------|-----------------------------|
-| Database | Supabase (Postgres + Auth)  |
+| Database | localStorage demo DB (Supabase-compatible emulator; live Supabase optional) |
 | Hosting  | Static files only           |
 | UI       | Vanilla HTML/CSS/JS         |
 | Payments | bKash, Nagad, Rocket, COD   |

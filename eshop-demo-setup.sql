@@ -117,8 +117,22 @@ INSERT INTO public.settings (key, value) VALUES
     ('site_tagline', 'Quality demo products for everyday life.'),
     ('footer_note', '© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.'),
     ('customer_order_mode', 'login'),
-    ('marquee_text', '🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Demo gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout')
+    ('marquee_text', '🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Demo gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout'),
+    -- 100% dynamic storefront (see dynamic-store.sql — same seeds, safe to re-run)
+    ('shipping_free_above', '2000'),
+    ('shipping_cost', '100'),
+    ('currency_code', 'BDT'),
+    ('currency_symbol', '৳'),
+    ('logo_url', 'assets/logo.svg'),
+    ('footer_links', '{"policies":[{"label":"Privacy Policy","url":"#"},{"label":"Refund Policy","url":"#"},{"label":"Shipping Policy","url":"#"},{"label":"Terms of Service","url":"#"}],"about":[{"label":"Our Story","url":"about.html"},{"label":"Our Sustainability Approach","url":"about.html"},{"label":"About","url":"about.html"}],"connect":[{"label":"Contact Us","url":"#"},{"label":"Contact Information","url":"#"},{"label":"Email","url":"#"},{"label":"Regulatory Information","url":"#"}]}'),
+    ('about_content', '{"eyebrow":"About this demo","subtitle":"Quality demo products for everyday life.","notice":"This is a generic portfolio demo store — not a real business. Products, prices and reviews are sample data you can fully manage from the admin panel.","sections":[{"title":"What Is This?","body":"E-Shop Demo is a portfolio project showing a complete e-commerce front-end built with vanilla HTML, CSS and JavaScript, backed by Supabase for products, orders, coupons and site settings."},{"title":"Demo Notice","body":"No real orders are fulfilled and no real payments are processed. Sample data (including product images) is for demonstration only."}],"values":[{"icon":"🛍️","title":"Browse & Search","body":"Filter by category, sort, search and open product pages with galleries and reviews."},{"icon":"🧾","title":"Cart & Checkout","body":"Add items to the cart, apply a coupon and place a demo order with bKash, Nagad, Rocket or Cash on Delivery instructions."},{"icon":"📦","title":"Orders & Tracking","body":"Sign in to see your orders, follow their status and track delivery on the tracking page."},{"icon":"⚙️","title":"Admin Panel","body":"Open the admin panel to manage products, stock, orders, coupons, banners and theme — no code changes needed."}]}'),
+    ('chatbot_intro', '["Hi! 👋 Welcome to E-Shop Demo 🛍️ Great to have you here!","Hi, is delivery free on all gadgets? 🙂","Free delivery across Bangladesh above our threshold, plus 7-day easy returns! 🚚 Pick an option below for details 👇"]'),
+    ('chatbot_options', '[{"key":"product","label":"🛍️ Product Information","reply":"You can browse the full catalog to see the latest gadgets and deals. Use the search bar to find a specific product, open it, and check its photos, specifications and price. Need more details? Chat with us on Messenger anytime."},{"key":"order","label":"🚚 Order / Delivery Help","reply":"You can track your order on the My Orders or Order Tracking pages using your order number. We deliver across Bangladesh — free delivery above the free-delivery threshold, and 7-day easy returns."},{"key":"payment","label":"💳 Payment Help","reply":"We accept bKash, Nagad, Rocket, Upay, major cards and Cash on Delivery. Your chosen payment method is shown at checkout with full instructions to complete the payment."},{"key":"return","label":"↩️ Return / Refund","reply":"Every product comes with a 7-day easy return policy. If something is not right, reach out to us on Messenger with your order number and we will arrange a return or refund quickly."}]')
 ON CONFLICT (key) DO NOTHING;
+
+-- ── 2b. PAYMENT LOGO COLUMN (custom logo per method, see dynamic-store.sql) ──
+ALTER TABLE public.payment_settings
+    ADD COLUMN IF NOT EXISTS logo_url text NOT NULL DEFAULT '';
 
 -- ── 3. NEUTRAL ADMIN EMAIL (legacy helper compat) ─────────
 -- The `admin_users` table (section 0) is the primary gate; these helpers

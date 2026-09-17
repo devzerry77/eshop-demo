@@ -112,6 +112,7 @@ DECLARE
     v_count integer := 0; v_total_qty integer := 0;
     v_subtotal numeric := 0; v_shipping numeric := 0;
     v_discount numeric := 0; v_fee numeric := 0; v_total numeric := 0;
+    v_free_above numeric := 2000; v_ship_cost numeric := 100;
     v_order_id public.orders.id%TYPE;
     v_order_number text;
     v_existing_id public.orders.id%TYPE;
@@ -279,8 +280,22 @@ BEGIN
         v_coupon := NULL;
     END IF;
 
-    -- ── Shipping + total from server-side rules (never the browser) ──
-    v_shipping := CASE WHEN v_subtotal >= 2000 THEN 0 ELSE 100 END;
+    -- ── Dynamic shipping from settings (admin-editable, never the browser) ──
+    BEGIN
+        SELECT COALESCE(NULLIF(value, ''), '2000') INTO v_free_above
+        FROM public.settings WHERE key = 'shipping_free_above' LIMIT 1;
+        v_free_above := COALESCE(v_free_above::numeric, 2000);
+    EXCEPTION WHEN OTHERS THEN
+        v_free_above := 2000;
+    END;
+    BEGIN
+        SELECT COALESCE(NULLIF(value, ''), '100') INTO v_ship_cost
+        FROM public.settings WHERE key = 'shipping_cost' LIMIT 1;
+        v_ship_cost := COALESCE(v_ship_cost::numeric, 100);
+    EXCEPTION WHEN OTHERS THEN
+        v_ship_cost := 100;
+    END;
+    v_shipping := CASE WHEN v_subtotal >= v_free_above THEN 0 ELSE v_ship_cost END;
     v_total := GREATEST(round(v_subtotal + v_shipping + v_fee - v_discount, 2), 0);
 
     -- ── Unique order number (retry on the astronomically rare clash) ──

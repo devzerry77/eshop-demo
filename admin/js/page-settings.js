@@ -18,6 +18,7 @@
         admin.loadMessengerSettings();
         admin.loadSocialSettings();
         admin.loadOrderModeSettings();
+        admin.loadDynamicStoreSettings();
         admin.loadStoreSettings();
         admin.loadCategories();
         admin.loadImgbbKey();
@@ -33,6 +34,7 @@
             admin.loadMessengerSettings();
             admin.loadSocialSettings();
             admin.loadOrderModeSettings();
+            admin.loadDynamicStoreSettings();
             admin.loadStoreSettings();
             admin.loadCategories();
             admin.loadImgbbKey();

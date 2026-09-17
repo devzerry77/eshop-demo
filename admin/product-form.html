@@ -157,7 +157,13 @@
                         <label class="field"><span>Rating</span><input type="number" id="prodRating" min="0" max="5" step="0.1" placeholder="0"></label>
                         <label class="field"><span>Reviews</span><input type="number" id="prodReviews" min="0" step="1" placeholder="0"></label>
                         <label class="field"><span>Stock Quantity *</span><input type="number" id="prodStock" min="0" step="1" placeholder="e.g. 50" required></label>
+                        <label class="field"><span>SKU</span><input type="text" id="prodSku" placeholder="Auto: ESH-000001"></label>
+                        <label class="field"><span>Low-stock threshold</span><input type="number" id="prodLowStock" min="0" step="1" placeholder="5"></label>
                         <label class="checkbox-field"><input type="checkbox" id="prodInStock" checked><span>Product is in stock</span></label>
+                        <label class="checkbox-field"><input type="checkbox" id="prodFeatured"><span>⭐ Featured product (homepage rail)</span></label>
+                        <label class="checkbox-field"><input type="checkbox" id="prodFlash"><span>⚡ Flash sale product</span></label>
+                        <label class="field field-wide"><span>SEO title (optional)</span><input type="text" id="prodSeoTitle" placeholder="Defaults to product title"></label>
+                        <label class="field field-wide"><span>SEO description (optional)</span><textarea id="prodSeoDesc" rows="2" placeholder="155 chars for search results"></textarea></label>
                         <label class="field field-wide"><span>Short Description</span><textarea id="prodShortDesc" rows="2" placeholder="Brief summary"></textarea></label>
                         <label class="field field-wide"><span>Full Description</span><textarea id="prodFullDesc" rows="6" placeholder="Supports paragraphs, line breaks, bullets (- or *), emojis"></textarea><div class="desc-preview" id="descPreview" style="display:none;"></div><button type="button" class="mini-button" id="toggleDescPreview" style="margin-top:4px;">Preview</button></label>
                         <div class="field field-wide"><span>Specifications</span><div id="specsContainer"><div class="spec-group"><input type="text" class="spec-key" placeholder="Key"><input type="text" class="spec-value" placeholder="Value"><button type="button" class="mini-button remove-spec" style="background:var(--danger); color:#fff;">✕</button></div></div><button type="button" class="mini-button" id="addSpecBtn">➕ Add Spec</button></div>
@@ -213,6 +219,7 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>

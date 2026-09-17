@@ -6,6 +6,7 @@ import { showToast } from '../components/toast.js';
 import { initAuthModal, openAuthModal, closeAuthModal, checkOAuthErrorAndShow } from '../components/auth-modal.js';
 import { createAddressSelects } from '../components/address-selects.js';
 import { getCart, setCoupon, clearCoupon, getCoupon } from '../core/storage.js';
+import { loadStoreSettings, calcShipping } from '../core/store-settings.js';
 
 const TOAST_ID = 'checkoutToast';
 
@@ -273,7 +274,7 @@ function renderOrderSummary() {
     `).join('');
 
     subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    shippingCost = subtotal >= 2000 ? 0 : 100;
+    shippingCost = calcShipping(subtotal);
     total = subtotal + shippingCost - discount;
     updateTotals();
 }
@@ -283,7 +284,7 @@ function updateTotals() {
     paymentFee = (method && parseFloat(method.fee)) || 0;
     total = subtotal + shippingCost - discount + paymentFee;
     document.getElementById('subtotalDisplay').textContent = formatPrice(subtotal);
-    document.getElementById('shippingDisplay').textContent = formatPrice(shippingCost);
+    document.getElementById('shippingDisplay').textContent = shippingCost === 0 && subtotal > 0 ? 'FREE' : formatPrice(shippingCost);
     document.getElementById('totalDisplay').textContent = formatPrice(total);
     const discountRow = document.getElementById('discountRow');
     if (discount > 0) {
@@ -301,6 +302,19 @@ function updateTotals() {
             feeRow.style.display = 'none';
         }
     }
+    // Free-shipping progress (threshold from store settings)
+    try {
+        const bar = document.getElementById('shipProgressFill');
+        const label = document.getElementById('shipProgressLabel');
+        const threshold = Number(localStorage.getItem('eshop_shipping_free_above') || 2000);
+        if (bar && label && threshold > 0) {
+            const pct = Math.min(100, Math.round((subtotal / threshold) * 100));
+            bar.style.width = pct + '%';
+            label.textContent = subtotal >= threshold
+                ? `🎉 You've unlocked FREE shipping!`
+                : `Add ${formatPrice(threshold - subtotal)} more for FREE shipping`;
+        }
+    } catch (_) {}
 }
 
 // ─── PAYMENT METHODS ────────────────────────────────────
@@ -311,7 +325,13 @@ const PAYMENT_LOGOS = {
     upay: 'assets/logos/payments/upay.png',
 };
 
-function getPaymentLogoSrc(methodName) {
+function getPaymentLogoSrc(methodOrName) {
+    const method = (methodOrName && typeof methodOrName === 'object') ? methodOrName : null;
+    // Admin-uploaded logo (payment_settings.logo_url) always wins.
+    if (method && method.logo_url && String(method.logo_url).trim()) {
+        return String(method.logo_url).trim();
+    }
+    const methodName = method ? method.method_name : methodOrName;
     const s = String(methodName || '').toLowerCase().replace(/[\s._-]/g, '');
     if (s.includes('bkash')) return PAYMENT_LOGOS.bkash;
     if (s.includes('nagad')) return PAYMENT_LOGOS.nagad;
@@ -343,7 +363,7 @@ function renderPaymentMethods() {
         if (method.status && method.status !== 'available') {
             detail += ` [${method.status.toUpperCase()}]`;
         }
-        const logoSrc = getPaymentLogoSrc(method.method_name);
+        const logoSrc = getPaymentLogoSrc(method);
         return `
             <label class="payment-method ${checked ? 'selected' : ''}" data-id="${method.id}">
                 <input type="radio" name="payment" value="${escapeHtml(method.method_name)}" ${checked} ${method.status !== 'available' ? 'disabled' : ''}>
@@ -403,10 +423,33 @@ function showPaymentDetails(methodName) {
     qrDiv.innerHTML = method.qr_code_url ? `<img src="${method.qr_code_url}" alt="QR Code" style="max-width:150px; margin-top:0.5rem;">` : '';
 }
 
-// ─── COUPON ──────────────────────────────────────────────────
+// ─── COUPON (server-validated, client fallback) ─────────
 async function applyCoupon(code, showFeedback = true) {
     code = String(code || '').trim().toUpperCase().slice(0, 32);
     if (!code) return false;
+    const fb = document.getElementById('couponFeedback');
+    // 1) Preferred: secure server validator (max_discount, per-user limit, dates)
+    try {
+        const email = document.getElementById('billingEmail')?.value?.trim() || user?.email || null;
+        const { data, error } = await withTimeout(
+            supabase.rpc('validate_coupon', { p_code: code, p_subtotal: subtotal, p_email: email }),
+            8000, 'Applying coupon'
+        );
+        if (!error && data && data.ok) {
+            discount = Math.min(Number(data.discount) || 0, subtotal);
+            couponCode = data.code || code;
+            if (showFeedback && fb) fb.innerHTML = `<span style="color:var(--success);">Coupon applied! Discount: ${formatPrice(discount)}</span>`;
+            setCoupon(couponCode);
+            updateTotals();
+            return true;
+        }
+        if (!error && data && !data.ok && data.error && !['INVALID'].includes(data.error)) {
+            // Server gave a specific reason (EXPIRED, MIN_ORDER, LIMIT...) — surface it.
+            const reasons = { INACTIVE: 'Coupon is inactive.', NOT_STARTED: 'Coupon is not yet valid.', EXPIRED: 'Coupon expired.', LIMIT_REACHED: 'Coupon usage limit reached.', PER_USER_LIMIT: 'You have already used this coupon.', MIN_ORDER: `Minimum order ${formatPrice(data.min || 0)} required.` };
+            if (showFeedback && fb) fb.innerHTML = `<span style="color:var(--danger);">${reasons[data.error] || 'Coupon not applicable.'}</span>`;
+            return false;
+        }
+    } catch (_) { /* fall through to client check */ }
     try {
         const { data, error } = await withTimeout(
             supabase
@@ -525,6 +568,10 @@ async function initCheckout() {
     document.getElementById('checkoutForm').style.display = 'none';
 
     supabase = getSupabase();
+    // Load dynamic shipping/currency/logo cache first (instant from
+    // localStorage, then refreshed from Supabase). Re-render totals once
+    // the fresh shipping rules arrive.
+    try { await loadStoreSettings(); } catch (_) { /* noop */ }
     if (!supabase) {
         showToastMsg('Supabase connection failed. Some features may not work.', 'warning');
         const stored = localStorage.getItem('eshop_products');
@@ -897,7 +944,7 @@ async function placeOrderLegacy(b) {
             const p = productsData.find(prod => String(prod.id) === String(item.product_id));
             return sum + (p ? (Number(p.price) || 0) : 0) * (parseInt(item.quantity, 10) || 0);
         }, 0);
-        const freshShipping = freshSubtotal >= 2000 ? 0 : 100;
+        const freshShipping = calcShipping(freshSubtotal);
         const method = paymentSettings.find(m => m.method_name === selectedPayment);
         const freshFee = (method && parseFloat(method.fee)) || 0;
         const freshTotal = Math.max(0, freshSubtotal + freshShipping + freshFee - Math.min(discount, freshSubtotal));

@@ -10,6 +10,8 @@ import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core
 import { buildProductCardHTML } from '../core/product-grid.js';
 import { ensureProducts } from '../core/products-loader.js';
 import { getCategories, renderFilterChips, renderSidebarLinks } from '../core/categories.js';
+import { pushRecentlyViewed, getRecentlyViewed } from '../core/premium.js';
+import { bindProductCards, flashCardButton, syncCardButtons } from '../core/product-card-actions.js';
 
 // ─── CACHE MANAGER ─────────────────────────────────────
 function getCache() {
@@ -202,6 +204,12 @@ function pickCategory(category) {
     displayedCount = 8;
     allLoaded = false;
     renderProducts(true);
+    document.querySelectorAll('[data-mega-menu] .mega-link').forEach(a => {
+        try {
+            const slug = new URL(a.href, location.origin).searchParams.get('category') || 'all';
+            a.classList.toggle('active', slug === category);
+        } catch (_) {}
+    });
     if (filterPanel) filterPanel.classList.remove('active');
     setTimeout(() => setupInfiniteScroll(), 200);
 }
@@ -213,9 +221,37 @@ async function setupDynamicCategories() {
         if (chips) renderFilterChips(chips, categories, currentCategory, pickCategory);
         const shopList = document.querySelector('[data-shop-list]');
         if (shopList) renderSidebarLinks(shopList, categories);
+        const mega = document.querySelector('[data-mega-menu]');
+        if (mega) {
+            mega.innerHTML = [{ slug: 'all', label: 'All' }, ...categories.filter(c => c && c.slug)].slice(0, 12).map(c =>
+                `<a class="mega-link ${currentCategory === c.slug ? 'active' : ''}" href="collection.html?category=${encodeURIComponent(c.slug)}">${escapeHtml(c.label || c.slug)}</a>`
+            ).join('');
+        }
     } catch (e) {
         console.warn('Dynamic categories failed, keeping defaults:', e);
     }
+}
+
+function renderMerchandisingRails() {
+    try {
+        const byId = new Map(productsData.map(p => [String(p.id), p]));
+        const featured = productsData.filter(p => p.isFeatured || (p.originalPrice && p.price < p.originalPrice)).slice(0, 8);
+        const best = [...productsData].sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 8);
+        const fresh = productsData.filter(p => p.isNew).concat(productsData.slice(-8)).slice(0, 8);
+        const recent = getRecentlyViewed().map(id => byId.get(String(id))).filter(Boolean).slice(0, 8);
+        const paint = (key, list) => {
+            const rail = document.querySelector(`[data-rail="${key}"]`);
+            const sec = rail?.closest('section');
+            if (!rail || !sec) return;
+            if (!list.length) { sec.hidden = true; return; }
+            sec.hidden = false;
+            rail.innerHTML = list.map((p, i) => buildProductCardHTML(p, i, cart)).join('');
+        };
+        paint('featured', featured);
+        paint('best', best);
+        paint('new', fresh);
+        paint('recent', recent);
+    } catch (e) { console.warn('Rails failed:', e); }
 }
 
 // ─── INIT ───────────────────────────────────────────────
@@ -244,6 +280,7 @@ async function init() {
     loadSitePalette();
     trackVisitor();
     renderProducts();
+    renderMerchandisingRails();
     updateCartUI();
     bindEvents();
 
@@ -260,6 +297,8 @@ async function init() {
     window.addEventListener('pagehide', () => setCache(productsData));
     window.addEventListener('pageshow', () => {
         document.body.classList.remove('page-exit');
+        // Repaint rails on return (e.g. recently-viewed after a product page).
+        try { renderMerchandisingRails(); } catch (_) {}
     });
     window.addEventListener('popstate', (e) => {
         if (restoreCache()) {
@@ -286,6 +325,7 @@ async function init() {
                 productsData = list;
                 setCache(productsData);
                 renderProducts();
+                try { renderMerchandisingRails(); } catch (_) {}
             });
         }
     });
@@ -406,11 +446,7 @@ function addToCart(id) {
     logCartActivity(id, p.title);
     saveCart();
     updateCartUI();
-    const btn = document.querySelector(`.add-cart-btn[data-id="${id}"]`);
-    if (btn) {
-        btn.textContent = '✓ Added!';
-        setTimeout(() => { btn.textContent = '✓ In Cart'; }, 1000);
-    }
+    flashCardButton(id);
     if (cartCountEl) cartCountEl.textContent = getCartCount();
     showToast(`${p.title} added to cart`);
 }
@@ -422,14 +458,7 @@ function removeFromCart(id) {
     else cart.splice(idx, 1);
     saveCart();
     updateCartUI();
-    const btn = document.querySelector(`.add-cart-btn[data-id="${id}"]`);
-    if (btn) {
-        const p = getProduct(id);
-        if (p) {
-            const inCart = getCartItem(id);
-            btn.textContent = inCart ? '✓ In Cart' : 'Add to Cart';
-        }
-    }
+    syncCardButtons(id, cart.some(item => String(item.id) === String(id)));
     if (cartCountEl) cartCountEl.textContent = getCartCount();
 }
 
@@ -437,7 +466,7 @@ function clearCart() {
     cart = [];
     saveCart();
     updateCartUI();
-    document.querySelectorAll('.add-cart-btn').forEach(btn => {
+    document.querySelectorAll('.p-add-btn, .add-cart-btn').forEach(btn => {
         const p = getProduct(parseInt(btn.dataset.id));
         if (p && p.inStock) btn.textContent = 'Add to Cart';
     });
@@ -516,10 +545,11 @@ function closeModal() {
     modalProductId = null;
 }
 
-// ─── NAVIGATE ──────────────────────────────────────────
+// ─── NAVIGATE (same-tab: reliable, no popup-blocker issues) ──
 function navigateToProduct(id) {
+    pushRecentlyViewed(id);
     setCache(productsData);
-    window.open('product.html?id=' + encodeURIComponent(id), '_blank', 'noopener');
+    window.location.assign('product.html?id=' + encodeURIComponent(id));
 }
 
 // ─── SEARCH ─────────────────────────────────────────────
@@ -724,23 +754,20 @@ function bindEvents() {
     });
 
     if (grid) {
-        grid.addEventListener('click', function (e) {
-            const card = e.target.closest('.product-card');
-            const cartBtn = e.target.closest('[data-action="add-cart"]');
-
-            if (cartBtn) {
-                e.stopPropagation();
-                e.preventDefault();
-                const id = parseInt(cartBtn.dataset.id);
-                addToCart(id);
-                return;
-            }
-            if (card && !e.target.closest('button')) {
-                const id = parseInt(card.dataset.id);
-                navigateToProduct(id);
-            }
+        bindProductCards(grid, {
+            onAdd: id => addToCart(parseInt(id)),
+            onQuickView: id => openModal(parseInt(id)),
+            onNavigate: id => navigateToProduct(parseInt(id)),
         });
     }
+    // Homepage merchandising rails share the same card contract.
+    document.querySelectorAll('[data-rail]').forEach(rail => {
+        bindProductCards(rail, {
+            onAdd: id => addToCart(parseInt(id)),
+            onQuickView: id => openModal(parseInt(id)),
+            onNavigate: id => navigateToProduct(parseInt(id)),
+        });
+    });
 
     if (cartItemsEl) {
         cartItemsEl.addEventListener('click', (e) => {
@@ -758,8 +785,7 @@ function bindEvents() {
                     cart.splice(idx, 1);
                     saveCart();
                     updateCartUI();
-                    const btn = document.querySelector(`.add-cart-btn[data-id="${id}"]`);
-                    if (btn) btn.textContent = 'Add to Cart';
+                    syncCardButtons(id, false);
                     if (cartCountEl) cartCountEl.textContent = getCartCount();
                 }
             }

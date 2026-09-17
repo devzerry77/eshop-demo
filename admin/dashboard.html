@@ -84,6 +84,12 @@
                     <span class="nav-icon">☰</span>
                     <span>Orders</span>
                 </a>
+                <a href="coupons.html"><span class="nav-icon">◈</span><span>Coupons</span></a>
+                <a href="inventory.html"><span class="nav-icon">⬢</span><span>Inventory</span></a>
+                <a href="customers.html"><span class="nav-icon">◉</span><span>Customers</span></a>
+                <a href="roles.html"><span class="nav-icon">⬣</span><span>Roles</span></a>
+                <a href="logs.html"><span class="nav-icon">◷</span><span>Logs</span></a>
+                <a href="marketing.html"><span class="nav-icon">✦</span><span>Marketing</span></a>
                 <a href="reviews.html" data-section="reviews">
                     <span class="nav-icon">★</span>
                     <span>Custom Reviews</span>
@@ -204,15 +210,40 @@
                             <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-receipt"></i></span>
                             <span class="qa-label">Orders</span>
                         </a>
+                        <a class="quick-action-card" href="coupons.html">
+                            <span class="qa-icon">◈</span>
+                            <span class="qa-label">Coupons</span>
+                        </a>
+                        <a class="quick-action-card" href="inventory.html">
+                            <span class="qa-icon">⬢</span>
+                            <span class="qa-label">Inventory</span>
+                        </a>
+                        <a class="quick-action-card" href="customers.html">
+                            <span class="qa-icon">◉</span>
+                            <span class="qa-label">Customers</span>
+                        </a>
                         <a class="quick-action-card" href="reviews.html">
                             <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-star"></i></span>
                             <span class="qa-label">Custom Reviews</span>
                         </a>
-                        <a class="quick-action-card" href="public-reviews.html">
-                            <span class="qa-icon" aria-hidden="true"><i class="fa-solid fa-comments"></i></span>
-                            <span class="qa-label">Public Reviews</span>
+                        <a class="quick-action-card" href="marketing.html">
+                            <span class="qa-icon">✦</span>
+                            <span class="qa-label">Marketing</span>
                         </a>
                     </div>
+                </section>
+
+                <!-- PREMIUM ANALYTICS (server snapshot + local trend chart) -->
+                <section class="page-section" aria-label="Premium analytics">
+                    <div class="section-header"><div><span class="eyebrow">PREMIUM</span><h2>Revenue & Trends</h2></div>
+                    <span id="premiumStatsNote" style="font-size:.78rem;color:var(--text-secondary)">Server snapshot via admin_stats()</span></div>
+                    <div class="p-kpi-grid" style="margin-top:.6rem">
+                        <div class="p-kpi"><span>Today</span><strong id="pRevToday">—</strong><small id="pOrdToday">—</small></div>
+                        <div class="p-kpi"><span>Last 7 days</span><strong id="pRevWeek">—</strong><small>Revenue</small></div>
+                        <div class="p-kpi"><span>Last 30 days</span><strong id="pRevMonth">—</strong><small>Revenue</small></div>
+                        <div class="p-kpi"><span>Low / Out stock</span><strong id="pStock">—</strong><small id="pStockSub">—</small></div>
+                    </div>
+                    <div class="p-chart-card"><b>Orders — last 14 days</b><canvas id="pOrdersChart" height="120" style="width:100%;margin-top:.5rem" aria-label="Orders chart"></canvas></div>
                 </section>
 
             </div>
@@ -261,6 +292,7 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>
@@ -271,5 +303,6 @@
     <script src="js/admin-settings.js"></script>
     <script src="js/admin-main.js"></script>
     <script src="js/page-dashboard.js"></script>
+    <script src="js/page-premium-stats.js"></script>
 </body>
 </html>

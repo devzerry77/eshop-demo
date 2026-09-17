@@ -96,6 +96,12 @@
                     <span class="nav-icon">◷</span>
                     <span>Cart Activity</span>
                 </a>
+                <a href="coupons.html"><span class="nav-icon">◈</span><span>Coupons</span></a>
+                <a href="inventory.html"><span class="nav-icon">⬢</span><span>Inventory</span></a>
+                <a href="customers.html"><span class="nav-icon">◉</span><span>Customers</span></a>
+                <a href="roles.html"><span class="nav-icon">⬣</span><span>Roles</span></a>
+                <a href="logs.html"><span class="nav-icon">◷</span><span>Logs</span></a>
+                <a href="marketing.html"><span class="nav-icon">✦</span><span>Marketing</span></a>
                 <a href="payments.html" data-section="payments" class="active">
                     <span class="nav-icon">◉</span>
                     <span>Payment Settings</span>
@@ -154,6 +160,7 @@
                         <label class="field"><span>Account Name</span><input type="text" id="pmAccount" placeholder="Alternative account field"></label>
                         <label class="field"><span>Instructions</span><textarea id="pmInstructions" rows="3" placeholder="How to pay via this method"></textarea></label>
                         <label class="field"><span>QR Code URL</span><input type="url" id="pmQr" placeholder="https://...qr.png"></label>
+                        <label class="field"><span>Logo URL (optional — overrides auto icon)</span><input type="url" id="pmLogo" placeholder="https://...logo.png"></label>
                         <label class="field"><span>Fee (৳)</span><input type="number" id="pmFee" min="0" step="1" value="0"></label>
                         <label class="field"><span>Display Order</span><input type="number" id="pmOrder" min="0" step="1" value="1"></label>
                         <label class="checkbox-field"><input type="checkbox" id="pmEnabled" checked><span>Enabled (shown at checkout)</span></label>
@@ -212,6 +219,7 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="js/admin-core.js"></script>

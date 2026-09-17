@@ -1,7 +1,16 @@
 // ─── UTILS ───────────────────────────────────────────────
+// Currency symbol is admin-editable (settings.currency_symbol) and cached
+// in localStorage by js/core/store-settings.js. formatPrice stays
+// synchronous so every cart/checkout render can use it.
+export function getCurrencySymbolSync() {
+    try {
+        return localStorage.getItem('eshop_currency_symbol') || '৳';
+    } catch (_) { return '৳'; }
+}
+
 export function formatPrice(amount) {
     const num = parseFloat(amount) || 0;
-    return '৳ ' + Math.round(num).toLocaleString('bn-BD');
+    return getCurrencySymbolSync() + ' ' + Math.round(num).toLocaleString('bn-BD');
 }
 
 export function renderStars(rating) {
@@ -17,21 +26,20 @@ export function escapeHtml(str) {
     return div.innerHTML;
 }
 
-// ─── DESCRIPTION RENDERER ───────────────────────────────
+// ─── DESCRIPTION RENDERER (safe allowlist) ────────────
+// Escapes everything, then restores a tiny set of SAFE formatting tags
+// (no attributes allowed, so no onclick/javascript: vectors). Stored
+// rich descriptions render correctly; anything else shows as plain text.
+const SAFE_DESC_TAGS = /&lt;(\/?)(p|br|b|strong|i|em|u|ul|ol|li)(\s*\/?)&gt;/gi;
 export function renderDescription(text) {
     if (!text) return '';
-    const htmlTagRegex = /<[^>]*>/;
-    if (htmlTagRegex.test(text)) {
-        return text;
-    }
-    const paragraphs = text.split(/\n\s*\n/);
-    return paragraphs.map(p => {
-        if (p.trim() === '') return '';
-        const lines = p.split(/\n/);
-        if (lines.length === 1) return `<p>${escapeHtml(lines[0])}</p>`;
-        const inner = lines.map(line => escapeHtml(line)).join('<br>');
-        return `<p>${inner}</p>`;
-    }).join('');
+    const safe = escapeHtml(text).replace(SAFE_DESC_TAGS, '<$1$2$3>');
+    if (/<(p|ul|ol)[\s>]/.test(safe)) return safe;
+    return safe
+        .split(/\n\s*\n/)
+        .filter(p => p.trim() !== '')
+        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+        .join('');
 }
 
 // ─── YOUTUBE HELPERS ───────────────────────────────────

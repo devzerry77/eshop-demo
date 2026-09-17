@@ -129,12 +129,41 @@
         const order = STATE.orders.find(o => String(o.id) === String(orderId));
         if (!order) return;
         const prev = order.status;
+        // Premium: secure server transition (restock-on-cancel + audit). Falls back to direct update on legacy DBs.
+        try {
+            const { data, error } = await STATE.supabase.rpc('set_order_status', { p_order_id: Number(orderId), p_status: newStatus });
+            const missingFn = error && /function|does not exist|42883/i.test(String(error.message || ''));
+            if (!error && data && data.ok !== false) {
+                order.status = newStatus;
+                renderOrderStats();
+                renderOrders();
+                showToast(`Order ${order.order_number} updated to ${newStatus.replace(/_/g, ' ')}.`, "success");
+                return;
+            }
+            // Server explicitly refused (e.g. FORBIDDEN/BAD_STATUS): surface it, NEVER fall back to a direct write.
+            if (!missingFn && ((data && data.ok === false) || (error && !missingFn))) {
+                throw new Error((data && data.error) || (error && error.message) || 'Update refused');
+            }
+        } catch (e) {
+            // Only a missing RPC (pre-migration DB) falls back to a direct
+            // write. Any explicit refusal stays refused — never bypass it.
+            if (!/function|does not exist|42883/i.test(String((e && e.message) || ''))) {
+                order.status = prev;
+                showToast("Could not update status: " + ((e && e.message) || e), "error");
+                return;
+            }
+            // fall through to legacy direct update
+        }
         try {
             const { error } = await STATE.supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
             if (error) throw error;
             order.status = newStatus;
             renderOrderStats();
             renderOrders();
+            try {
+                const { data: { user } } = await STATE.supabase.auth.getUser();
+                await STATE.supabase.from('audit_logs').insert({ actor_email: user?.email || null, action: 'order.status', entity: 'order', entity_id: String(orderId), metadata: { from: prev, to: newStatus, via: 'legacy' } });
+            } catch (_) {}
             showToast(`Order ${order.order_number} updated to ${newStatus.replace(/_/g, ' ')}.`, "success");
         } catch (err) {
             order.status = prev;
@@ -219,6 +248,7 @@
                 account_info: row.account_info || {},
                 instructions: row.instructions || '',
                 qr_code_url: row.qr_code_url || '',
+                logo_url: row.logo_url || '',
                 display_order: Number(row.display_order) || 0
             }));
         } catch (err) {
@@ -246,6 +276,7 @@
                     ${detail ? `<div class="pm-meta">${escapeHTML(detail)}</div>` : ''}
                     <div class="pm-meta">Fee: ${formatPrice(m.fee)} · Status: ${escapeHTML(m.status.replace(/_/g, ' '))}</div>
                     ${m.instructions ? `<div class="pm-meta" style="white-space:pre-line;">${escapeHTML(m.instructions)}</div>` : ''}
+                    ${m.logo_url ? `<img src="${escapeHTML(m.logo_url)}" alt="Logo" style="width:64px; height:32px; object-fit:contain; border:1px solid var(--border); border-radius:6px; background:#fff;">` : ''}
                     ${m.qr_code_url ? `<img src="${escapeHTML(m.qr_code_url)}" alt="QR" style="width:64px; height:64px; object-fit:contain; border:1px solid var(--border); border-radius:6px;">` : ''}
                     <div class="pm-actions">
                         <button class="table-action" data-pmedit="${escapeHTML(m.id)}">Edit</button>
@@ -270,6 +301,7 @@
         DOM.pmAccount.value = info.account || '';
         DOM.pmInstructions.value = method ? (method.instructions || '') : '';
         DOM.pmQr.value = method ? (method.qr_code_url || '') : '';
+        if (DOM.pmLogo) DOM.pmLogo.value = method ? (method.logo_url || '') : '';
         DOM.pmFee.value = method ? (method.fee || 0) : 0;
         DOM.pmOrder.value = method ? (method.display_order || 1) : (STATE.paymentMethods.length + 1);
         DOM.pmEnabled.checked = method ? method.enabled !== false : true;
@@ -301,6 +333,7 @@
             },
             instructions: DOM.pmInstructions.value.trim(),
             qr_code_url: DOM.pmQr.value.trim(),
+            logo_url: DOM.pmLogo ? DOM.pmLogo.value.trim() : '',
             display_order: Number(DOM.pmOrder.value) || 0
         };
         STATE.savingPayment = true;

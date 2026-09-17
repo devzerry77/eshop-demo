@@ -43,6 +43,7 @@
     <link rel="stylesheet" href="css/components.css" media="all" />
     <link rel="stylesheet" href="css/pages.css" media="all" />
     <link rel="stylesheet" href="css/responsive.css" media="all" />
+    <link rel="stylesheet" href="css/premium.css" media="all" />
     <link rel="stylesheet" href="css/demo-contact.css" />
     <noscript>
         <link rel="stylesheet" href="css/layout.css" />
@@ -198,7 +199,14 @@
 
             <!-- Checkout Form -->
             <div id="checkoutForm" style="display:none;">
-                <h1 style="font-size:1.8rem; font-weight:800; margin-bottom:1.5rem;">Checkout</h1>
+                <h1 style="font-size:1.8rem; font-weight:800; margin-bottom:1rem;">Checkout</h1>
+                <div class="p-steps no-print" aria-label="Checkout progress">
+                    <div class="p-step done">1 · Cart ✓</div>
+                    <div class="p-step current">2 · Address</div>
+                    <div class="p-step">3 · Shipping</div>
+                    <div class="p-step">4 · Payment</div>
+                    <div class="p-step">5 · Confirm</div>
+                </div>
 
                 <div id="guestNotice" style="display:none; margin-bottom:1rem; padding:0.8rem 1rem; background:var(--secondary-bg); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.9rem;">
                     You&apos;re checking out as a guest — no account needed.
@@ -276,6 +284,10 @@
                     <div>
                         <div class="order-summary">
                             <h3 style="margin-bottom:1rem;">Order Summary</h3>
+                            <div class="ship-progress" id="shipProgressBox">
+                                <span id="shipProgressLabel">Add items for FREE shipping</span>
+                                <div class="ship-progress-bar"><div class="ship-progress-fill" id="shipProgressFill" style="width:0%"></div></div>
+                            </div>
                             <div id="orderItemsList"></div>
                             <div class="summary-item">
                                 <span>Subtotal</span>
@@ -347,6 +359,7 @@
     </footer>
 
     <script src="js/supabase/supabase-config.js"></script>
+    <script src="js/supabase/local-backend.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script type="module" src="js/components/mobile-nav.js"></script>
     <script type="module" src="js/components/chatbot.js"></script>

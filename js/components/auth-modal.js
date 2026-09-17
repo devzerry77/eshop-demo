@@ -60,6 +60,25 @@ let previousOverflow = '';
 let lastFocused = null;
 let callbacks = { onSuccess: null, onNotice: null };
 
+// Demo mode (Supabase frozen): auth runs on the localStorage emulator.
+function isLocalMode() {
+    try { return !!(window.LocalBackend && window.LocalBackend.useLocal()); }
+    catch (_) { return false; }
+}
+
+// One-time demo hint so visitors know the demo accounts.
+function ensureDemoHint() {
+    if (!isLocalMode() || !modal) return;
+    if (modal.querySelector('[data-demo-hint]')) return;
+    const anchor = modal.querySelector('.auth-terms');
+    const hint = document.createElement('p');
+    hint.setAttribute('data-demo-hint', 'true');
+    hint.style.cssText = 'margin:0.6rem 0 0;font-size:0.78rem;color:var(--text-secondary);text-align:center;line-height:1.5;';
+    hint.innerHTML = 'Demo mode — no real accounts needed.<br>Shopper: <b>demo@eshop.demo</b> / <b>demo123</b> · Admin: <b>admin@eshop.demo</b> / <b>Demo123!</b><br>Google button signs you in instantly. Forgot password resets to <b>demo1234</b>.';
+    if (anchor) anchor.before(hint);
+    else modal.querySelector('.auth-dialog')?.appendChild(hint);
+}
+
 // ─── ELEMENT HELPERS ───────────────────────────────────────
 function cacheElements() {
     const gid = (id) => document.getElementById(id);
@@ -316,11 +335,18 @@ async function handleGoogle() {
     saveReturnIntent();
     setGoogleBusy(true);
     try {
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: { redirectTo: window.location.origin }
         });
         if (error) throw error;
+        // Local demo mode: no redirect — the emulator signs in a demo
+        // Google shopper instantly. (Live Supabase redirects away, so
+        // the lines below never run there.)
+        if (data && data.session) {
+            setGoogleBusy(false);
+            emitSuccess();
+        }
     } catch (err) {
         setGoogleBusy(false);
         showFormError(friendlyError(err));
@@ -357,7 +383,9 @@ async function handleForgot() {
         signingIn = false;
         els.submitBtn.disabled = false;
         els.googleBtn.disabled = false;
-        emitNotice('Password reset link sent to your email.');
+        emitNotice(isLocalMode()
+            ? 'Demo mode: your password was reset to demo1234. Sign in with it.'
+            : 'Password reset link sent to your email.');
         closeAuthModal();
     } catch (err) {
         signingIn = false;
@@ -416,6 +444,7 @@ export function openAuthModal(options = {}) {
 
     renderText();
     clearAllErrors();
+    ensureDemoHint();
     if (options.notice) showFormError(options.notice);
     if (options.email) els.emailInput.value = options.email;
 

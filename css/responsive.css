@@ -356,6 +356,67 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   PREMIUM CARDS + CHECKOUT — compact mobile (functionality unchanged)
+   The premium card uses .p-* classes, so it needs its own compact rules
+   mirroring the legacy block above. Target: 360px and up.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width:767px) {
+    /* Horizontal-overflow backstop (body already hidden; clip guards sticky/fixed children) */
+    html { overflow-x: clip; }
+
+    .product-card.premium { border-radius: 12px; min-width: 0; height: 100%; }
+    .p-card-media { aspect-ratio: 5/4; }
+    .p-card-badges { top: 6px; left: 6px; gap: 4px; max-width: calc(100% - 48px); }
+    .p-badge { font-size: 0.58rem; padding: 2px 8px; }
+    .p-wishlist-btn { width: 30px; height: 30px; font-size: 0.9rem; top: 6px; right: 6px; }
+    .p-card-body { padding: 0.45rem 0.5rem 0.5rem; gap: 0.15rem; min-width: 0; }
+    .p-card-cat { display: none; }
+    .p-card-title { font-size: 0.72rem; line-height: 1.25; min-height: 1.8em; }
+    .p-card-rating { font-size: 0.62rem; gap: 4px; white-space: nowrap; overflow: hidden; }
+    .p-card-rating span:nth-child(3) { display: none; } /* hide SKU chip on phones */
+    .p-card-price { gap: 5px; flex-wrap: wrap; overflow-wrap: anywhere; }
+    .p-price { font-size: 0.82rem; }
+    .p-price-old { font-size: 0.62rem; }
+    .p-off { font-size: 0.6rem; padding: 1px 6px; }
+    .p-stock-line { font-size: 0.66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-card-foot { gap: 6px; margin-top: 0.4rem; flex-wrap: nowrap; }
+    .p-card-foot > * { min-width: 0; }
+    .p-add-btn { min-height: 32px; font-size: 0.68rem; border-radius: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-view-btn { min-height: 32px; padding: 0 10px; font-size: 0.68rem; border-radius: 10px; flex-shrink: 0; }
+
+    .p-section-head { margin: 1.4rem 0 0.7rem; }
+    .p-section-head h2 { font-size: 1.05rem; }
+    .p-section-head p { font-size: 0.76rem; }
+    .p-see-all { font-size: 0.72rem; padding: 6px 12px; }
+
+    .p-steps { gap: 4px; }
+    .p-step { min-width: 88px; font-size: 0.66rem; padding: 8px 6px; }
+    .place-order-btn { min-height: 48px; font-size: 1rem; }
+    .coupon-apply { display: flex; gap: 8px; }
+    .coupon-apply input { min-width: 0; flex: 1; }
+    .coupon-apply button { flex-shrink: 0; }
+    .payment-methods { gap: 8px; }
+    .order-summary { padding: 1rem; }
+    .ship-progress { font-size: 0.76rem; }
+
+    .p-empty { padding: 2rem 1rem; }
+    .p-dialog { padding: 1.2rem; max-width: calc(100vw - 2rem); }
+}
+@media (max-width:480px) {
+    .p-rail { grid-auto-columns: minmax(150px, 200px); gap: 0.7rem; }
+    .p-card-title { font-size: 0.7rem; }
+    .p-price { font-size: 0.78rem; }
+    .p-step { min-width: 76px; font-size: 0.6rem; }
+    .checkout-container { padding: 0 0.75rem; }
+    .order-summary { margin-top: 1rem; }
+}
+@media (max-width:380px) {
+    .p-card-body { padding: 0.4rem 0.45rem 0.45rem; }
+    .p-add-btn, .p-view-btn { min-height: 30px; font-size: 0.64rem; }
+    .p-view-btn { padding: 0 8px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    HEADER & FOOTER SOLID COLOR — final guard (loaded last).
    Light mode uses --hf-bg-light, dark mode uses --hf-bg-dark
    (both default matte black #000000, admin-controllable).

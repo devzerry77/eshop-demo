@@ -7,6 +7,8 @@ import { getSearchResults, highlightMatch, getKeywordSuggestions } from '../core
 import { getCachedProducts, ensureProducts } from '../core/products-loader.js';
 import { STORAGE_KEYS } from '../core/config.js';
 import { getCategories, renderSidebarLinks } from '../core/categories.js';
+import { bindProductCards } from '../core/product-card-actions.js';
+import { pushRecentlyViewed } from '../core/premium.js';
 
 // ─── CATEGORY LABELS (static fallback; DB-driven list preferred) ──
 const CATEGORY_NAMES = {
@@ -218,11 +220,16 @@ function setupInfiniteScroll() {
 // ─── CART ───────────────────────────────────────────────
 function refreshProductCards() {
     if (!grid) return;
-    grid.querySelectorAll('.add-cart-btn').forEach(btn => {
+    grid.querySelectorAll('.p-add-btn[data-action="add-cart"], .add-cart-btn').forEach(btn => {
         if (btn.disabled) return;
         const p = getProduct(btn.dataset.id);
         if (p) btn.textContent = getCartItem(cart, p.id) ? '✓ In Cart' : 'Add to Cart';
     });
+}
+
+function goToProduct(id) {
+    pushRecentlyViewed(id);
+    window.location.assign('product.html?id=' + encodeURIComponent(id));
 }
 
 function updateCartUI() {
@@ -358,11 +365,10 @@ function bindEvents() {
         else if (rem) removeFromCart(Number(rem.dataset.id));
     });
 
-    if (grid) grid.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card');
-        const cartBtn = e.target.closest('[data-action="add-cart"]');
-        if (cartBtn) { e.stopPropagation(); e.preventDefault(); addToCart(Number(cartBtn.dataset.id)); return; }
-        if (card) { e.preventDefault(); window.open('product.html?id=' + encodeURIComponent(card.dataset.id), '_blank', 'noopener'); }
+    if (grid) bindProductCards(grid, {
+        onAdd: id => addToCart(Number(id)),
+        onQuickView: id => goToProduct(id),
+        onNavigate: id => goToProduct(id),
     });
 
     document.addEventListener('keydown', (e) => {

@@ -1026,6 +1026,13 @@ async function saveSocialSettings() {
 
         // Admin access
         DOM.addAdminBtn?.addEventListener('click', admin.addAdmin);
+
+        // 100% dynamic storefront
+        DOM.saveShipBtn?.addEventListener('click', admin.saveShipSettings);
+        DOM.saveBrandBtn?.addEventListener('click', admin.saveBrandSettings);
+        DOM.saveFooterLinksBtn?.addEventListener('click', admin.saveFooterLinksSettings);
+        DOM.saveAboutBtn?.addEventListener('click', admin.saveAboutSettings);
+        DOM.saveChatBtn?.addEventListener('click', admin.saveChatSettings);
         DOM.adminEmail?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') { e.preventDefault(); admin.addAdmin(); }
         });
@@ -1294,6 +1301,176 @@ async function saveSocialSettings() {
         }
     }
 
+    // ─── 100% DYNAMIC STOREFRONT ──────────────────────────
+    // Shipping & currency / logo / footer links / about / chatbot.
+    // All rows live in the existing `settings` table (see dynamic-store.sql)
+    // and are mirrored to localStorage `eshop_*` so the site paints instantly.
+    const DYNAMIC_KEYS = [
+        'shipping_free_above', 'shipping_cost', 'currency_code',
+        'currency_symbol', 'logo_url', 'footer_links', 'about_content',
+        'chatbot_intro', 'chatbot_options'
+    ];
+
+    async function loadDynamicStoreSettings() {
+        try {
+            const { data, error } = await STATE.supabase.from('settings').select('*').in('key', DYNAMIC_KEYS);
+            if (error) throw error;
+            const map = {};
+            (data || []).forEach(row => { map[row.key] = row.value; });
+            if (DOM.shipFreeAbove) DOM.shipFreeAbove.value = map.shipping_free_above || '2000';
+            if (DOM.shipCost) DOM.shipCost.value = map.shipping_cost || '100';
+            if (DOM.currencyCode) DOM.currencyCode.value = map.currency_code || 'BDT';
+            if (DOM.currencySymbol) DOM.currencySymbol.value = map.currency_symbol || '৳';
+            if (DOM.brandLogoUrl) DOM.brandLogoUrl.value = map.logo_url || 'assets/logo.svg';
+            if (DOM.footerLinksJson) DOM.footerLinksJson.value = map.footer_links || '';
+            try {
+                const about = map.about_content ? JSON.parse(map.about_content) : null;
+                if (about) {
+                    if (DOM.aboutEyebrow && about.eyebrow) DOM.aboutEyebrow.value = about.eyebrow;
+                    if (DOM.aboutNotice && about.notice) DOM.aboutNotice.value = about.notice;
+                    if (DOM.aboutSectionsJson && about.sections) DOM.aboutSectionsJson.value = JSON.stringify(about.sections, null, 2);
+                    if (DOM.aboutValuesJson && about.values) DOM.aboutValuesJson.value = JSON.stringify(about.values, null, 2);
+                }
+            } catch (_) { /* keep raw */ }
+            try {
+                if (DOM.chatIntro && map.chatbot_intro) {
+                    const arr = JSON.parse(map.chatbot_intro);
+                    if (Array.isArray(arr)) DOM.chatIntro.value = arr.join('\n');
+                }
+                if (DOM.chatOptionsJson && map.chatbot_options) {
+                    const arr = JSON.parse(map.chatbot_options);
+                    DOM.chatOptionsJson.value = JSON.stringify(arr, null, 2);
+                }
+            } catch (_) { /* keep raw */ }
+        } catch (err) {
+            showToast('Failed to load dynamic store settings: ' + (err.message || err), 'error');
+        }
+    }
+
+    async function saveShipSettings() {
+        const freeAbove = String(parseFloat(DOM.shipFreeAbove.value) >= 0 ? DOM.shipFreeAbove.value : '2000');
+        const cost = String(parseFloat(DOM.shipCost.value) >= 0 ? DOM.shipCost.value : '100');
+        const code = (DOM.currencyCode.value || 'BDT').trim().slice(0, 6) || 'BDT';
+        const symbol = (DOM.currencySymbol.value || '৳').trim().slice(0, 4) || '৳';
+        const settings = [
+            { key: 'shipping_free_above', value: freeAbove },
+            { key: 'shipping_cost', value: cost },
+            { key: 'currency_code', value: code },
+            { key: 'currency_symbol', value: symbol }
+        ];
+        if (DOM.shipStatus) DOM.shipStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            settings.forEach(s => { try { localStorage.setItem('eshop_' + s.key, s.value); } catch (_) {} });
+            showToast('Shipping & currency saved! Checkout updates automatically.', 'success');
+            if (DOM.shipStatus) { DOM.shipStatus.textContent = '✓ Saved'; setTimeout(() => { if (DOM.shipStatus) DOM.shipStatus.textContent = ''; }, 2500); }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.shipStatus) DOM.shipStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function saveBrandSettings() {
+        const url = (DOM.brandLogoUrl.value || '').trim() || 'assets/logo.svg';
+        if (DOM.brandStatus) DOM.brandStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert([{ key: 'logo_url', value: url }], { onConflict: 'key' });
+            if (error) throw error;
+            try { localStorage.setItem('eshop_logo_url', url); } catch (_) {}
+            showToast('Logo saved! Every page updates automatically.', 'success');
+            if (DOM.brandStatus) { DOM.brandStatus.textContent = '✓ Saved'; setTimeout(() => { if (DOM.brandStatus) DOM.brandStatus.textContent = ''; }, 2500); }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.brandStatus) DOM.brandStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function saveFooterLinksSettings() {
+        const raw = (DOM.footerLinksJson.value || '').trim();
+        if (!raw) { showToast('Paste footer links JSON first.', 'warning'); return; }
+        let parsed;
+        try { parsed = JSON.parse(raw); } catch (_) { showToast('Invalid JSON. Check syntax and retry.', 'warning'); return; }
+        ['policies', 'about', 'connect'].forEach(k => { if (!Array.isArray(parsed[k])) parsed[k] = []; });
+        const value = JSON.stringify(parsed);
+        if (DOM.footerLinksStatus) DOM.footerLinksStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert([{ key: 'footer_links', value }], { onConflict: 'key' });
+            if (error) throw error;
+            try { localStorage.setItem('eshop_footer_links', value); } catch (_) {}
+            showToast('Footer links saved!', 'success');
+            if (DOM.footerLinksStatus) { DOM.footerLinksStatus.textContent = '✓ Saved'; setTimeout(() => { if (DOM.footerLinksStatus) DOM.footerLinksStatus.textContent = ''; }, 2500); }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.footerLinksStatus) DOM.footerLinksStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function saveAboutSettings() {
+        let sections = [], values = [];
+        try {
+            if ((DOM.aboutSectionsJson.value || '').trim()) sections = JSON.parse(DOM.aboutSectionsJson.value);
+            if ((DOM.aboutValuesJson.value || '').trim()) values = JSON.parse(DOM.aboutValuesJson.value);
+            if (!Array.isArray(sections)) throw new Error('sections must be an array');
+            if (!Array.isArray(values)) throw new Error('values must be an array');
+        } catch (err) {
+            showToast('Invalid sections/values JSON: ' + (err.message || err), 'warning');
+            return;
+        }
+        // Merge with existing about_content so empty fields don't wipe data.
+        let existing = {};
+        try {
+            const { data } = await STATE.supabase.from('settings').select('value').eq('key', 'about_content').maybeSingle();
+            if (data && data.value) existing = JSON.parse(data.value);
+        } catch (_) { /* noop */ }
+        const content = {
+            eyebrow: (DOM.aboutEyebrow.value || '').trim() || existing.eyebrow || 'About this demo',
+            subtitle: existing.subtitle || '',
+            notice: (DOM.aboutNotice.value || '').trim() || existing.notice || '',
+            sections: sections.length ? sections : (existing.sections || []),
+            values: values.length ? values : (existing.values || [])
+        };
+        const value = JSON.stringify(content);
+        if (DOM.aboutStatus) DOM.aboutStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert([{ key: 'about_content', value }], { onConflict: 'key' });
+            if (error) throw error;
+            try { localStorage.setItem('eshop_about_content', value); } catch (_) {}
+            showToast('About page saved!', 'success');
+            if (DOM.aboutStatus) { DOM.aboutStatus.textContent = '✓ Saved'; setTimeout(() => { if (DOM.aboutStatus) DOM.aboutStatus.textContent = ''; }, 2500); }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.aboutStatus) DOM.aboutStatus.textContent = '✗ Error';
+        }
+    }
+
+    async function saveChatSettings() {
+        const introLines = (DOM.chatIntro.value || '').split('\n').map(s => s.trim()).filter(Boolean);
+        let options;
+        try {
+            options = JSON.parse(DOM.chatOptionsJson.value || '[]');
+            if (!Array.isArray(options) || !options.length) throw new Error('options must be a non-empty array');
+        } catch (err) {
+            showToast('Invalid options JSON: ' + (err.message || err), 'warning');
+            return;
+        }
+        const settings = [
+            { key: 'chatbot_intro', value: JSON.stringify(introLines.length ? introLines : ['Hi! 👋 Welcome!']) },
+            { key: 'chatbot_options', value: JSON.stringify(options) }
+        ];
+        if (DOM.chatStatus) DOM.chatStatus.textContent = 'Saving...';
+        try {
+            const { error } = await STATE.supabase.from('settings').upsert(settings, { onConflict: 'key' });
+            if (error) throw error;
+            settings.forEach(s => { try { localStorage.setItem('eshop_' + s.key, s.value); } catch (_) {} });
+            showToast('Chatbot messages saved!', 'success');
+            if (DOM.chatStatus) { DOM.chatStatus.textContent = '✓ Saved'; setTimeout(() => { if (DOM.chatStatus) DOM.chatStatus.textContent = ''; }, 2500); }
+        } catch (err) {
+            showToast('Failed to save: ' + (err.message || err), 'error');
+            if (DOM.chatStatus) DOM.chatStatus.textContent = '✗ Error';
+        }
+    }
+
     Object.assign(admin, {
         loadMarqueeSettings, saveMarqueeSettings, resetMarqueeToDefault, updateMarqueePreview,
         loadThemeSettings, saveThemeSettings, resetThemeSettings,
@@ -1308,6 +1485,8 @@ async function saveSocialSettings() {
         loadCategories, addCategory, deleteCategory,
         loadImgbbKey, saveImgbbKey,
         loadAdmins, addAdmin, removeAdmin,
+        loadDynamicStoreSettings, saveShipSettings, saveBrandSettings,
+        saveFooterLinksSettings, saveAboutSettings, saveChatSettings,
         bindSettingsControls, bindThemeSettings
     });
 

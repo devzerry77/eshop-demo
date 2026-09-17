@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coupons — E-Shop Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="../css/premium.css">
+</head>
+<body>
+    <section class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true">
+        <div class="login-card glass-card">
+            <div class="brand brand-login"><img class="brand-logo" src="../assets/logo.svg" alt="E-Shop Demo"><span>E-Shop Admin</span></div>
+            <form id="loginForm" novalidate>
+                <label class="field"><span>Email</span><input type="email" id="loginEmail" required></label>
+                <label class="field"><span>Password</span><input type="password" id="loginPassword" required></label>
+                <p class="form-error" id="loginError" role="alert"></p>
+                <p class="rate-limit" id="loginRateLimit">Too many attempts. Please try again later.</p>
+                <button type="submit" class="button button-primary button-full" id="loginBtn"><span class="button-label">Sign in</span><span class="button-loader"></span></button>
+            </form>
+        </div>
+    </section>
+    <div class="admin-layout" id="adminLayout">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-top">
+                <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+                <div class="brand"><img class="brand-logo" src="../assets/logo.svg" alt=""><span>E-Shop Demo</span></div><span class="admin-label">ADMIN</span></div>
+            <nav class="admin-nav" aria-label="Admin navigation">
+                <a href="dashboard.html">⌂ Dashboard</a>
+                <a href="products.html">▦ Products</a>
+                <a href="orders.html">☰ Orders</a>
+                <a href="coupons.html" class="active">◈ Coupons</a>
+                <a href="inventory.html">⬢ Inventory</a>
+                <a href="customers.html">◉ Customers</a>
+                <a href="roles.html">⬣ Staff & Roles</a>
+                <a href="logs.html">◷ Activity Logs</a>
+                <a href="marketing.html">✦ Marketing & SEO</a>
+                <a href="payments.html">◎ Payments</a>
+                <a href="settings.html">⚙ Settings</a>
+            </nav>
+            <div class="sidebar-bottom"><button class="sidebar-action" id="logoutBtn">↪ Sign out</button></div>
+        </aside>
+        <main class="admin-main">
+            <header class="admin-header"><div class="header-left"><button class="mobile-toggle" id="adminMobileToggle" aria-label="Open menu" aria-expanded="false">☰</button><h1>Coupons & Promotions</h1></div>
+            <div class="header-right"><button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode"><span class="theme-icon">🌙</span><span class="theme-label">Dark</span></button><button class="button button-primary" id="newCouponBtn">+ New coupon</button></div></header>
+            <div class="admin-content">
+                <div class="p-kpi-grid">
+                    <div class="p-kpi"><span>Active coupons</span><strong id="kpiActive">0</strong><small>Currently redeemable</small></div>
+                    <div class="p-kpi"><span>Total redemptions</span><strong id="kpiUsed">0</strong><small>Sum of used_count</small></div>
+                    <div class="p-kpi"><span>Expired</span><strong id="kpiExpired">0</strong><small>Past valid_to</small></div>
+                </div>
+                <div class="p-table-wrap"><table class="p-table" aria-label="Coupons">
+                    <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min order</th><th>Max off</th><th>Uses</th><th>Per-user</th><th>Valid</th><th>Status</th><th></th></tr></thead>
+                    <tbody id="couponRows"><tr><td colspan="10">Loading…</td></tr></tbody>
+                </table></div>
+                <p style="margin-top:.8rem;color:var(--text-secondary);font-size:.82rem">Rules are enforced server-side by <code>validate_coupon</code> + checkout RPC — browser values are never trusted. Product/category scoping uses <code>product_ids</code> / <code>category_slugs</code>.</p>
+            </div>
+        </main>
+    </div>
+    <div class="p-dialog-overlay" id="couponDialog" hidden><div class="p-dialog" role="dialog" aria-modal="true" style="max-width:520px">
+        <h3 id="couponDlgTitle">New coupon</h3>
+        <p>Percentage or fixed discount with secure server-side validation.</p>
+        <div style="display:grid;gap:10px">
+            <label>Code <input id="cCode" placeholder="MEGA20" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <label>Type <select id="cType" style="width:100%;padding:10px;border-radius:10px"><option value="percentage">Percentage %</option><option value="fixed">Fixed amount</option></select></label>
+                <label>Value <input id="cValue" type="number" min="0" value="10" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <label>Min order <input id="cMin" type="number" min="0" value="0" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+                <label>Max discount (cap) <input id="cMax" type="number" min="0" placeholder="optional" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+                <label>Usage limit <input id="cLimit" type="number" min="0" placeholder="∞" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+                <label>Per-user limit <input id="cPerUser" type="number" min="0" placeholder="∞" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+                <label>Active <select id="cActive" style="width:100%;padding:10px;border-radius:10px"><option value="true">Yes</option><option value="false">No</option></select></label>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <label>Valid from <input id="cFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+                <label>Valid to <input id="cTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+            </div>
+            <label>Campaign <input id="cCampaign" placeholder="e.g. eid-sale" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)"></label>
+        </div>
+        <div class="p-dialog-actions" style="margin-top:1rem"><button class="p-btn" id="couponCancel">Cancel</button><button class="p-btn primary" id="couponSave">Save coupon</button></div>
+    </div></div>
+    <div id="toastContainer" class="toast-container"></div>
+    <script src="../js/supabase/supabase-config.js"></script>
+    <script src="../js/supabase/local-backend.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/admin-core.js"></script>
+    <script src="js/admin-main.js"></script>
+    <script src="js/page-coupons.js"></script>
+</body>
+</html>

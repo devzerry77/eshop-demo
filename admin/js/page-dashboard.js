@@ -10,10 +10,12 @@
         await admin.loadProducts();
         await admin.loadOrders();
         admin.renderStats();
+        if (admin.renderPremiumStats) admin.renderPremiumStats();
 
         DOM.refreshStats?.addEventListener("click", async () => {
             await Promise.all([admin.loadProducts(), admin.loadOrders(), admin.loadPaymentSettings()]);
             admin.renderStats();
+            if (admin.renderPremiumStats) admin.renderPremiumStats();
             showToast("Data refreshed.", "info");
         });
 
@@ -22,7 +24,10 @@
         });
 
         setInterval(() => {
-            if (STATE.loggedIn) admin.renderStats();
+            if (STATE.loggedIn) {
+                admin.renderStats();
+                if (admin.renderPremiumStats) admin.renderPremiumStats();
+            }
         }, 60000);
     });
 

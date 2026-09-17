@@ -12,6 +12,49 @@ import { createClient } from '../supabase/client.js';
     const MESSENGER_KEY = 'messenger_link';
     let messengerLink = localStorage.getItem('eshop_messenger_link') || '';
 
+    function loadDynamicChatbot() {
+        // Admin-editable via Settings → Chatbot (settings.chatbot_intro /
+        // settings.chatbot_options). Returns null when not configured so the
+        // built-in defaults below keep working as fallback.
+        try {
+            const introRaw = localStorage.getItem('eshop_chatbot_intro') || '';
+            const optsRaw = localStorage.getItem('eshop_chatbot_options') || '';
+            let intro = null, opts = null;
+            if (introRaw) {
+                const arr = JSON.parse(introRaw);
+                if (Array.isArray(arr) && arr.length) intro = arr.map(String);
+            }
+            if (optsRaw) {
+                const arr = JSON.parse(optsRaw);
+                if (Array.isArray(arr) && arr.length) {
+                    opts = arr.filter(o => o && o.key && o.label && o.reply);
+                    if (!opts.length) opts = null;
+                }
+            }
+            return { intro, opts };
+        } catch (_) { return { intro: null, opts: null }; }
+    }
+
+    async function refreshChatbotSettings() {
+        try {
+            const { createClient } = await import('../supabase/client.js');
+            const supabase = createClient();
+            if (!supabase) return;
+            const { data, error } = await supabase.from('settings').select('*')
+                .in('key', ['chatbot_intro', 'chatbot_options']);
+            if (error || !data) return;
+            data.forEach(row => {
+                try { localStorage.setItem('eshop_' + row.key, row.value || ''); } catch (_) { /* noop */ }
+            });
+            const dyn = loadDynamicChatbot();
+            if (dyn.intro) INTRO.length = 0, dyn.intro.forEach(t => INTRO.push(t));
+            if (dyn.opts) {
+                HELP_OPTIONS.length = 0;
+                dyn.opts.forEach(o => HELP_OPTIONS.push(o));
+            }
+        } catch (_) { /* keep cached values */ }
+    }
+
     const HELP_OPTIONS = [
         {
             key: 'product',
@@ -42,6 +85,13 @@ import { createClient } from '../supabase/client.js';
     ];
 
     function buildWidget() {
+        // Apply cached admin chatbot copy before first paint.
+        try {
+            const dyn = loadDynamicChatbot();
+            if (dyn.intro) { INTRO.length = 0; dyn.intro.forEach(t => INTRO.push(t)); }
+            if (dyn.opts) { HELP_OPTIONS.length = 0; dyn.opts.forEach(o => HELP_OPTIONS.push(o)); }
+        } catch (_) { /* use built-in defaults */ }
+        refreshChatbotSettings();
         const widget = document.createElement('div');
         widget.className = 'chatbot-widget';
         widget.id = 'chatbotWidget';

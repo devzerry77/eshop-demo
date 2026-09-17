@@ -23,8 +23,20 @@ function resolveKey() {
 }
 
 let client = null;
+let localClient = null;
 
 export function createClient() {
+    // ── DEMO MODE (Supabase frozen) ──────────────────────────
+    // Unless localStorage.eshop_backend is explicitly 'supabase',
+    // every call site gets the localStorage-backed emulator
+    // (js/supabase/local-backend.js) — zero network, same API.
+    try {
+        var backend = window.LocalBackend;
+        if (backend && backend.useLocal()) {
+            if (!localClient) localClient = backend.createClient();
+            return localClient;
+        }
+    } catch (_) { /* fall through to Supabase */ }
     if (client) return client;
     const url = resolveUrl();
     const key = resolveKey();

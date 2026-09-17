@@ -81,7 +81,17 @@ INSERT INTO public.settings (key, value) VALUES
     ('footer_note', '© 2026 E-Shop Demo · Demo portfolio project — no real orders are fulfilled.'),
     ('marquee_text', '🚚 Demo delivery on all orders &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🎁 Demo gift wrapping &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ↩️ 7-day easy return &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; 🔒 Secure checkout'),
     ('marquee_enabled', 'true'),
-    ('theme_preset', 'silver')
+    ('theme_preset', 'silver'),
+    -- 100% dynamic storefront (also seeded by dynamic-store.sql / eshop-demo-setup.sql)
+    ('shipping_free_above', '2000'),
+    ('shipping_cost', '100'),
+    ('currency_code', 'BDT'),
+    ('currency_symbol', '৳'),
+    ('logo_url', 'assets/logo.svg'),
+    ('footer_links', '{"policies":[{"label":"Privacy Policy","url":"#"},{"label":"Refund Policy","url":"#"},{"label":"Shipping Policy","url":"#"},{"label":"Terms of Service","url":"#"}],"about":[{"label":"Our Story","url":"about.html"},{"label":"Our Sustainability Approach","url":"about.html"},{"label":"About","url":"about.html"}],"connect":[{"label":"Contact Us","url":"#"},{"label":"Contact Information","url":"#"},{"label":"Email","url":"#"},{"label":"Regulatory Information","url":"#"}]}'),
+    ('about_content', '{"eyebrow":"About this demo","subtitle":"Quality demo products for everyday life.","notice":"This is a generic portfolio demo store — not a real business. Products, prices and reviews are sample data you can fully manage from the admin panel.","sections":[{"title":"What Is This?","body":"E-Shop Demo is a portfolio project showing a complete e-commerce front-end built with vanilla HTML, CSS and JavaScript, backed by Supabase for products, orders, coupons and site settings."},{"title":"Demo Notice","body":"No real orders are fulfilled and no real payments are processed. Sample data (including product images) is for demonstration only."}],"values":[{"icon":"🛍️","title":"Browse & Search","body":"Filter by category, sort, search and open product pages with galleries and reviews."},{"icon":"🧾","title":"Cart & Checkout","body":"Add items to the cart, apply a coupon and place a demo order with bKash, Nagad, Rocket or Cash on Delivery instructions."},{"icon":"📦","title":"Orders & Tracking","body":"Sign in to see your orders, follow their status and track delivery on the tracking page."},{"icon":"⚙️","title":"Admin Panel","body":"Open the admin panel to manage products, stock, orders, coupons, banners and theme — no code changes needed."}]}'),
+    ('chatbot_intro', '["Hi! 👋 Welcome to E-Shop Demo 🛍️ Great to have you here!","Hi, is delivery free on all gadgets? 🙂","Free delivery across Bangladesh above our threshold, plus 7-day easy returns! 🚚 Pick an option below for details 👇"]'),
+    ('chatbot_options', '[{"key":"product","label":"🛍️ Product Information","reply":"You can browse the full catalog to see the latest gadgets and deals. Use the search bar to find a specific product, open it, and check its photos, specifications and price. Need more details? Chat with us on Messenger anytime."},{"key":"order","label":"🚚 Order / Delivery Help","reply":"You can track your order on the My Orders or Order Tracking pages using your order number. We deliver across Bangladesh — free delivery above the free-delivery threshold, and 7-day easy returns."},{"key":"payment","label":"💳 Payment Help","reply":"We accept bKash, Nagad, Rocket, Upay, major cards and Cash on Delivery. Your chosen payment method is shown at checkout with full instructions to complete the payment."},{"key":"return","label":"↩️ Return / Refund","reply":"Every product comes with a 7-day easy return policy. If something is not right, reach out to us on Messenger with your order number and we will arrange a return or refund quickly."}]')
 ON CONFLICT (key) DO NOTHING;
 
 -- ══ 2. PRODUCTS ══
@@ -235,6 +245,7 @@ CREATE TABLE IF NOT EXISTS public.payment_settings (
     account_info jsonb NOT NULL DEFAULT '{}'::jsonb,
     instructions text NOT NULL DEFAULT '',
     qr_code_url text NOT NULL DEFAULT '',
+    logo_url text NOT NULL DEFAULT '',
     display_order integer NOT NULL DEFAULT 0
 );
 
@@ -969,6 +980,7 @@ DECLARE
     v_count integer := 0; v_total_qty integer := 0;
     v_subtotal numeric := 0; v_shipping numeric := 0;
     v_discount numeric := 0; v_fee numeric := 0; v_total numeric := 0;
+    v_free_above numeric := 2000; v_ship_cost numeric := 100;
     v_order_id public.orders.id%TYPE;
     v_order_number text;
     v_existing_id public.orders.id%TYPE;
@@ -1137,7 +1149,21 @@ BEGIN
     END IF;
 
     -- ── Shipping + total from server-side rules (never the browser) ──
-    v_shipping := CASE WHEN v_subtotal >= 2000 THEN 0 ELSE 100 END;
+    BEGIN
+        SELECT COALESCE(NULLIF(value, ''), '2000') INTO v_free_above
+        FROM public.settings WHERE key = 'shipping_free_above' LIMIT 1;
+        v_free_above := COALESCE(v_free_above::numeric, 2000);
+    EXCEPTION WHEN OTHERS THEN
+        v_free_above := 2000;
+    END;
+    BEGIN
+        SELECT COALESCE(NULLIF(value, ''), '100') INTO v_ship_cost
+        FROM public.settings WHERE key = 'shipping_cost' LIMIT 1;
+        v_ship_cost := COALESCE(v_ship_cost::numeric, 100);
+    EXCEPTION WHEN OTHERS THEN
+        v_ship_cost := 100;
+    END;
+    v_shipping := CASE WHEN v_subtotal >= v_free_above THEN 0 ELSE v_ship_cost END;
     v_total := GREATEST(round(v_subtotal + v_shipping + v_fee - v_discount, 2), 0);
 
     -- ── Unique order number (retry on the astronomically rare clash) ──
